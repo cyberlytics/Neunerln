@@ -1,0 +1,209 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%2345678901234567890123456789012345678901234567890123456789012345678901234567890
+%        1         2         3         4         5         6         7         8
+
+\documentclass[letterpaper, 10 pt, conference]{IEEEtran} 
+
+\IEEEoverridecommandlockouts
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[ngerman]{babel}
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+
+
+\title{\LARGE \bf Konzeptpapier: Neunerln}
+
+
+
+\author{Team Weiß}
+
+\begin{document}
+
+
+
+\maketitle
+\thispagestyle{empty}
+\pagestyle{empty}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{abstract}
+
+Ziel des Projektes ist eine Webanwendung, die es zwei oder mehr Spielern ermöglicht, online in einem Spiel Neunerln gegeninander anzutreten.
+
+\end{abstract}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Einleitung}
+
+Neunerln zählt zu den traditionellen Kartenspielen, die in Österreich und Bayern sehr beliebt sind. Das Spiel wird mit einem deutschen Blatt mit 36 Karten gespielt und eignet sich für zwei oder mehr Spieler. 
+
+Das Ziel des Spiels ist es, möglichst geschickt und schnell alle Handkarten abzuwerfen. Der anfangende Spieler wird per Zufall ermittelt und jeder Spieler erhält zunächst sechs Karten. Neunerln erinnert in seiner Spielweise an die bekannten Spiele Uno oder Mau Mau.
+
+Im rundenbasierten Verlauf des Spiels können die Spieler abwechselnd versuchen, Karten abzulegen. Hierbei dürfen nur Karten derselben Farbe oder Zahl auf den Ablagestapel gespielt werden, wobei für manche Karten besondere Regeln gelten:
+
+\begin{itemize}
+
+        \item ``7'': Der nächste Spieler muss zwei Karten vom Ziehstapel ziehen. Er kann allerdings selbst eine 7 auf die zuvor gespielte legen, um das Ziehergebnis um weitere zwei Karten zu erhöhen und an den nächsten Spieler weiterzugeben.
+        \item ``8'': Der nächste Spieler muss aussetzen und der darauffolgende Spieler kommt an die Reihe.
+        \item ``9'': Diese Karte darf auf jede Karte gelegt werden, unabhängig von Farbe oder Zahl. Der Spieler darf sich eine Farbe wünschen, welche als nächste Karte gespielt werden muss.
+        \item ``Ass'': Der Spieler ist direkt noch einmal am Zug.
+        
+\end{itemize}
+
+
+\section{Verwandte Arbeiten}
+
+\subsection{Mau-Mau}
+
+Mau-Mau ist ein Kartenspiel, das Neunerln in seinem Spielprinzip ähnelt. Beide Spiele nutzen ein Kartendeck, um Handkarten abzulegen und besondere Funktionen auszulösen. Während Neunerln mit einem deutschen Blatt gespielt wird, verwendet Mau-Mau ein französisches oder deutsches Blatt. Beide Spiele sind leicht zu erlernen und eignen sich für unterschiedliche Altersgruppen.
+
+\subsection{Uno}
+
+Uno ist ein international verbreitetes Kartenspiel, das Parallelen zu Neunerln aufweist. Beide Spiele verfolgen das Ziel, Handkarten loszuwerden, und nutzen Aktionskarten, um den Spielverlauf zu beeinflussen. Während Neunerln auf einem deutschen Blatt basiert, verwendet Uno ein spezielles Kartendeck.
+
+\subsection{Durak}
+
+Weiterhin soll das beliebte Handy-Spiel Durak eine Inspiration für die Gestaltung unserer Web-Applikation sein. Die Ansicht während eines Spiels soll dabei ähnlich gestaltet sein wie im folgenden Screenshot.
+\begin{center}
+   \includegraphics[width=0.35\textwidth]{durak}
+\end{center}
+
+
+
+\section{Anforderungen}
+
+Für die Projektarbeit haben wir uns fünf primäre Ziele gesetzt: (A) Ein Monorepo in GitLab, (B) die Cloudfähigkeit der Anwendung, (C) die Möglichkeit zur Registrierung und Anmeldung des Spielers, (D) die Multiplayer Funktionalität und (E) die Anzeige einer Rangliste der Spieler mit Win-Rate.
+\bigbreak
+Zwei optionale Ziele des Projekts sind (F) die Implementierung weitere Sonderkarten, sowie (G) die Möglichkeit, das Spiel in einer größeren Runde zu spielen mit bis zu vier Spielern.
+
+
+\subsection{Monorepo}
+
+Als Entwickler möchte ich ein Monorepo, um einen konsistenten Projektstand zu gewährleisten. Akzeptanzkriterien sind:
+
+\begin{itemize}
+
+   \item Backend- und Frontend-Code im Repository.
+   \item Kennzeichnung des neuen Codes in der Projektarbeit.
+   \item Konfigurierte und funktionierende Building-, Test- und Linting-Tools.
+   \item Gitlab-Pipeline für Linting- und Testing-Tools.
+   \item Anleitung zur lokalen Projekteinrichtung im Repository.
+   
+\end{itemize}
+
+%%%%%%%
+
+\subsection{Cloud-Fähigkeit}
+
+Als DevOps-Engineer möchte ich eine Cloud-kompatible Neunerln-Anwendung für problemlose Bereitstellung. Akzeptanzkriterien sind:
+
+\begin{itemize}
+
+   \item Konfigurierbares Backend mittels Umgebungsvariable.
+   \item Erreichbarkeit des Spiels in der Cloud.
+   
+\end{itemize}
+
+%%%%%%%
+
+\subsection{Registrierung und Anmeldung des Spielers} 
+
+Als Spieler möchte ich mich registrieren/anmelden können, um auf accountspezifische Daten zuzugreifen. Akzeptanzkriterien sind:
+
+\begin{itemize}
+
+   \item Anmeldung mit E-Mail oder Benutzername und Passwort.
+   \item Anmeldung über RESTful-API.
+   \item Implementierte Anmeldeansicht im Frontend.
+   \item Abmeldung über Sitzungsverwaltung.
+   
+\end{itemize}
+
+%%%%%%%
+
+\subsection{Multiplayer Funktionalität}
+
+Als Spieler möchte ich die Möglichkeit haben, online mit bis zu zwei (vier) Spielern in verschiedenen Räumen Neunerln zu spielen. Akzeptanzkriterien sind:
+
+\begin{itemize}
+
+\item Unterstützung von zwei (vier) Spielern pro Spielraum.
+\item Möglichkeit, einen öffentlichen Raum zu erstellen.
+\item Möglichkeit, offene Räume einzusehen und beizutreten.
+\item Synchronisierung des Spielzustands zwischen den Spielern in Echtzeit.
+\item Anzeige von Benutzernamen und Spielstatus (z.B. verbleibende Karten) der anderen Spieler während des Spiels.
+
+
+\end{itemize}
+
+%%%%%%%
+
+\subsection{Anzeige einer Rangliste}
+
+Als Spieler möchte ich eine Rangliste zum Vergleich mit anderen Spielern sehen. Akzeptanzkriterien sind:
+
+\begin{itemize}
+
+\item Implementierte Rangliste im Frontend.
+\item Sortierung nach gewonnenen Spielen.
+\item Fixierte Anzeige des eigenen Ranglisteneintrags.
+\item Datenabfrage über RESTful-API.
+
+
+\end{itemize}
+
+%%%%%%%
+
+\subsection{Implementierung weiterer Sonderkarten}
+
+Als Spieler möchte ich ein spannenderes Spielerlebnis mit zusätzlichen Sonderkarten. Weitere Ideen sind:
+
+\begin{itemize}
+
+\item	10: Nach Legen der Karte, darf sich der Spieler eine weitere seiner Handkarten aussuchen und diese verdeckt einem anderen Spieler geben.
+\item	Herz König: Der nächste Spieler muss vier Karten ziehen.
+
+\end{itemize}
+
+%%%%%%%
+
+\subsection{Spiel in größerer Runde}
+
+Als Spieler möchte ich nicht nur gegen einen Gegner spielen, sondern in einer größeren Runde mit bis zu vier Spielern zusammen spielen. Akzeptanzkriterien sind:
+
+\begin{itemize}
+
+\item	Die Multiplayer Funktionalität wird auf vier Spieler ausgeweitet.
+
+\end{itemize}
+
+
+\section{Methode}
+
+Für die Projektarbeit haben wir uns für den MEVN-Stack entschieden. Durch die Verwendung von TypeScript, ein Superset von JavaScript, sollen potenzielle Fehler frühzeitig erkannt werden. Außerdem soll die Codequalität und -wartbarkeit durch Typescript verbessert werden.
+
+Die Interaktion zwischen Frontend und Backend erfolgt über eine RESTful-Schnittstelle. Die API wird mit der Spezifikation von OpenAPI 3.0 dokumentiert.
+
+Alle Tests werden mithilfe des Frameworks Jest programmiert. Jest wird hauptsächlich für das Testen von JavaScript- und TypeScript Code verwendet.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Motiviation}
+
+Unsere Motivation für diese Projektarbeit beruht darauf, dass es bislang keine Webanwendung gibt, mit der man das Spiel Neunerln online spielen kann.
+
+Zwar gibt es ähnliche Spiele wie Uno oder Mau Mau, aber Neunerln wird bisher nicht digital angeboten.
+
+Daher haben wir beschlossen, diese Lücke zu schließen und eine eigene Webanwendung zu entwickeln.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\end{document}
