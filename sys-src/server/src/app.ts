@@ -2,6 +2,15 @@ import express from 'express'
 import 'express-async-errors'
 import cookieSession from 'cookie-session'
 
+// errors
+import { NotFoundError } from './errors/not-found-error'
+
+// middlewares
+import { errorHandler } from './middlewares/error-handler'
+
+// routes
+import test from './routes/test'
+
 // create server
 const app = express()
 
@@ -25,9 +34,14 @@ app.use(
 /**
  * Here are the primary routes of the app
  */
+app.use(test)
+app.all('*', async () => {
+  throw new NotFoundError()
+})
 
 /**
  * Error handling
  */
+app.use(errorHandler)
 
 export { app }
