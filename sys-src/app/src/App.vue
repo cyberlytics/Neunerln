@@ -12,7 +12,7 @@ onMounted(()=>{
     const res = await axios.get("http://localhost:3000/api/test")
     const s =  res.data.user
   users.value.push(...s)
-    console.log(users)
+    // console.log(users)
 
   }
 
@@ -22,7 +22,7 @@ onMounted(()=>{
 </script>
 
 <template>
-  <header>
+  <!-- <header>
     <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
 
     <div class="wrapper">
@@ -37,7 +37,7 @@ onMounted(()=>{
         <RouterLink to="/about">About</RouterLink>
       </nav>
     </div>
-  </header>
+  </header> -->
 
   <RouterView />
 </template>
