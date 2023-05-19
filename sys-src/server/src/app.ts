@@ -12,7 +12,7 @@ import { errorHandler } from './middlewares/error-handler'
 import test from './routes/test'
 
 // create server
-const app = express()
+const server = express()
 
 /**
  * The code below will configure
@@ -21,9 +21,9 @@ const app = express()
 
 // app.set('trust proxy', true) only necessary if server sits behind a proxy
 
-app.use(express.json()) // parse body
+server.use(express.json()) // parse body
 
-app.use(
+server.use(
   cookieSession({
     // store session data within a cookie
     signed: false,
@@ -34,14 +34,18 @@ app.use(
 /**
  * Here are the primary routes of the app
  */
-app.use(test)
-app.all('*', async () => {
+server.use(test)
+server.all('*', async () => {
   throw new NotFoundError()
 })
 
 /**
  * Error handling
  */
-app.use(errorHandler)
+server.use(errorHandler)
+
+// don't know if this breaks functionality above,
+// but socket.io requires http module
+const app = require('http').Server(server);
 
 export { app }

@@ -1,8 +1,13 @@
 import { app } from './app'
+import { SocketManager } from './services/socketManager';
 
 const start = async () => {
   try {
     // connect to database here
+
+    // initialize SocketManager
+    const socketManager = new SocketManager();
+    socketManager.subscribe();
   } catch (err) {
     // close server
     app.close(() => {
