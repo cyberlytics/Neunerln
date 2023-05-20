@@ -1,14 +1,14 @@
 import { app } from './app'
+import mongoose from 'mongoose'
 
 const start = async () => {
   try {
     // connect to database here
+    await mongoose.connect(
+      "mongodb+srv://Admin:ebewnO8vJqdoKnVp@neunerln.hipwzzh.mongodb.net/?retryWrites=true&w=majority"
+    );
   } catch (err) {
-    // close server
-    app.close(() => {
-      console.error(err)
-      process.exit(0)
-    })
+    console.error(err)
   }
 
   app.listen(3000, () => {
