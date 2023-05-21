@@ -1,21 +1,56 @@
 <template>
   <div>
     <h3>{{ userName }}</h3>
-    <hr><br>
+    <hr />
+    <br />
 
     <h2>Create</h2>
 
     <div>special cards: {{ specialCards }}</div>
-    <input type="checkbox" id="seven" value="seven" v-model="specialCards">
+    <div class="specCards">
+      <div class="specCard">
+        <CardFront
+          value="7"
+          descrip="Der nächste Spieler muss zwei Karten vom Ziehstapel ziehen. Er kann allerdings selbst eine 7 auf die zuvor Gespielte legen."
+        />
+        <input type="checkbox" id="seven" value="seven" v-model="specialCards" />
+      </div>
+      <div class="specCard">
+        <CardFront
+          value="8"
+          descrip="Der nächste Spieler muss aussetzen und der darauffolgende Spieler kommt an die Reihe."
+        />
+        <input type="checkbox" id="eight" value="eight" v-model="specialCards" />
+      </div>
+      <div class="specCard">
+        <CardFront
+          value="9"
+          descrip="Diese Karte darf auf jede Karte gelegt werden, unabhängig von Farbe oder Zahl. Der Spieler darf sich eine Farbe wünschen."
+        />
+        <input type="checkbox" id="nine" value="nine" v-model="specialCards" />
+      </div>
+      <div class="specCard">
+        <CardFront
+          value="10"
+          descrip="Der Spieler darf eine Karte verdeckt an einen Mitspieler weitergeben, der diese aufnehmen muss."
+        />
+        <input type="checkbox" id="ten" value="ten" v-model="specialCards" />
+      </div>
+      <div class="specCard">
+        <CardFront value="A" descrip="Der Spieler ist direkt noch einmal an der Reihe." />
+        <input type="checkbox" id="ace" value="ace" v-model="specialCards" />
+      </div>
+    </div>
+    <!-- <input type="checkbox" id="seven" value="seven" v-model="specialCards" />
     <label for="seven">7</label>
-    <input type="checkbox" id="eight" value="eight" v-model="specialCards">
+    <input type="checkbox" id="eight" value="eight" v-model="specialCards" />
     <label for="eight">8</label>
-    <input type="checkbox" id="nine" value="nine" v-model="specialCards">
+    <input type="checkbox" id="nine" value="nine" v-model="specialCards" />
     <label for="nine">9</label>
-    <input type="checkbox" id="ten" value="ten" v-model="specialCards">
+    <input type="checkbox" id="ten" value="ten" v-model="specialCards" />
     <label for="ten">10</label>
-    <input type="checkbox" id="ace" value="ace" v-model="specialCards">
-    <label for="ace">ace</label>
+    <input type="checkbox" id="ace" value="ace" v-model="specialCards" />
+    <label for="ace">ace</label> -->
     <!-- <br><br> -->
 
     <div>players: {{ maxPlayers }}</div>
@@ -26,13 +61,13 @@
     <input type="radio" id="four" value="4" v-model="maxPlayers" />
     <label for="four">4</label>
 
-    <br>
+    <br />
     <button @click="createRoom()">Create room</button>
 
-    <br><br>
+    <br /><br />
     <!-- <hr> -->
-    <br>
-    
+    <br />
+
     <h2>Open Rooms</h2>
     <ul>
       <li v-for="room in props.rooms" :key="room.id">
@@ -44,28 +79,38 @@
     </ul>
   </div>
 </template>
-  
+
 <script setup lang="ts">
 //#region imports
-import type { PublicRoomData } from '@/types/publicRoomData';
-import { ref } from 'vue';
+import type { PublicRoomData } from '@/types/publicRoomData'
+import CardFront from '../game/CardFront.vue'
+import { ref } from 'vue'
 //#endregion imports
 
-const specialCards = ref(["seven", "eight", "nine", "ten", "ace"]);
-const maxPlayers = ref(2);
+const specialCards = ref(['seven', 'eight', 'nine', 'ten', 'ace'])
+const maxPlayers = ref(2)
 
 const props = defineProps({
   rooms: Array<PublicRoomData>,
   userName: String
-});
-const emit = defineEmits(['createRoom', 'joinRoom']);
-
+})
+const emit = defineEmits(['createRoom', 'joinRoom'])
 
 function createRoom() {
-  emit('createRoom', specialCards.value, maxPlayers.value);
+  emit('createRoom', specialCards.value, maxPlayers.value)
 }
 
 function joinRoom(roomId: string) {
-  emit('joinRoom', roomId);
+  emit('joinRoom', roomId)
 }
 </script>
+
+<style scoped>
+.specCards {
+  display: flex;
+  text-align: center;
+}
+.specCard {
+  margin-right: 1em;
+}
+</style>
