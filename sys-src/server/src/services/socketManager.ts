@@ -5,107 +5,132 @@ import { PublicRoomData } from "../types/publicRoomData";
 import { SocketRoom } from "../types/socketRoom";
 import { Room } from "./room";
 
-
 export class SocketManager {
   // logging
   userConnectionLog = false;
   roomUpdateLog = true;
-    
+  
   io = require('socket.io')(app, {
     cors: {
       origin: "*"
     }
   });
-  
   rooms: Room[] = [];
-
-  subscribe() {
+  
+  initialize() {
     this.io.on(SocketRoom.onConnection, (socket: any) => {
-      if (this.userConnectionLog) {
-        console.log(`Client ${socket.id} connected. (${this.io.engine.clientsCount})`);
-      }
+      this.connectUser(socket);
+    });
+
+    return this;
+  }
+
+  connectUser(socket: any) {
+    // send rooms to new client
+    socket.emit(SocketRoom.publishOpenRooms, this.getLobbyData());
+      
+    socket.on(SocketRoom.onCreateRoom, (userName: string, specialCards: string[], maxPlayers: number) => {
+      this.createRoom(socket.id, userName, specialCards, maxPlayers);
+    });
+
+    socket.on(SocketRoom.onJoinRoom, (roomId: string, userName: string) => {
+      this.joinRoom(socket, roomId, userName);
+    });
+
+    socket.on(SocketRoom.requestHandCards, (roomId: string) => {
+      this.sendHandCards(socket, roomId);
+      
+    });
+
+    socket.on(SocketRoom.onDisconnect, () => {
+      this.disconnectUser(socket.id);
+    });
+
+    if (this.userConnectionLog) {
+      console.log(`Client ${socket.id} connected. (${this.io.engine.clientsCount})`);
+    }
+  }
+
+  disconnectUser(userId: string) {
+    // find joined game
+    let joinedRoom = this.rooms.filter(room => room.players.some((player: Player) => player.id == userId))[0];
+    if (!joinedRoom) {
+      return;
+    }
+
+    // leave joined games
+    joinedRoom.players = joinedRoom.players.filter((player: Player) => player.id != userId);
+
+    // close room if empty
+    if (joinedRoom.players.length == 0) {
+      this.rooms = this.rooms.filter(room => room.id != joinedRoom.id);
+    }
+
+    // update lobby data
+    this.io.emit(SocketRoom.publishOpenRooms, this.getLobbyData());
+
+    if (this.userConnectionLog) {
+      console.log(`Client ${userId} disconnected. (${this.io.engine.clientsCount})`);
+    }
+  }
   
-      // send rooms to new client
-      socket.emit(SocketRoom.publishOpenRooms, this.getLobbyData());
-  
-      socket.on(SocketRoom.onCreateRoom, (userName: string, specialCards: string[], maxPlayers: number) => {
-        const newRoom: Room = new Room(
-          socket.id,
-          `Room of ${userName}`,
-          specialCards,
-          maxPlayers
-        );
-        this.rooms.push(newRoom);
-        this.io.emit(SocketRoom.publishOpenRooms, this.getLobbyData());
-  
-        this.LogRooms();
-      });
-  
-      socket.on(SocketRoom.onJoinRoom, (roomId: string, userName: string) => {
-        const room = this.rooms.find((room) => room.id == roomId);
-        if (!room) {
+  createRoom(userId: string, userName: string, specialCards: string[], maxPlayers: number) {
+    const newRoom: Room = new Room(
+      userId,
+      `Room of ${userName}`,
+      specialCards,
+      maxPlayers
+    );
+    this.rooms.push(newRoom);
+    this.io.emit(SocketRoom.publishOpenRooms, this.getLobbyData());
+
+    this.LogRooms();
+  }
+
+  joinRoom(socket: any, roomId: string, userName: string) {
+    const room = this.rooms.find((room) => room.id == roomId);
+        if (!room
+          || room.ingame) {
           return;
         }
-  
-        if (room.ingame) {
-          return;
-        }
-  
+
+        // add and subscribe player to room
         room.players.push(new Player(socket.id, userName));
         socket.join(room.id);
-        // this.io.to(room.id).emit(SocketRoom.onRoomJoined, userName);
   
+        // start game if full
         if (room.isFull()) {
           room.startGame();
+          this.io.to(room.id).emit(SocketRoom.onStartGame);
         }
 
+        // update lobby rooms
         this.io.emit(SocketRoom.publishOpenRooms, this.getLobbyData());
-        this.io.to(room.id).emit(SocketRoom.onStartGame);
   
-        var cardsPerPlayer: { [userName: string]: number; } = {};
-        room.players.forEach((player) => {
-          cardsPerPlayer[player.name] = player.handCards.length;
-        });
-        this.io.to(room.id).emit(SocketRoom.getGameMetadata, new PublicGameMetadata(
+        // get new game data
+        const cardsPerPlayer = room.players.reduce((result, player) => {
+          result[player.name] = player.handCards.length;
+          return result;
+        }, {} as { [userName: string]: number; });
+        const gameMetadata = new PublicGameMetadata(
           cardsPerPlayer,
           room.drawPile.length,
           room.discardPile,
           room.players.map((player) => player.name),
           room.currentPlayer?.name
-        ));
-      });
-  
-      socket.on(SocketRoom.requestHandCards, (roomId: string) => {
-        var correspondingRoom = this.rooms.find((room) => room.id == roomId);
-        var handCards = correspondingRoom?.players.find((player) => player.id == socket.id)?.handCards;
-        socket.emit(SocketRoom.getHandCards, handCards);
-      });
-  
-      socket.on(SocketRoom.onDisconnect, () => {
-        let playerId = socket.id;
-  
-        // find joined game
-        let joinedRoom = this.rooms.filter(room => room.players.some((player: Player) => player.id == playerId))[0];
-        if (!joinedRoom) {
-          return;
-        }
-  
-        // leave joined games
-        joinedRoom.players = joinedRoom.players.filter((player: Player) => player.id != playerId);
-  
-        // close room if empty
-        if (joinedRoom.players.length == 0) {
-          this.rooms = this.rooms.filter(room => room.id != joinedRoom.id);
-  
-        }
-  
-        this.io.emit(SocketRoom.publishOpenRooms, this.getLobbyData());
-  
-        if (this.userConnectionLog) {
-          console.log(`Client ${socket.id} disconnected. (${this.io.engine.clientsCount})`);
-        }
-      });
-    });
+        )
+
+        // update room members with new game data
+        this.io.to(room.id).emit(SocketRoom.getGameMetadata, gameMetadata);
+  }
+
+  sendHandCards(socket: any, roomId: string) {
+    // get user's handcards
+    var correspondingRoom = this.rooms.find((room) => room.id == roomId);
+    var handCards = correspondingRoom?.players.find((player) => player.id == socket.id)?.handCards;
+
+    // send back to user
+    socket.emit(SocketRoom.getHandCards, handCards);
   }
 
   getLobbyData() {

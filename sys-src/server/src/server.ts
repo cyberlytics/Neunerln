@@ -6,8 +6,7 @@ const start = async () => {
     // connect to database here
 
     // initialize SocketManager
-    const socketManager = new SocketManager();
-    socketManager.subscribe();
+    new SocketManager().initialize();
   } catch (err) {
     // close server
     app.close(() => {
