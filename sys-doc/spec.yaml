@@ -25,18 +25,20 @@ externalDocs:
 servers:
   - url: https://petstore3.swagger.io/api/v3
 tags:
-  - name: pet
-    description: Everything about your Pets
-    externalDocs:
-      description: Find out more
-      url: http://swagger.io
-  - name: store
-    description: Access to Petstore orders
-    externalDocs:
-      description: Find out more about our store
-      url: http://swagger.io
-  - name: user
-    description: Operations about user
+  - name: users
+    description: Everything about user
+  - name: auth
+    description: Everything about Signing in
+  - name: rooms
+    description: Everything about Rooms
+  - name: rules
+    description: Everything about creating and changing Rules
+  - name: cards
+    description: Everything about creating the Card Deck and hand
+  - name: ranking
+    description: Everything about creating and displaying Rankings
+  - name: turn
+    description: Everything about creating and displaying Player Turns
 paths:
   /auth/signup:
     post:
@@ -103,304 +105,296 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /pet/findByTags:
-    get:
+  /rooms:
+    post:
       tags:
-        - pet
-      summary: Finds Pets by tags
-      description: Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
-      operationId: findPetsByTags
-      parameters:
-        - name: tags
-          in: query
-          description: Tags to filter by
-          required: false
-          explode: true
-          schema:
-            type: array
-            items:
-              type: string
+        - rooms
+      summary: Room creation
+      description: create a new Room
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                host:
+                  $ref: "#/components/schemas/User/properties/username"
+                size:
+                  $ref: "#/components/schemas/Room/properties/size"
       responses:
         "200":
-          description: successful operation
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+        "400":
+          description: Invalid Input supplied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    get:
+      tags:
+        - rooms
+      summary: retrieve Rooms
+      description: get a list of all created Rooms
+      responses:
+        "200":
+          description: Successful operation
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Pet"
-            application/xml:
+                  $ref: "#/components/schemas/Room"
+  /rooms/{roomId}:
+    delete:
+      tags:
+        - rooms
+      summary: delete a Room
+      description: deletes a specific existing Room
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Room deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+        "400":
+          description: Room not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      tags:
+        - rooms
+      summary: update a Room
+      description: updates a specific existing Room
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Room updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+        "400":
+          description: Room not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /rooms/{roomId}/rules:
+    post:
+      tags:
+        - rules
+      summary: Rule creation
+      description: create a Rule for a specific Room
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Rule"
+      responses:
+        "200":
+          description: Rule created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rule"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Room not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      tags:
+        - rules
+      summary: Rule update
+      description: update a Rule for a specific Room
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Rule"
+      responses:
+        "200":
+          description: Rule updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rule"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Room not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    get:
+      tags:
+        - rules
+      summary: get Rules
+      description: retrieve all Rules for a specific Room
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Rule"
+      responses:
+        "200":
+          description: Rules retrieved
+          content:
+            application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Pet"
-        "400":
-          description: Invalid tag value
-      security:
-        - petstore_auth:
-            - write:pets
-            - read:pets
-  /pet/{petId}:
-    get:
-      tags:
-        - pet
-      summary: Find pet by ID
-      description: Returns a single pet
-      operationId: getPetById
-      parameters:
-        - name: petId
-          in: path
-          description: ID of pet to return
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "200":
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Pet"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/Pet"
-        "400":
-          description: Invalid ID supplied
+                  $ref: "#/components/schemas/Rule"
         "404":
-          description: Pet not found
-      security:
-        - api_key: []
-        - petstore_auth:
-            - write:pets
-            - read:pets
-    post:
-      tags:
-        - pet
-      summary: Updates a pet in the store with form data
-      description: ""
-      operationId: updatePetWithForm
-      parameters:
-        - name: petId
-          in: path
-          description: ID of pet that needs to be updated
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: name
-          in: query
-          description: Name of pet that needs to be updated
-          schema:
-            type: string
-        - name: status
-          in: query
-          description: Status of pet that needs to be updated
-          schema:
-            type: string
-      responses:
-        "405":
-          description: Invalid input
-      security:
-        - petstore_auth:
-            - write:pets
-            - read:pets
-    delete:
-      tags:
-        - pet
-      summary: Deletes a pet
-      description: delete a pet
-      operationId: deletePet
-      parameters:
-        - name: api_key
-          in: header
-          description: ""
-          required: false
-          schema:
-            type: string
-        - name: petId
-          in: path
-          description: Pet id to delete
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "400":
-          description: Invalid pet value
-      security:
-        - petstore_auth:
-            - write:pets
-            - read:pets
-  /pet/{petId}/uploadImage:
-    post:
-      tags:
-        - pet
-      summary: uploads an image
-      description: ""
-      operationId: uploadFile
-      parameters:
-        - name: petId
-          in: path
-          description: ID of pet to update
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: additionalMetadata
-          in: query
-          description: Additional Metadata
-          required: false
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/octet-stream:
-            schema:
-              type: string
-              format: binary
-      responses:
-        "200":
-          description: successful operation
+          description: Room not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponse"
-      security:
-        - petstore_auth:
-            - write:pets
-            - read:pets
-  /store/inventory:
-    get:
-      tags:
-        - store
-      summary: Returns pet inventories by status
-      description: Returns a map of status codes to quantities
-      operationId: getInventory
-      responses:
-        "200":
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: object
-                additionalProperties:
-                  type: integer
-                  format: int32
-      security:
-        - api_key: []
-  /store/order:
+                $ref: "#/components/schemas/Error"
+  /rooms/{roomId}/cards:
     post:
       tags:
-        - store
-      summary: Place an order for a pet
-      description: Place a new order in the store
-      operationId: placeOrder
+        - cards
+      summary: Card deck creation
+      description: create a Card deck for a specific Room
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Order"
-          application/xml:
-            schema:
-              $ref: "#/components/schemas/Order"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/Order"
+              type: array
+              minItems: 36
+              maxItems: 36
+              items:
+                $ref: "#/components/schemas/Card"
+              uniqueItems: true
       responses:
         "200":
-          description: successful operation
+          description: Card deck created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Order"
-        "405":
-          description: Invalid input
-  /store/order/{orderId}:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Card"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Room not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /rooms/{roomId}/users:
     get:
       tags:
-        - store
-      summary: Find purchase order by ID
-      description: For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.
-      operationId: getOrderById
+        - users
+      summary: retrieve Users
+      description: retrieve all Users of specific Room
       parameters:
-        - name: orderId
+        - name: roomId
           in: path
-          description: ID of order that needs to be fetched
           required: true
           schema:
             type: integer
-            format: int64
       responses:
         "200":
-          description: successful operation
+          description: Users retrieved
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Order"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/Order"
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
         "400":
-          description: Invalid ID supplied
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         "404":
-          description: Order not found
-    delete:
+          description: Room not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
       tags:
-        - store
-      summary: Delete purchase order by ID
-      description: For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors
-      operationId: deleteOrder
+        - users
+      summary: update Users
+      description: update Users of specific Room
       parameters:
-        - name: orderId
+        - name: roomId
           in: path
-          description: ID of the order that needs to be deleted
           required: true
           schema:
             type: integer
-            format: int64
-      responses:
-        "400":
-          description: Invalid ID supplied
-        "404":
-          description: Order not found
-  /user:
-    post:
-      tags:
-        - user
-      summary: Create user
-      description: This can only be done by the logged in user.
-      operationId: createUser
       requestBody:
-        description: Created user object
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/User"
-          application/xml:
-            schema:
-              $ref: "#/components/schemas/User"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/User"
-      responses:
-        default:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/User"
-  /user/createWithList:
-    post:
-      tags:
-        - user
-      summary: Creates list of users with given input array
-      description: Creates list of users with given input array
-      operationId: createUsersWithListInput
-      requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -409,224 +403,339 @@ paths:
                 $ref: "#/components/schemas/User"
       responses:
         "200":
-          description: Successful operation
+          description: Users updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/User"
-        default:
-          description: successful operation
-  /user/login:
-    get:
-      tags:
-        - user
-      summary: Logs user into the system
-      description: ""
-      operationId: loginUser
-      parameters:
-        - name: username
-          in: query
-          description: The user name for login
-          required: false
-          schema:
-            type: string
-        - name: password
-          in: query
-          description: The password for login in clear text
-          required: false
-          schema:
-            type: string
-      responses:
-        "200":
-          description: successful operation
-          headers:
-            X-Rate-Limit:
-              description: calls per hour allowed by the user
-              schema:
-                type: integer
-                format: int32
-            X-Expires-After:
-              description: date in UTC when token expires
-              schema:
-                type: string
-                format: date-time
-          content:
-            application/xml:
-              schema:
-                type: string
-            application/json:
-              schema:
-                type: string
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
         "400":
-          description: Invalid username/password supplied
-  /user/logout:
-    get:
-      tags:
-        - user
-      summary: Logs out current logged in user session
-      description: ""
-      operationId: logoutUser
-      parameters: []
-      responses:
-        default:
-          description: successful operation
-  /user/{username}:
-    get:
-      tags:
-        - user
-      summary: Get user by user name
-      description: ""
-      operationId: getUserByName
-      parameters:
-        - name: username
-          in: path
-          description: "The name that needs to be fetched. Use user1 for testing. "
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: successful operation
+          description: Bad Request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
-            application/xml:
-              schema:
-                $ref: "#/components/schemas/User"
-        "400":
-          description: Invalid username supplied
+                $ref: "#/components/schemas/Error"
         "404":
-          description: User not found
-    put:
+          description: Room not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /rooms/{roomId}/users/{userId}/cards:
+    post:
       tags:
-        - user
-      summary: Update user
-      description: This can only be done by the logged in user.
-      operationId: updateUser
+        - cards
+      summary: user Card "hand" creation
+      description: create a Card hand for a specific User in a specific Room
       parameters:
-        - name: username
+        - name: roomId
           in: path
-          description: name that need to be deleted
           required: true
           schema:
-            type: string
+            type: integer
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
       requestBody:
-        description: Update an existent user in the store
+        required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/User"
-          application/xml:
-            schema:
-              $ref: "#/components/schemas/User"
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: "#/components/schemas/User"
+              type: array
+              minItems: 6
+              maxItems: 6
+              items:
+                $ref: "#/components/schemas/Card"
+              uniqueItems: true
       responses:
-        default:
-          description: successful operation
-    delete:
+        "200":
+          description: Card hand created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Card"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Room not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
       tags:
-        - user
-      summary: Delete user
-      description: This can only be done by the logged in user.
-      operationId: deleteUser
+        - cards
+      summary: update Card "hand"
+      description: update a Card hand for a specific User in a specific Room
       parameters:
-        - name: username
+        - name: roomId
           in: path
-          description: The name that needs to be deleted
           required: true
           schema:
-            type: string
+            type: integer
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/Card"
+              uniqueItems: true
       responses:
+        "200":
+          description: Card hand updated
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Card"
         "400":
-          description: Invalid username supplied
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Room not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /rankings/{userId}:
+    post:
+      tags:
+        - ranking
+      summary: create Ranking
+      description: create user specific Ranking
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: integer
+      responses:
+        "200":
+          description: Ranking created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Ranking"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         "404":
           description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      tags:
+        - ranking
+      summary: delete Ranking
+      description: delete a Ranking for a specific User
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Ranking deleted
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    get:
+      tags:
+        - ranking
+      summary: retrieve Ranking
+      description: retrieve a Ranking for a specific User
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Ranking retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ranking"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /rankings:
+    get:
+      tags:
+        - ranking
+      summary: retrieve Ranking
+      description: retrieve all Rankings of all Users
+      responses:
+        "200":
+          description: Rankings retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Ranking"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /rooms/{roomId}/user/{userId}/moves:
+    post:
+      tags:
+        - turn
+      summary: create turn
+      description: create a User specific Turn in a Room
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Turn"
+      responses:
+        "200":
+          description: Turn created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Turn"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /rooms/{roomId}/moves:
+    get:
+      tags:
+        - turn
+      summary: retrieve Turn
+      description: retrieve all Turns of a specific Room
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Turns retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Turn"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 components:
   schemas:
-    Order:
+    Room:
       type: object
       properties:
         id:
           type: integer
           format: int64
-          example: 10
-        petId:
+        size:
           type: integer
-          format: int64
-          example: 198772
-        quantity:
-          type: integer
-          format: int32
-          example: 7
-        shipDate:
-          type: string
-          format: date-time
-        status:
-          type: string
-          description: Order Status
-          example: approved
-          enum:
-            - placed
-            - approved
-            - delivered
-        complete:
-          type: boolean
-      xml:
-        name: order
-    Customer:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          example: 100000
-        username:
-          type: string
-          example: fehguy
-        address:
+          minimum: 2
+          maximum: 4
+        users:
           type: array
-          xml:
-            name: addresses
-            wrapped: true
+          minItems: 2
+          maxItems: 4
           items:
-            $ref: "#/components/schemas/Address"
-      xml:
-        name: customer
-    Address:
-      type: object
-      properties:
-        street:
-          type: string
-          example: 437 Lytton
-        city:
-          type: string
-          example: Palo Alto
-        state:
-          type: string
-          example: CA
-        zip:
-          type: string
-          example: "94301"
-      xml:
-        name: address
-    Category:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          example: 1
-        name:
-          type: string
-          example: Dogs
-      xml:
-        name: category
+            $ref: "#/components/schemas/User"
+        rules:
+          type: array
+          items:
+            $ref: "#/components/schemas/Rule"
     User:
       type: object
       required:
@@ -649,9 +758,7 @@ components:
           type: string
           example: "Aa345678"
           description: "Pattern for atleast one uppercase, one lowercase and one digit. Min 8 Max 64 characters"
-      xml:
-        name: user
-    Tag:
+    Rule:
       type: object
       properties:
         id:
@@ -659,8 +766,38 @@ components:
           format: int64
         name:
           type: string
-      xml:
-        name: tag
+        checked:
+          type: boolean
+    Card:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        farbe:
+          type: string
+        augen:
+          type: string
+    Ranking:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        wins:
+          type: integer
+        User:
+          $ref: "#/components/schemas/User/properties/username"
+    Turn:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        Card:
+          $ref: "#/components/schemas/Card"
+        User:
+          $ref: "#/components/schemas/User/properties/username"
     Response:
       type: object
       properties:
@@ -700,84 +837,3 @@ components:
                       type: integer
                   suggested_application_actions:
                     type: string
-    Pet:
-      required:
-        - name
-        - photoUrls
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-          example: 10
-        name:
-          type: string
-          example: doggie
-        category:
-          $ref: "#/components/schemas/Category"
-        photoUrls:
-          type: array
-          xml:
-            wrapped: true
-          items:
-            type: string
-            xml:
-              name: photoUrl
-        tags:
-          type: array
-          xml:
-            wrapped: true
-          items:
-            $ref: "#/components/schemas/Tag"
-        status:
-          type: string
-          description: pet status in the store
-          enum:
-            - available
-            - pending
-            - sold
-      xml:
-        name: pet
-    ApiResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-          format: int32
-        type:
-          type: string
-        message:
-          type: string
-      xml:
-        name: "##default"
-  requestBodies:
-    Pet:
-      description: Pet object that needs to be added to the store
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Pet"
-        application/xml:
-          schema:
-            $ref: "#/components/schemas/Pet"
-    UserArray:
-      description: List of user object
-      content:
-        application/json:
-          schema:
-            type: array
-            items:
-              $ref: "#/components/schemas/User"
-  securitySchemes:
-    petstore_auth:
-      type: oauth2
-      flows:
-        implicit:
-          authorizationUrl: https://petstore3.swagger.io/oauth/authorize
-          scopes:
-            write:pets: modify pets in your account
-            read:pets: read your pets
-    api_key:
-      type: apiKey
-      name: api_key
-      in: header
