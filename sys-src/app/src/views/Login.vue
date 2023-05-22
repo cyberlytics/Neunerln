@@ -1,3 +1,19 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const loginButton = ref('Login')
+const showLoginParts = ref(true)
+
+function login() {
+  //check with Database for user with password check
+}
+
+function register() {
+  loginButton.value = 'Register'
+  showLoginParts.value = !showLoginParts.value
+}
+</script>
+
 <template>
   <head> </head>
 
@@ -7,13 +23,13 @@
         <td colspan="2"><div class="heading">Login</div></td>
       </tr>
       <tr>
-        <td><label for="benutzername"></label> Benutzername</td>
+        <td><label for="benutzername">Benutzername</label></td>
         <td>
           <input
             id="benutzername"
             class="inputField"
             type="text"
-            placeholder="NeunerlnGeed2000"
+            placeholder="NeunerlnGeek2000"
             required
           />
         </td>
@@ -21,27 +37,37 @@
       <tr>
         <td><label for="password">Password</label></td>
         <td>
-          <input
-            id="password"
-            class="inputField"
-            type="password"
-            placeholder="Over9000"
-            required
-          />
+          <input id="password" class="inputField" type="password" placeholder="Over9000" required />
+        </td>
+      </tr>
+      <tr v-if="!showLoginParts">
+        <td><label for="password">Password bestätigen</label></td>
+        <td>
+          <input id="password" class="inputField" type="password" placeholder="Over9000" required />
         </td>
       </tr>
       <tr>
         <td colspan="2">
-          <button class="button" type="submit" form="LoginForm">Login</button>
+          <button class="button" type="submit" form="LoginForm" @click="login">
+            {{ loginButton }}
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <a v-if="showLoginParts" href="#top" @click="register">I don't have an account</a>
+          <p v-else></p>
         </td>
       </tr>
     </table>
   </body>
 </template>
+
 <style>
 * {
-  font-family: "Lucida Console", "Courier New", monospace;
+  font-family: 'Lucida Console', 'Courier New', monospace;
 }
+html,
 body {
   width: 100%;
   height: 100%;
@@ -51,21 +77,29 @@ body {
 }
 label {
   align-items: center;
-  grid-template-columns: auto 1fr;
+  margin-right: 20px;
 }
 table {
+  position: relative;
   left: 50%;
-  top: 50%;
-  transform: translate(50%, 50%);
+  /*top: 50%;*/
+  transform: translate(-50%, -50%);
+}
+a {
+  text-align: center;
+  margin: 0 auto;
+  display: block;
 }
 .button {
+  position: relative;
   border: none;
   background-color: darkblue;
   color: white;
   padding: 15px 30px;
   text-align: center;
   font-size: 16px;
-  margin: 5px;
+  margin: 0 auto;
+  display: block;
 }
 .heading {
   position: relative;
