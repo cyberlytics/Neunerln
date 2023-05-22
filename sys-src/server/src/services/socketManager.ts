@@ -56,27 +56,14 @@ export class SocketManager {
       console.log(`Client ${socket.id} connected. (${this.io.engine.clientsCount})`);
     }
   }
-
+ 
   disconnectUser(userId: string) {
     // find joined game
     let joinedRoom = this.rooms.filter(room => room.players.some((player: Player) => player.id == userId))[0];
-    if (!joinedRoom) {
-      return;
+    if (joinedRoom) {
+      this.leaveRoom(joinedRoom, userId);
     }
 
-    // leave joined games
-    joinedRoom.players = joinedRoom.players.filter((player: Player) => player.id != userId);
-
-    // close room if empty
-    if (joinedRoom.players.length == 0) {
-      this.rooms = this.rooms.filter(room => room.id != joinedRoom.id);
-    }
-
-    // update lobby data
-    this.io.emit(
-      SocketRoom.lobbyRoomsChanged,
-      this.getLobbyData()
-    );
 
     if (this.userConnectionLog) {
       console.log(`Client ${userId} disconnected. (${this.io.engine.clientsCount})`);
@@ -125,24 +112,48 @@ export class SocketManager {
           this.getLobbyData()
         );
   
-        // get new game data
-        const cardsPerPlayer = room.players.reduce((result, player) => {
-          result[player.name] = player.handCards.length;
-          return result;
-        }, {} as { [userName: string]: number; });
-        const gameMetadata = new PublicGameMetadata(
-          cardsPerPlayer,
-          room.drawPile.length,
-          room.discardPile,
-          room.players.map((player) => player.name),
-          room.currentPlayer?.name
-        )
+        this.updateGamedata(room);
+  }
 
-        // update room members with new game data
-        this.io.to(room.id).emit(
-          SocketRoom.gamedataPublished,
-          gameMetadata
-        );
+  leaveRoom(room: Room, userId: string) {
+    // leave joined games
+    room.players = room.players.filter((player: Player) => player.id != userId);
+
+    // close room if empty
+    if (room.players.length == 0) {
+      this.rooms = this.rooms.filter(room => room.id != room.id);
+    }
+    // update room members
+    else {
+      this.updateGamedata(room);
+    }
+
+    // update lobby data
+    this.io.emit(
+      SocketRoom.lobbyRoomsChanged,
+      this.getLobbyData()
+    ); 
+  }
+
+  updateGamedata(room: Room) {
+    // get new game data
+    const cardsPerPlayer = room.players.reduce((result, player) => {
+      result[player.name] = player.handCards.length;
+      return result;
+    }, {} as { [userName: string]: number; });
+    const gameMetadata = new PublicGameMetadata(
+      cardsPerPlayer,
+      room.drawPile.length,
+      room.discardPile,
+      room.players.map((player) => player.name),
+      room.currentPlayer?.name
+    )
+
+    // update room members with new game data
+    this.io.to(room.id).emit(
+      SocketRoom.gamedataPublished,
+      gameMetadata
+    );
   }
 
   sendHandCards(socket: any, roomId: string) {

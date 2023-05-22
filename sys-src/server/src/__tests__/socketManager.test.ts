@@ -63,23 +63,28 @@ describe('joinRoom', () => {
     })
 })
 
-describe('joinRoom', () => {
-    it('adds user to room correctly', () => {
-        let roomCreatorId = 'creatorId'
-        let roomCreaterName  = 'creatorName'
-        let specialCards = [ 'bar1', 'bar2'];
-        let maxPlayers = 2;
-
-        let joinUserId = 'joinId';
-        let joinUserName = 'joinName';
-
-        socketManager.createRoom(roomCreatorId, roomCreaterName, specialCards, maxPlayers);
-        socketManager.joinRoom({ id: joinUserId, join: () => {}}, roomCreatorId, joinUserName);
-        
+describe('leaveRoom', () => {
+    it('removes user from joined room', () => {
+        let userId = 'joinId';
+        socketManager.createRoom('1', '1', [ 'seven' ], 2);
+        socketManager.joinRoom({ id: userId, join: () => {}}, '1', 'joinName');
+                
         let room = socketManager.rooms[0];
         expect(room.playerCount()).toBe(1);
-        expect(room.players[0].id).toBe(joinUserId);
-        expect(room.players[0].name).toBe(joinUserName);
+
+        socketManager.leaveRoom(room, userId);
+        expect(room.playerCount()).toBe(0);
+    })
+})
+
+describe('leaveRoom', () => {
+    it('closes room if empty', () => {
+        let userId = 'joinId';
+        socketManager.createRoom('1', '1', [ 'seven' ], 2);
+        socketManager.joinRoom({ id: userId, join: () => {}}, '1', 'joinName');
+        socketManager.leaveRoom(socketManager.rooms[0], userId);
+
+        expect(socketManager.rooms.length).toBe(0);
     })
 })
 
