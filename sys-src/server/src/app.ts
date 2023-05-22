@@ -9,7 +9,6 @@ import { NotFoundError } from './errors/not-found-error'
 import { errorHandler } from './middlewares/error-handler'
 
 // routes
-import test from './routes/test'
 import { signoutRouter } from './routes/signout'
 
 // create server
@@ -35,7 +34,6 @@ app.use(
 /**
  * Here are the primary routes of the app
  */
-app.use(test)
 app.use(signoutRouter)
 app.all('*', async () => {
   throw new NotFoundError()
