@@ -1,16 +1,15 @@
 export enum SocketRoom {
-    onConnection = 'connection',
-    onDisconnect = 'disconnect',
+    connection = 'connection',
+    disconnected = 'disconnect',
 
-    onCreateRoom = 'createRoom',
-    onJoinRoom = 'joinRoom',
-    onRoomJoined = 'roomJoined',
-    onStartGame = "startGame",
+    roomCreated = 'roomCreated',
+    roomJoined = 'roomJoined',
+    gameStarted = "gameStarted",
 
-    publishOpenRooms = 'publishOpenRooms',
+    lobbyRoomsChanged = 'lobbyRoomsChanged',
 
-    requestHandCards = 'requestHandCards',
-    getHandCards = 'getHandCards',
+    handcardsRequested = 'handcardsRequested',
+    handCardsPublished = 'getHandCards',
     
-    getGameMetadata = 'getGameMetadata',
+    gamedataPublished = 'gamedataPublished',
 }

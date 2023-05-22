@@ -9,7 +9,7 @@ import { NotFoundError } from './errors/not-found-error'
 import { errorHandler } from './middlewares/error-handler'
 
 // routes
-import test from './routes/test'
+import test from './routes/example'
 
 // create server
 const server = express()

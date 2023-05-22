@@ -32,21 +32,21 @@ const userName = ref<string>(getRandomName());
 
 //#region subscribe
 
-socket.on(SocketRoom.publishOpenRooms, (openRooms: PublicRoomData[]) => {
+socket.on(SocketRoom.lobbyRoomsChanged, (openRooms: PublicRoomData[]) => {
   roomData.value = openRooms;
 });
 
-socket.on(SocketRoom.onStartGame, () => {
+socket.on(SocketRoom.gameStarted, () => {
   // do something
 });
 
-socket.on(SocketRoom.getGameMetadata, (gameMetadata: PublicGameMetadata) => {
+socket.on(SocketRoom.gamedataPublished, (gameMetadata: PublicGameMetadata) => {
   publicGameMetadata.value = gameMetadata;
   
-  socket.emit(SocketRoom.requestHandCards, currentRoomId.value);
+  socket.emit(SocketRoom.handcardsRequested, currentRoomId.value);
 });
 
-socket.on(SocketRoom.getHandCards, (cards: Card[]) => {
+socket.on(SocketRoom.handCardsPublished, (cards: Card[]) => {
   handCards.value = cards;
 });
 
@@ -56,7 +56,7 @@ socket.on(SocketRoom.getHandCards, (cards: Card[]) => {
 
 function createRoom(specialCards: string[], maxPlayers: number) {
   socket.emit(
-    SocketRoom.onCreateRoom, 
+    SocketRoom.roomCreated, 
     userName.value, specialCards, maxPlayers
   );
 
@@ -67,7 +67,7 @@ function joinRoom(roomId: string) {
   currentRoomId.value = roomId;
 
   socket.emit(
-    SocketRoom.onJoinRoom,
+    SocketRoom.roomJoined,
     roomId, userName.value
   );
 }

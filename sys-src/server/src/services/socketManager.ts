@@ -16,35 +16,41 @@ export class SocketManager {
     }
   });
   rooms: Room[] = [];
-  
+
   initialize() {
-    this.io.on(SocketRoom.onConnection, (socket: any) => {
-      this.connectUser(socket);
-    });
+    this.io.on(
+      SocketRoom.connection, (socket: any) =>
+      this.connectUser(socket)
+    );
 
     return this;
   }
 
   connectUser(socket: any) {
     // send rooms to new client
-    socket.emit(SocketRoom.publishOpenRooms, this.getLobbyData());
+    socket.emit(
+      SocketRoom.lobbyRoomsChanged,
+      this.getLobbyData());
       
-    socket.on(SocketRoom.onCreateRoom, (userName: string, specialCards: string[], maxPlayers: number) => {
-      this.createRoom(socket.id, userName, specialCards, maxPlayers);
-    });
+    socket.on(
+      SocketRoom.roomCreated, (userName: string, specialCards: string[], maxPlayers: number) =>
+      this.createRoom(socket.id, userName, specialCards, maxPlayers)
+    );
 
-    socket.on(SocketRoom.onJoinRoom, (roomId: string, userName: string) => {
-      this.joinRoom(socket, roomId, userName);
-    });
+    socket.on(
+      SocketRoom.roomJoined, (roomId: string, userName: string) =>
+      this.joinRoom(socket, roomId, userName)
+    );
 
-    socket.on(SocketRoom.requestHandCards, (roomId: string) => {
-      this.sendHandCards(socket, roomId);
-      
-    });
+    socket.on(
+      SocketRoom.handcardsRequested, (roomId: string) =>
+      this.sendHandCards(socket, roomId)
+    );
 
-    socket.on(SocketRoom.onDisconnect, () => {
-      this.disconnectUser(socket.id);
-    });
+    socket.on(
+      SocketRoom.disconnected, () =>
+      this.disconnectUser(socket.id)
+    );
 
     if (this.userConnectionLog) {
       console.log(`Client ${socket.id} connected. (${this.io.engine.clientsCount})`);
@@ -67,7 +73,10 @@ export class SocketManager {
     }
 
     // update lobby data
-    this.io.emit(SocketRoom.publishOpenRooms, this.getLobbyData());
+    this.io.emit(
+      SocketRoom.lobbyRoomsChanged,
+      this.getLobbyData()
+    );
 
     if (this.userConnectionLog) {
       console.log(`Client ${userId} disconnected. (${this.io.engine.clientsCount})`);
@@ -75,6 +84,7 @@ export class SocketManager {
   }
   
   createRoom(userId: string, userName: string, specialCards: string[], maxPlayers: number) {
+    // create and save new room
     const newRoom: Room = new Room(
       userId,
       `Room of ${userName}`,
@@ -82,9 +92,14 @@ export class SocketManager {
       maxPlayers
     );
     this.rooms.push(newRoom);
-    this.io.emit(SocketRoom.publishOpenRooms, this.getLobbyData());
+    
+    // send updated lobby rooms to clients
+    this.io.emit(
+      SocketRoom.lobbyRoomsChanged,
+      this.getLobbyData()
+    );
 
-    this.LogRooms();
+    this.logRooms();
   }
 
   joinRoom(socket: any, roomId: string, userName: string) {
@@ -101,11 +116,14 @@ export class SocketManager {
         // start game if full
         if (room.isFull()) {
           room.startGame();
-          this.io.to(room.id).emit(SocketRoom.onStartGame);
+          this.io.to(room.id).emit(SocketRoom.gameStarted);
         }
 
         // update lobby rooms
-        this.io.emit(SocketRoom.publishOpenRooms, this.getLobbyData());
+        this.io.emit(
+          SocketRoom.lobbyRoomsChanged,
+          this.getLobbyData()
+        );
   
         // get new game data
         const cardsPerPlayer = room.players.reduce((result, player) => {
@@ -121,7 +139,10 @@ export class SocketManager {
         )
 
         // update room members with new game data
-        this.io.to(room.id).emit(SocketRoom.getGameMetadata, gameMetadata);
+        this.io.to(room.id).emit(
+          SocketRoom.gamedataPublished,
+          gameMetadata
+        );
   }
 
   sendHandCards(socket: any, roomId: string) {
@@ -130,7 +151,10 @@ export class SocketManager {
     var handCards = correspondingRoom?.players.find((player) => player.id == socket.id)?.handCards;
 
     // send back to user
-    socket.emit(SocketRoom.getHandCards, handCards);
+    socket.emit(
+      SocketRoom.handCardsPublished,
+      handCards
+    );
   }
 
   getLobbyData() {
@@ -140,7 +164,7 @@ export class SocketManager {
       .map((room) => new PublicRoomData(room.id, room.name, room.specialCards, room.startingHandCards, room.playerCount(), room.maxPlayers))
   }
 
-  LogRooms() {
+  logRooms() {
     if (this.roomUpdateLog) {
       console.log(`rooms: open (${(this.getLobbyData()).length}) / all (${this.rooms.length})`);
     }
