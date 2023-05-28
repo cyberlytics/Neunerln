@@ -14,7 +14,8 @@ interface IUser {
 const userSchema = new Schema<IUser>({
   name: {
     type: String,
-    required: true
+    required: true,
+    unique: true
   },
   email: {
     type: String,
