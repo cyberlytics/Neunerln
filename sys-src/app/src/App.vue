@@ -6,17 +6,6 @@ import { ref, onMounted } from 'vue'
 import Login from './views/Login.vue'
 
 const users = ref([])
-
-onMounted(() => {
-  const fetch = async () => {
-    const res = await axios.get('http://localhost:3000/api/test')
-    const s = res.data.user
-    users.value.push(...s)
-    console.log(users)
-  }
-
-  fetch()
-})
 </script>
 
 <template>

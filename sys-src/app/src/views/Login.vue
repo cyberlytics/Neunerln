@@ -1,8 +1,46 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import axios from 'axios'
 
 const loginButton = ref('Login')
 const showLoginParts = ref(true)
+const benutzername = ref('')
+const email = ref('')
+const password = ref('')
+const confirmPassword = ref('')
+
+function handleInput(e: any, name: string) {
+  switch (name) {
+    case 'benutzername':
+      benutzername.value = e.target.value
+      break
+    case 'password':
+      password.value = e.target.value
+      break
+    case 'confirmPassword':
+      confirmPassword.value = e.target.value
+      break
+    case 'email':
+      email.value = e.target.value
+      break
+  }
+}
+
+async function signup() {
+  try {
+    const res = await axios.post('http://localhost:3000/api/auth/signup', {
+      benutzername,
+      password,
+      confirmPassword,
+      email
+    })
+    console.log(res.status)
+    //TODO: Erfolg dem User anzeigen
+  } catch (err: any) {
+    //TODO: Fehler dem User anzeigen
+    console.log(err)
+  }
+}
 
 function login() {
   //check with Database for user with password check
@@ -26,10 +64,25 @@ function register() {
         <td><label for="benutzername">Benutzername</label></td>
         <td>
           <input
+            :value="benutzername"
             id="benutzername"
             class="inputField"
             type="text"
             placeholder="NeunerlnGeek2000"
+            @input="(e) => handleInput(e, 'benutzername')"
+            required
+          />
+        </td>
+      </tr>
+      <tr v-if="!showLoginParts">
+        <td><label for="email">E-Mail</label></td>
+        <td>
+          <input
+            :value="email"
+            id="email"
+            class="inputField"
+            type="text"
+            placeholder="benutzer@oth-aw.de"
             required
           />
         </td>
@@ -37,19 +90,49 @@ function register() {
       <tr>
         <td><label for="password">Password</label></td>
         <td>
-          <input id="password" class="inputField" type="password" placeholder="Over9000" required />
+          <input
+            :value="password"
+            id="password"
+            class="inputField"
+            type="password"
+            placeholder="Over9000"
+            required
+          />
         </td>
       </tr>
       <tr v-if="!showLoginParts">
         <td><label for="password">Password bestätigen</label></td>
         <td>
-          <input id="password" class="inputField" type="password" placeholder="Over9000" required />
+          <input
+            :value="confirmPassword"
+            id="password"
+            class="inputField"
+            type="password"
+            placeholder="Over9000"
+            required
+          />
         </td>
       </tr>
       <tr>
         <td colspan="2">
-          <button class="button" type="submit" form="LoginForm" @click="login">
-            {{ loginButton }}
+          <button
+            v-if="showLoginParts"
+            class="button"
+            type="submit"
+            form="LoginForm"
+            @click="login"
+          >
+            Login
+          </button>
+          <!-- TODO: Ladeanimation im Button anzeigen-->
+          <button
+            v-if="!showLoginParts"
+            class="button"
+            type="submit"
+            form="LoginForm"
+            @click="signup"
+          >
+            Register
           </button>
         </td>
       </tr>
