@@ -12,7 +12,7 @@ import { errorHandler } from './middlewares/error-handler'
 import { signoutRouter } from './routes/signout'
 
 // create server
-const app = express()
+var app = express()
 
 /**
  * The code below will configure
@@ -43,5 +43,9 @@ app.all('*', async () => {
  * Error handling
  */
 app.use(errorHandler)
+
+// don't know if this breaks functionality above,
+// but socket.io requires http module
+app = require('http').Server(app);
 
 export { app }
