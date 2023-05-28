@@ -2,15 +2,16 @@
 import { ref } from 'vue'
 import axios from 'axios'
 
-const loginButton = ref('Login')
+const header = ref('Login')
 const showLoginParts = ref(true)
 const benutzername = ref('')
 const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
+const name = ref('')
 
-function handleInput(e: any, name: string) {
-  switch (name) {
+function handleInput(e: any, input: string) {
+  switch (input) {
     case 'benutzername':
       benutzername.value = e.target.value
       break
@@ -22,6 +23,9 @@ function handleInput(e: any, name: string) {
       break
     case 'email':
       email.value = e.target.value
+      break
+    case 'name':
+      name.value = e.target.value
       break
   }
 }
@@ -42,13 +46,28 @@ async function signup() {
   }
 }
 
-function login() {
-  //check with Database for user with password check
+async function login() {
+  try {
+    const res = await axios.post('http://localhost:3000/api/auth/signin', {
+      name,
+      password
+    })
+    console.log(res.status)
+    //TODO: Erfolg dem User anzeigen
+  } catch (err: any) {
+    //TODO: Fehler dem User anzeigen
+    console.log(err)
+  }
 }
 
-function register() {
-  loginButton.value = 'Register'
+function showRegisterView() {
   showLoginParts.value = !showLoginParts.value
+  header.value = 'Register'
+}
+
+function showLoginView() {
+  showLoginParts.value = !showLoginParts.value
+  header.value = 'Login'
 }
 </script>
 
@@ -58,9 +77,25 @@ function register() {
   <body>
     <table>
       <tr>
-        <td colspan="2"><div class="heading">Login</div></td>
+        <td colspan="2">
+          <div class="heading">{{ header }}</div>
+        </td>
       </tr>
-      <tr>
+      <tr v-if="showLoginParts">
+        <td><label for="benutzername">Benutzername oder E-Mail</label></td>
+        <td>
+          <input
+            :value="name"
+            id="benutzername"
+            class="inputField"
+            type="text"
+            placeholder="NeunerlnGeek2000"
+            @input="(e) => handleInput(e, 'name')"
+            required
+          />
+        </td>
+      </tr>
+      <tr v-if="!showLoginParts">
         <td><label for="benutzername">Benutzername</label></td>
         <td>
           <input
@@ -81,7 +116,7 @@ function register() {
             :value="email"
             id="email"
             class="inputField"
-            type="text"
+            type="email"
             placeholder="benutzer@oth-aw.de"
             required
           />
@@ -138,7 +173,13 @@ function register() {
       </tr>
       <tr>
         <td colspan="2">
-          <a v-if="showLoginParts" href="#top" @click="register">I don't have an account</a>
+          <a v-if="showLoginParts" href="#top" @click="showRegisterView">I don't have an account</a>
+          <p v-else></p>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <a v-if="!showLoginParts" href="#top" @click="showLoginView">Back to Login</a>
           <p v-else></p>
         </td>
       </tr>
@@ -165,7 +206,7 @@ label {
 table {
   position: relative;
   left: 50%;
-  /*top: 50%;*/
+  top: 20%;
   transform: translate(-50%, -50%);
 }
 a {
