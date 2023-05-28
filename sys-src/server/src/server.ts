@@ -8,6 +8,7 @@ const start = async () => {
       'mongodb+srv://Admin:ebewnO8vJqdoKnVp@neunerln.hipwzzh.mongodb.net/Neunerln?retryWrites=true&w=majority'
     )
   } catch (err) {
+    // close server
     console.error(err)
   }
 
