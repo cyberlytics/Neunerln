@@ -1,5 +1,5 @@
-import { DatabaseError } from 'src/errors/database-error.js'
-import User from '../model/User.js'
+import { DatabaseError } from '../errors/database-error'
+import User from '../model/User'
 
 // Create a new User and insert into database
 export async function createUser(name: string, email: string, password: string) {
@@ -18,6 +18,10 @@ export async function createUser(name: string, email: string, password: string) 
 //by email
 export async function findUserByEmail(email: string) {
   return User.findOne({ email: email }, 'name played won')
+}
+
+export async function findUserByUsername(username: string) {
+  return User.findOne({ username }, 'name played won')
 }
 
 export async function findEmailAndPass(email: string, password: string) {

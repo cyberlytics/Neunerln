@@ -1,6 +1,7 @@
 import express from 'express'
 import 'express-async-errors'
 import cookieSession from 'cookie-session'
+import cors from 'cors'
 
 // errors
 import { NotFoundError } from './errors/not-found-error'
@@ -10,9 +11,10 @@ import { errorHandler } from './middlewares/error-handler'
 
 // routes
 import { signoutRouter } from './routes/signout'
+import { signUpRouter } from './routes/signup'
 
 // create server
-var app = express()
+const app = express()
 
 /**
  * The code below will configure
@@ -20,6 +22,22 @@ var app = express()
  */
 
 // app.set('trust proxy', true) only necessary if server sits behind a proxy
+
+// cors configuration
+const whitelist = ['http://localhost:5173', 'http://localhost:3000']
+const corsOptions = {
+  origin: function (origin: any, callback: any) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  }
+}
+
+if (process.env.NODE_ENV !== 'test') {
+  app.use(cors(corsOptions))
+}
 
 app.use(express.json()) // parse body
 
@@ -35,6 +53,8 @@ app.use(
  * Here are the primary routes of the app
  */
 app.use(signoutRouter)
+app.use(signUpRouter)
+
 app.all('*', async () => {
   throw new NotFoundError()
 })
@@ -43,9 +63,5 @@ app.all('*', async () => {
  * Error handling
  */
 app.use(errorHandler)
-
-// don't know if this breaks functionality above,
-// but socket.io requires http module
-app = require('http').Server(app);
 
 export { app }
