@@ -1,5 +1,6 @@
 import { app } from './app'
 import mongoose from 'mongoose'
+import { SocketManager } from './services/socketManager';
 
 const start = async () => {
   try {
@@ -7,6 +8,9 @@ const start = async () => {
     await mongoose.connect(
       'mongodb+srv://Admin:ebewnO8vJqdoKnVp@neunerln.hipwzzh.mongodb.net/Neunerln?retryWrites=true&w=majority'
     )
+
+    // initialize SocketManager
+    new SocketManager().initialize();
   } catch (err) {
     // close server
     console.error(err)
