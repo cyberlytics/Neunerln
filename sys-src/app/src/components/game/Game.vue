@@ -8,7 +8,9 @@
     <div class="table">
         DrawingPile: {{ publicGameMetadata?.drawingPileCount }}<br>
         DiscardPile: {{ publicGameMetadata?.discardPile.length }}<br>
-        {{ publicGameMetadata?.discardPile.map(card => `${card.number}${card.color}`).join(', ') }}
+         <!-- {{ publicGameMetadata?.discardPile.map(card => `${card.number}${card.color}`).join(', ') }}  -->
+        <CardFront v-for="card in publicGameMetadata?.discardPile" :value="card.number" :color="card.color" />
+
         <br><br>
         Current player: {{ publicGameMetadata?.currentPlayerName }}
     </div>
@@ -76,10 +78,9 @@ body > div {
 
 .enemies {
     position: absolute;
-    inset: 0 0 auto 0;
-    
+    inset: 0 0 150px 0;
     border: solid 2px turquoise;
-    height: 100px;
+    height: 150px;
 }
 
 .hand-cards{
@@ -88,16 +89,17 @@ body > div {
 
 .player {
     position: absolute;
-    inset: auto 0 0 0;
+    inset: 475px 0 0 0;
     
     border: solid 2px orange;
-    height: 100px;
+    height: fit-content;
 }
 
 
 .table {
     position: absolute;
-    inset: 100px 0 100px 0;
+    inset: 150px 0 0 0;
     border: solid 2px green;
+    height: 325px;
 }
 </style>
