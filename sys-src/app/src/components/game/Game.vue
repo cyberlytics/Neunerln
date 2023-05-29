@@ -15,13 +15,17 @@
     <div class="player">
         <h3>player</h3>
         {{ userName }}: {{ publicGameMetadata?.cardCountPerPlayer[player || ''] }}<br>
-        {{ handCards?.map(card => `${card.number}${card.color}`).join(', ') }}
-    </div>
+        <div class="hand-cards">
+        <!-- {{ handCards?.map(card => `${card.number}${card.color}`).join(', ') }} -->
+            <CardFront v-if="handCards" v-for="card in handCards" :value="card.number" :color="card.color" />
+        </div>
+   </div>
 </template>
 
 <script setup lang="ts">
 //#region imports
 import type { Card } from '@/types/card';
+import CardFront from '../game/CardFront.vue';
 import { PublicGameMetadata } from '@/types/publicGameMetadata';
 import { computed } from 'vue';
 //#endregion imports
@@ -76,6 +80,10 @@ body > div {
     
     border: solid 2px turquoise;
     height: 100px;
+}
+
+.hand-cards{
+    display: flex;
 }
 
 .player {

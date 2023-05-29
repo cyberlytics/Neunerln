@@ -1,6 +1,6 @@
 export enum CardColor {
-    herz = "♥",
-    blatt = "♠",
-    eichel = "♣",
-    schellen = "♦"
+    herz = "../../assets/oth-aw.png",
+    gras = "../../assets/oth-aw.png",
+    eichel = "../../assets/oth-aw.png",
+    schellen = "../../assets/oth-aw.png"
 }

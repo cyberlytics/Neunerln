@@ -2,24 +2,24 @@
  <div class="card">
    <img class="oth-logo" src="../../assets/oth-aw.png" alt="" />
    <img class="oth-logo" src="../../assets/oth-aw.png" alt="" />
-   <img class="color-image color-img-top" :src="imageSrc" alt="" />
-   <img class="color-image color-img-bottom" :src="imageSrc" alt="" />
+   <img class="color-image color-img-top" :src="color" alt="" />
+   <img class="color-image color-img-bottom" :src="color" alt="" />
 
    <div class="value-color">
      <span>{{ value }}</span>
-     <div><img class="img-corner" :src="imageSrc" /></div>
+     <div><img class="img-corner" :src="color" /></div>
    </div>
    <div class="value-color">
      <span>{{ value }}</span>
-     <div><img class="img-corner" :src="imageSrc" /></div>
+     <div><img class="img-corner" :src="color" /></div>
    </div>
    <div class="value-color">
      <span>{{ value }}</span>
-     <div><img class="img-corner" :src="imageSrc" /></div>
+     <div><img class="img-corner" :src="color" /></div>
    </div>
    <div class="value-color">
      <span>{{ value }}</span>
-     <div><img class="img-corner" :src="imageSrc" /></div>
+     <div><img class="img-corner" :src="color" /></div>
    </div>
    <div class="card-line"></div>
    <div class="card-border"></div>
@@ -33,7 +33,7 @@
 const props = defineProps({
  value: String,
  descrip: String,
- imageSrc: String
+ color: String
 })
 </script>
 
