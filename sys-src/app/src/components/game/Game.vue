@@ -8,9 +8,11 @@
     <div class="table">
         DrawingPile: {{ publicGameMetadata?.drawingPileCount }}<br>
         DiscardPile: {{ publicGameMetadata?.discardPile.length }}<br>
+        <div class="discard-pile">
          <!-- {{ publicGameMetadata?.discardPile.map(card => `${card.number}${card.color}`).join(', ') }}  -->
+        <CardFront :back="cardBack" />
         <CardFront v-for="card in publicGameMetadata?.discardPile" :value="card.number" :color="card.color" />
-
+    </div>
         <br><br>
         Current player: {{ publicGameMetadata?.currentPlayerName }}
     </div>
@@ -31,6 +33,9 @@ import CardFront from '../game/CardFront.vue';
 import { PublicGameMetadata } from '@/types/publicGameMetadata';
 import { computed } from 'vue';
 //#endregion imports
+
+const cardBack= '../src/assets/card_back.svg';
+
 
 const props = defineProps({
     userName: String,
@@ -76,6 +81,9 @@ body > div {
     inset: 0;
 }
 
+.discard-pile {
+    display: flex;
+}
 .enemies {
     position: absolute;
     inset: 0 0 150px 0;

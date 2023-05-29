@@ -26,14 +26,16 @@
    <div class="descrip">
      <span class="description">{{ descrip }}</span>
    </div>
+   <img class="back-card" :src="back" alt="" />
  </div>
 </template>
 
 <script setup lang="ts">
 const props = defineProps({
  value: String,
+ color: String,
  descrip: String,
- color: String
+ back: String
 })
 </script>
 
@@ -47,15 +49,16 @@ const props = defineProps({
  display: flex;
  justify-content: center;
  align-items: center;
-
  position: relative;
  font-size: 20px;
- /* background-image: linear-gradient(
-   hsl(0, 0%, 100%) 40%,
-   hsla(40, 81%, 60%, 0.312) 50%,
-   hsl(0, 0%, 100%) 60%
- ); */
  margin-right: 10px;
+}
+
+.back-card {
+  position: absolute;
+  height: 13.2rem;
+  /* width: 7.2rem; */
+  z-index: 2;
 }
 
 .descrip {
