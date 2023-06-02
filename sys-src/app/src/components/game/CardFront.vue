@@ -21,6 +21,8 @@
      <span>{{ value }}</span>
      <div><img class="img-corner" :src="color" /></div>
    </div>
+   
+   <div class="card-line-orange"></div>
    <div class="card-line"></div>
    <div class="card-border"></div>
    <div class="descrip">
@@ -82,13 +84,15 @@ const props = defineProps({
  position: absolute;
  padding-top: 0.2rem;
  background: white;
+ text-align: center;
  z-index: 1;
 }
 .value-color span {
  transform: scale(0.9, 1.3);
  display: inline-block;
  font-family: 'Angsana New';
- letter-spacing: -1px;
+ /* letter-spacing: -1px; */
+ 
  font-weight: bold;
  color: black;
 }
@@ -140,10 +144,10 @@ const props = defineProps({
 }
 .card-line {
  position: absolute;
- top: 50%;
+ top: 6.95rem;
  height: 0.1rem;
  width: 6.4rem;
- background-color: black;
+ /* background-color: black; */
 }
 .card-border {
  position: absolute;
@@ -151,5 +155,13 @@ const props = defineProps({
  width: 6.4rem;
  border-radius: 12px;
  border: 0.1rem solid black;
+}
+
+.card-line-orange {
+  position: absolute;
+ top: 6.9rem;
+ height: 0.2rem;
+ width: 6.4rem;
+ background-image:linear-gradient( #f4aa3268 15%, black 70%, #f4a932 15%)
 }
 </style>
