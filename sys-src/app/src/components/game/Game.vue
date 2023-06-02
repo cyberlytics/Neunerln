@@ -21,19 +21,15 @@
                 <CardFront v-for="card in publicGameMetadata?.discardPile" :value="card.number" :color="card.color" />
             </div>
     </div>
-        <br><br>
+        <br>
         Current player: {{ publicGameMetadata?.currentPlayerName }}<br>
     
-     
-
-        
-    </div>
-    <div class="player">
+        <div class="player">
         <h3>player</h3>
         {{ userName }}: {{ publicGameMetadata?.cardCountPerPlayer[player || ''] }}<br>
         <div class="hand-cards">
         <!-- {{ handCards?.map(card => `${card.number}${card.color}`).join(', ') }} -->
-            <CardFront class="playerCards" v-if="handCards" v-for="card in handCards" :value="card.number" :color="card.color"  />
+            <CardFront class="playerCards" v-if="handCards" v-for="card in handCards" :value="card.number" :color="card.color"   />
         </div>
    </div>
 
@@ -43,6 +39,10 @@
         <button @click="endRound()">End Round</button>
         
    </div>
+
+        
+    </div>
+
 </template>
 
 <script setup lang="ts">
@@ -116,6 +116,7 @@ function endRound() {
 }
 
 
+
 </script>
 
 <style>
@@ -134,7 +135,7 @@ body > div {
 .enemies {
     /* position: absolute;
     inset: 0 0 150px 0; */
-    border: solid 2px turquoise;
+    /* border: solid 2px turquoise; */
     /* height: 150px; */
 }
 
@@ -158,7 +159,7 @@ body > div {
     /* position: absolute;
     inset: 475px 0 0 0; */
     
-    border: solid 2px orange;
+    /* border: solid 2px orange; */
     /* height: fit-content; */
 }
 
@@ -166,7 +167,7 @@ body > div {
 .table {
     /* position: absolute;
     inset: 150px 0 0 0; */
-    border: solid 2px green;
+    /* border: solid 2px green; */
     /* height: 325px;*/
 } 
 
@@ -174,7 +175,7 @@ body > div {
     /* position: absolute;
     inset: 780px 0 0 0; */
     
-    border: solid 2px blue;
+    /* border: solid 2px blue; */
     /* height: 150px; */
 }
 </style>
