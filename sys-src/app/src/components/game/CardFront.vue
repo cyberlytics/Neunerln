@@ -53,7 +53,9 @@ const props = defineProps({
  align-items: center;
  position: relative;
  font-size: 20px;
- margin-right: 10px;
+ /* margin-right: 10px; */
+ background: white;
+ z-index: 3;
 }
 
 .back-card {

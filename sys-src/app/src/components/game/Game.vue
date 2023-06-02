@@ -2,16 +2,24 @@
     <div class="enemies">
         <h3>enemies</h3>
         <div v-for="enemy in orderedEnemies">
-            {{ enemy }}: {{ publicGameMetadata?.cardCountPerPlayer[enemy] }}<br>
+            <div>{{ enemy }}:</div>
+            <div class="enemies-handcards"><CardFront class="enemiesCards" :back="cardBack" v-for="card in publicGameMetadata?.cardCountPerPlayer[enemy]"/></div>
         </div>
     </div>
     <div class="table">
-        DrawingPile: {{ publicGameMetadata?.drawingPileCount }}<br>
-        DiscardPile: {{ publicGameMetadata?.discardPile.length }}<br>
+        <h3>pile</h3>
+        <div class="drawPile">
+        <div>DrawingPile: {{ publicGameMetadata?.drawingPileCount }}<br></div>&nbsp;
+          <div>DiscardPile: {{ publicGameMetadata?.discardPile.length }}<br></div>
+        </div>
         <div class="discard-pile">
+            <div>
          <!-- {{ publicGameMetadata?.discardPile.map(card => `${card.number}${card.color}`).join(', ') }}  -->
-        <CardFront :back="cardBack" />
-        <CardFront v-for="card in publicGameMetadata?.discardPile" :value="card.number" :color="card.color" />
+                <CardFront class="drawingCards" :back="cardBack" v-for="card in publicGameMetadata?.drawingPileCount"/>
+            </div>
+            <div class="discardPile">
+                <CardFront v-for="card in publicGameMetadata?.discardPile" :value="card.number" :color="card.color" />
+            </div>
     </div>
         <br><br>
         Current player: {{ publicGameMetadata?.currentPlayerName }}<br>
@@ -25,7 +33,7 @@
         {{ userName }}: {{ publicGameMetadata?.cardCountPerPlayer[player || ''] }}<br>
         <div class="hand-cards">
         <!-- {{ handCards?.map(card => `${card.number}${card.color}`).join(', ') }} -->
-            <CardFront v-if="handCards" v-for="card in handCards" :value="card.number" :color="card.color" />
+            <CardFront class="playerCards" v-if="handCards" v-for="card in handCards" :value="card.number" :color="card.color"  />
         </div>
    </div>
 
@@ -107,6 +115,7 @@ function endRound() {
     //console.log("Fucks given");
 }
 
+
 </script>
 
 <style>
@@ -115,41 +124,57 @@ body > div {
     inset: 0;
 }
 
-.discard-pile {
-    display: flex;
-}
-.enemies {
-    position: absolute;
-    inset: 0 0 150px 0;
-    border: solid 2px turquoise;
-    height: 150px;
+
+
+.discardPile {
+    position: relative;
+    left: 9rem;
 }
 
-.hand-cards{
+.enemies {
+    /* position: absolute;
+    inset: 0 0 150px 0; */
+    border: solid 2px turquoise;
+    /* height: 150px; */
+}
+
+.hand-cards, .enemies-handcards{
     display: flex;
+}
+
+.drawPile {
+    display: flex;
+}
+
+.card.drawingCards {
+    position: absolute;
+}
+
+.enemiesCards, .playerCards {
+    margin-right: -50px;
 }
 
 .player {
-    position: absolute;
-    inset: 475px 0 0 0;
+    /* position: absolute;
+    inset: 475px 0 0 0; */
     
     border: solid 2px orange;
-    height: fit-content;
+    /* height: fit-content; */
 }
 
 
 .table {
-    position: absolute;
-    inset: 150px 0 0 0;
+    /* position: absolute;
+    inset: 150px 0 0 0; */
     border: solid 2px green;
-    height: 325px;
-}
+    /* height: 325px;*/
+} 
 
 .options {
-    position: absolute;
-    inset: 780px 0 0 0;
+    /* position: absolute;
+    inset: 780px 0 0 0; */
     
     border: solid 2px blue;
-    height: 150px;
+    /* height: 150px; */
 }
 </style>
