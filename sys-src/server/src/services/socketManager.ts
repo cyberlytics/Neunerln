@@ -5,6 +5,8 @@ import { PublicRoomData } from "../types/publicRoomData";
 import { SocketRoom } from "../types/socketRoom";
 import { Room } from "./room";
 
+let RoomID: Room;
+
 export class SocketManager {
   // logging
   userConnectionLog = false;
@@ -26,6 +28,8 @@ export class SocketManager {
     return this;
   }
 
+
+
   connectUser(socket: any) {
     // send rooms to new client
     socket.emit(
@@ -34,17 +38,19 @@ export class SocketManager {
       
     socket.on(
       SocketRoom.roomCreated, (userName: string, specialCards: string[], maxPlayers: number) =>
-      this.createRoom(socket.id, userName, specialCards, maxPlayers)
+      this.createRoom(socket.id, userName, specialCards, maxPlayers),
+
     );
 
     socket.on(
       SocketRoom.roomJoined, (roomId: string, userName: string) =>
-      this.joinRoom(socket, roomId, userName)
+      this.joinRoom(socket, roomId, userName),
     );
 
     socket.on(
       SocketRoom.handcardsRequested, (roomId: string) =>
       this.sendHandCards(socket, roomId)
+    
     );
 
     socket.on(
@@ -52,10 +58,18 @@ export class SocketManager {
       this.disconnectUser(socket.id)
     );
 
+    socket.on(
+      SocketRoom.NextPlayer, (players: string, currentPlayer:string) =>
+      this.nextPlayer(players, currentPlayer),
+      );
+
+      
     if (this.userConnectionLog) {
       console.log(`Client ${socket.id} connected. (${this.io.engine.clientsCount})`);
     }
   }
+
+  
  
   disconnectUser(userId: string) {
     // find joined game
@@ -95,7 +109,8 @@ export class SocketManager {
           || room.ingame) {
           return;
         }
-
+        const meins = this.RoomId(room);
+        console.log(meins);
         // add and subscribe player to room
         room.players.push(new Player(socket.id, userName));
         socket.join(room.id);
@@ -112,7 +127,7 @@ export class SocketManager {
           this.getLobbyData()
         );
   
-        this.updateGamedata(room);
+        this.updateGamedata(room,undefined);
   }
 
   leaveRoom(room: Room, userId: string) {
@@ -125,7 +140,7 @@ export class SocketManager {
     }
     // update room members
     else {
-      this.updateGamedata(room);
+      this.updateGamedata(room, undefined);
     }
 
     // update lobby data
@@ -135,25 +150,57 @@ export class SocketManager {
     ); 
   }
 
-  updateGamedata(room: Room) {
+  updateGamedata(room: Room, NextPlayer: string|undefined) {
     // get new game data
-    const cardsPerPlayer = room.players.reduce((result, player) => {
-      result[player.name] = player.handCards.length;
-      return result;
-    }, {} as { [userName: string]: number; });
-    const gameMetadata = new PublicGameMetadata(
-      cardsPerPlayer,
-      room.drawPile.length,
-      room.discardPile,
-      room.players.map((player) => player.name),
-      room.currentPlayer?.name
-    )
+    
+    
+
+if(NextPlayer == undefined){
+
+  const cardsPerPlayer = room.players.reduce((result, player) => {
+    result[player.name] = player.handCards.length;
+    return result;
+  }, {} as { [userName: string]: number; })
+
+       const gameMetadata = new PublicGameMetadata(
+        cardsPerPlayer,
+        room.drawPile.length,
+        room.discardPile,
+        room.players.map((player) => player.name),
+        room.currentPlayer?.name,
+      )
+
+    
 
     // update room members with new game data
     this.io.to(room.id).emit(
       SocketRoom.gamedataPublished,
       gameMetadata
     );
+}else{
+  const nextPlayer = NextPlayer;
+  const cardsPerPlayer = room.players.reduce((result, player) => {
+    result[player.name] = player.handCards.length;
+    return result;
+  }, {} as { [userName: string]: number; })
+
+  const gameMetadata = new PublicGameMetadata(
+    cardsPerPlayer,
+    room.drawPile.length,
+    room.discardPile,
+    room.players.map((player) => player.name),
+    nextPlayer,
+  )
+  console.log(nextPlayer);
+
+
+
+// update room members with new game data
+this.io.to(room.id).emit(
+  SocketRoom.gamedataPublished,
+  gameMetadata
+);
+}
   }
 
   sendHandCards(socket: any, roomId: string) {
@@ -179,5 +226,41 @@ export class SocketManager {
     if (this.roomUpdateLog) {
       console.log(`rooms: open (${(this.getLobbyData()).length}) / all (${this.rooms.length})`);
     }
-}
+  }
+
+  RoomId(room: Room| null){
+    
+    if(room !== null){
+    RoomID = room;
+    return RoomID;
+    }else{
+      return RoomID;
+    }
+  }
+  
+
+  nextPlayer(players: string, currentPlayer:string){
+
+    console.log(currentPlayer);
+    console.log(players.length);
+    const room = this.RoomId(null);
+    //console.log(room);
+    let Nextplayer = undefined;
+    for(let i = 0; i < players.length; i++){
+      if(currentPlayer == players[i]){
+        var a=i;
+        if(a++ < players.length-1){
+        Nextplayer = players[i+1];
+        break;
+        }else{
+          Nextplayer = players[0];
+          break;
+        }
+      }
+    }
+    console.log(Nextplayer);
+
+    this.updateGamedata(room, Nextplayer)
+    
+  }
 }

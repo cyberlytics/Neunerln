@@ -14,7 +14,11 @@
         <CardFront v-for="card in publicGameMetadata?.discardPile" :value="card.number" :color="card.color" />
     </div>
         <br><br>
-        Current player: {{ publicGameMetadata?.currentPlayerName }}
+        Current player: {{ publicGameMetadata?.currentPlayerName }}<br>
+    
+     
+
+        
     </div>
     <div class="player">
         <h3>player</h3>
@@ -24,6 +28,13 @@
             <CardFront v-if="handCards" v-for="card in handCards" :value="card.number" :color="card.color" />
         </div>
    </div>
+
+   <div class="options" v-if="props.publicGameMetadata?.currentPlayerName == userName">
+        <h3>options</h3>
+        
+        <button @click="endRound()">End Round</button>
+        
+   </div>
 </template>
 
 <script setup lang="ts">
@@ -32,6 +43,13 @@ import type { Card } from '@/types/card';
 import CardFront from '../game/CardFront.vue';
 import { PublicGameMetadata } from '@/types/publicGameMetadata';
 import { computed } from 'vue';
+import { PublicRoomData } from '@/types/publicRoomData';
+import { io } from 'socket.io-client';
+
+
+
+
+
 //#endregion imports
 
 const cardBack= '../src/assets/card_back.svg';
@@ -40,8 +58,12 @@ const cardBack= '../src/assets/card_back.svg';
 const props = defineProps({
     userName: String,
     publicGameMetadata: PublicGameMetadata,
-    handCards: Array<Card>
+    handCards: Array<Card>,
+ 
 });
+
+
+
 
 const player = computed(() => {
     return props.publicGameMetadata?.players
@@ -72,6 +94,18 @@ const orderedEnemies = computed(() => {
     const enemies = enemiesAfterPlayer.concat(enemiesBeforePlayer);
     return enemies;
 });
+
+
+
+//const emit = defineEmits(['nextPlayer']);
+const socket = io('127.0.0.1:3000');
+
+function endRound() {
+
+//console.log(currentRoomId?.value);
+  socket.emit('nextPlayer', props.publicGameMetadata?.players, props.publicGameMetadata?.currentPlayerName);
+    //console.log("Fucks given");
+}
 
 </script>
 
@@ -109,5 +143,13 @@ body > div {
     inset: 150px 0 0 0;
     border: solid 2px green;
     height: 325px;
+}
+
+.options {
+    position: absolute;
+    inset: 780px 0 0 0;
+    
+    border: solid 2px blue;
+    height: 150px;
 }
 </style>

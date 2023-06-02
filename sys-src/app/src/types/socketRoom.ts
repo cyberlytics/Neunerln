@@ -12,4 +12,6 @@ export enum SocketRoom {
     handCardsPublished = 'getHandCards',
     
     gamedataPublished = 'gamedataPublished',
+    
+    NextPlayer = 'nextPlayer',
 }
