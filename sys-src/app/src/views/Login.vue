@@ -31,6 +31,14 @@ function handleInput(e: any, input: string) {
 }
 
 async function signup() {
+  if (!isEmailCorrect()) {
+    alert('Bitte korrekte Email Adresse eingeben.')
+    return
+  }
+  if (!arePasswordsEqual()) {
+    alert('Die Passwörter stimmen nicht überein!')
+    return
+  }
   try {
     const res = await axios.post('http://localhost:3000/api/auth/signup', {
       benutzername,
@@ -43,6 +51,7 @@ async function signup() {
   } catch (err: any) {
     //TODO: Fehler dem User anzeigen
     console.log(err)
+    alert('Fehler beim Registerien.')
   }
 }
 
@@ -57,6 +66,7 @@ async function login() {
   } catch (err: any) {
     //TODO: Fehler dem User anzeigen
     console.log(err)
+    alert('Fehler beim Einloggen.')
   }
 }
 
@@ -68,6 +78,18 @@ function showRegisterView() {
 function showLoginView() {
   showLoginParts.value = !showLoginParts.value
   header.value = 'Login'
+}
+
+function isEmailCorrect() {
+  //contains email @
+  if (email.value.indexOf('@') == -1) return false
+  //is there a dot after the @
+  if (email.value.indexOf('.', email.value.indexOf('@')) == -1) return false
+  return true
+}
+function arePasswordsEqual() {
+  if (password.value != confirmPassword.value) return false
+  else return true
 }
 </script>
 
@@ -204,10 +226,8 @@ label {
   margin-right: 20px;
 }
 table {
-  position: relative;
   left: 50%;
   top: 20%;
-  transform: translate(-50%, -50%);
 }
 a {
   text-align: center;
@@ -224,6 +244,9 @@ a {
   font-size: 16px;
   margin: 0 auto;
   display: block;
+  animation-name: loading;
+  animation-duration: 2s;
+  animation-iteration-count: 5;
 }
 .heading {
   position: relative;
@@ -244,5 +267,14 @@ a {
   border-radius: calc(5.8rem * 0.3);
   padding: calc(5.8rem * 0.2);
   box-shadow: 0 0 2rem rgb(0, 0, 0, 20%);
+}
+
+@keyframes loading {
+  from {
+    background-color: blue;
+  }
+  to {
+    background-color: darkorchid;
+  }
 }
 </style>
