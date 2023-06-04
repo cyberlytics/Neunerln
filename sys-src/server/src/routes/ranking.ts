@@ -2,6 +2,8 @@ import express, { Request, Response } from 'express'
 import { body, param } from 'express-validator'
 import { BadRequestError } from '../errors/bad-request-error'
 import { validateRequest } from '../middlewares/validate-request'
+import { InternalServerError } from '../errors/interal-server-error'
+import Ranking from 'src/model/Ranking'
 
 const router = express.Router()
 
@@ -27,15 +29,21 @@ router.post(
     const { userId } = req.params
     const { wins, losses } = req.body
 
-    // throw 404 error if user doesnt exist
+    if (await findUserById(userId)) {
+      // throw bad request error if user doesnt exist
+      throw new BadRequestError('User does not exist', ['User does not exist'])
+    }
+    // create and commit new user to db
+    try {
+      await Ranking.create({ wins, losses, userId })
 
-    // create database transaction to save ranking
-
-    // commit database transaction
-
-    return res.status(201).send({
-      message: 'Successfully created Ranking!',
-      links: [{ href: '/api/rankings/{userId}', rel: 'self', method: 'POST' }]
-    })
+      // return success response
+      return res.status(201).send({
+        message: 'Successfully created Ranking!',
+        links: [{ href: '/api/rankings/{userId}', rel: 'self', method: 'POST' }]
+      })
+    } catch (e) {
+      throw new InternalServerError('Something went wrong with saving the user in the database')
+    }
   }
 )
