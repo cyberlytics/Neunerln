@@ -9,6 +9,7 @@ const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const name = ref('')
+const success = ref(true)
 
 function handleInput(e: any, input: string) {
   switch (input) {
@@ -47,10 +48,12 @@ async function signup() {
       email
     })
     console.log(res.status)
-    //TODO: Erfolg dem User anzeigen
+    success.value = true
+    //TODO: Weiterleiten an Lobby
   } catch (err: any) {
     //TODO: Fehler dem User anzeigen
     console.log(err)
+    //TODO: Welche Fehler können auftreten?
     alert('Fehler beim Registerien.')
   }
 }
@@ -62,7 +65,7 @@ async function login() {
       password
     })
     console.log(res.status)
-    //TODO: Erfolg dem User anzeigen
+    success.value = true
   } catch (err: any) {
     //TODO: Fehler dem User anzeigen
     console.log(err)
@@ -72,7 +75,7 @@ async function login() {
 
 function showRegisterView() {
   showLoginParts.value = !showLoginParts.value
-  header.value = 'Register'
+  header.value = 'Registrieren'
 }
 
 function showLoginView() {
@@ -172,6 +175,11 @@ function arePasswordsEqual() {
       </tr>
       <tr>
         <td colspan="2">
+          <div v-if="success" class="success">{{ header }} war erfolgreich</div>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
           <button
             v-if="showLoginParts"
             class="button"
@@ -189,19 +197,19 @@ function arePasswordsEqual() {
             form="LoginForm"
             @click="signup"
           >
-            Register
+            Registrieren
           </button>
         </td>
       </tr>
       <tr>
         <td colspan="2">
-          <a v-if="showLoginParts" href="#top" @click="showRegisterView">I don't have an account</a>
+          <a v-if="showLoginParts" href="#top" @click="showRegisterView">Ich habe keinen Account</a>
           <p v-else></p>
         </td>
       </tr>
       <tr>
         <td colspan="2">
-          <a v-if="!showLoginParts" href="#top" @click="showLoginView">Back to Login</a>
+          <a v-if="!showLoginParts" href="#top" @click="showLoginView">Zurück zum Login</a>
           <p v-else></p>
         </td>
       </tr>
@@ -253,6 +261,12 @@ a {
   font-size: large;
   padding: 5px;
   text-align: center;
+}
+.success {
+  font-size: xx-large;
+  padding: 5px;
+  text-align: center;
+  color: hsla(160, 100%, 37%, 1);
 }
 .container {
   position: absolute;
