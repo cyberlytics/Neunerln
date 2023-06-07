@@ -9,7 +9,8 @@ const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const name = ref('')
-const success = ref(true)
+const showErrorOrSuccess = ref(true)
+const errorState = ref('')
 
 function handleInput(e: any, input: string) {
   switch (input) {
@@ -48,14 +49,17 @@ async function signup() {
       email
     })
     console.log(res.status)
-    success.value = true
-    //TODO: Weiterleiten an Lobby
+    showErrorOrSuccess.value = true
   } catch (err: any) {
-    //TODO: Fehler dem User anzeigen
+    if (err.response.status === 400)
+      errorState.value = 'Fehler beim Registieren. Bitte überprüfen Sie die Eingaben.'
+    else if (err.response.status === 500)
+      errorState.value = 'Verbindung zum Server fehlgeschlagen. Bitte erneut versuchen.'
     console.log(err)
-    //TODO: Welche Fehler können auftreten?
-    alert('Fehler beim Registerien.')
+    return
   }
+  errorState.value = 'Registrierung war erfolgreich.'
+  //TODO: Weiterleiten an Lobby
 }
 
 async function login() {
@@ -64,23 +68,31 @@ async function login() {
       name,
       password
     })
-    console.log(res.status)
-    success.value = true
+    //console.log(res.status)
+    showErrorOrSuccess.value = true
   } catch (err: any) {
     //TODO: Fehler dem User anzeigen
+    if (err.response.status === 404) {
+      errorState.value = 'Fehler beim Einloggen. Bitte überprüfen Sie die Eingaben.'
+    } else if (err.response.status === 500)
+      errorState.value = 'Verbindung zum Server fehlgeschlagen. Bitte erneut versuchen.'
     console.log(err)
-    alert('Fehler beim Einloggen.')
+    return
   }
+  errorState.value = 'Einloggen erfolgreich'
+  //TODO: Weiterleitung
 }
 
 function showRegisterView() {
   showLoginParts.value = !showLoginParts.value
   header.value = 'Registrieren'
+  errorState.value = ''
 }
 
 function showLoginView() {
   showLoginParts.value = !showLoginParts.value
   header.value = 'Login'
+  errorState.value = ''
 }
 
 function isEmailCorrect() {
@@ -175,7 +187,15 @@ function arePasswordsEqual() {
       </tr>
       <tr>
         <td colspan="2">
-          <div v-if="success" class="success">{{ header }} war erfolgreich</div>
+          <div
+            v-if="showErrorOrSuccess"
+            :class="{
+              success: !errorState.includes('Fehler'),
+              fail: errorState.includes('Fehler')
+            }"
+          >
+            {{ errorState }}
+          </div>
         </td>
       </tr>
       <tr>
@@ -267,6 +287,13 @@ a {
   padding: 5px;
   text-align: center;
   color: hsla(160, 100%, 37%, 1);
+}
+
+.fail {
+  font-size: xx-large;
+  padding: 5px;
+  text-align: center;
+  color: rgb(209, 44, 15);
 }
 .container {
   position: absolute;
