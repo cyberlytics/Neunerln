@@ -9,8 +9,8 @@
     <div class="table">
         <h3>pile</h3>
         <div class="drawPile">
-        <div>DrawingPile: {{ publicGameMetadata?.drawingPileCount }}<br></div>&nbsp;
-          <div>DiscardPile: {{ publicGameMetadata?.discardPile.length }}<br></div>
+            <div>DrawingPile: {{ publicGameMetadata?.drawingPileCount }}<br></div>&nbsp;
+            <div>DiscardPile: {{ publicGameMetadata?.discardPile.length }}<br></div>
         </div>
         <div class="discard-pile">
             <div>
@@ -20,29 +20,20 @@
             <div class="discardPile">
                 <CardFront v-for="card in publicGameMetadata?.discardPile" :value="card.number" :color="card.color" />
             </div>
+        </div>
     </div>
-        <br>
-        Current player: {{ publicGameMetadata?.currentPlayerName }}<br>
-    
-        <div class="player">
+    <br>
+    Current player: {{ publicGameMetadata?.currentPlayerName }}<br>
+
+    <div class="player">
         <h3>player</h3>
         {{ userName }}: {{ publicGameMetadata?.cardCountPerPlayer[player || ''] }}<br>
         <div class="hand-cards">
         <!-- {{ handCards?.map(card => `${card.number}${card.color}`).join(', ') }} -->
-            <CardFront class="playerCards" v-if="handCards" v-for="card in handCards" :value="card.number" :color="card.color"   />
+            <CardFront class="playerCards" v-if="handCards" v-for="card in handCards" :value="card.number" :color="card.color"
+                @click="playCard(card)"/>
         </div>
-   </div>
-
-   <div class="options" v-if="props.publicGameMetadata?.currentPlayerName == userName">
-        <h3>options</h3>
-        
-        <button @click="endRound()">End Round</button>
-        
-   </div>
-
-        
     </div>
-
 </template>
 
 <script setup lang="ts">
@@ -51,13 +42,6 @@ import type { Card } from '@/types/card';
 import CardFront from '../game/CardFront.vue';
 import { PublicGameMetadata } from '@/types/publicGameMetadata';
 import { computed } from 'vue';
-import { PublicRoomData } from '@/types/publicRoomData';
-import { io } from 'socket.io-client';
-
-
-
-
-
 //#endregion imports
 
 const cardBack= '../src/assets/card_back.svg';
@@ -103,20 +87,12 @@ const orderedEnemies = computed(() => {
     return enemies;
 });
 
+const emit = defineEmits(['cardPlayed']);
 
 
-//const emit = defineEmits(['nextPlayer']);
-const socket = io('127.0.0.1:3000');
-
-function endRound() {
-
-//console.log(currentRoomId?.value);
-  socket.emit('nextPlayer', props.publicGameMetadata?.players, props.publicGameMetadata?.currentPlayerName);
-    //console.log("Fucks given");
+function playCard(card: Card) {
+  emit('cardPlayed', card);
 }
-
-
-
 </script>
 
 <style>

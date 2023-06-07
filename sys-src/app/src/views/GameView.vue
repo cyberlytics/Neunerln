@@ -5,6 +5,7 @@
     />
     <Game v-else
       :userName="userName" :publicGameMetadata="publicGameMetadata" :handCards="handCards"
+      @cardPlayed="cardPlayed"
     />
 </template>
 
@@ -50,6 +51,11 @@ socket.on(SocketRoom.handCardsPublished, (cards: Card[]) => {
   handCards.value = cards;
 });
 
+socket.on(SocketRoom.cardMoveFeedback, (message: string) => {
+  alert(message);
+});
+
+
 //#endregion subscribe
 
 //#region publish
@@ -69,6 +75,14 @@ function joinRoom(roomId: string) {
   socket.emit(
     SocketRoom.roomJoined,
     roomId, userName.value
+  );
+}
+
+function cardPlayed(card: Card) {
+  // sent move to backend
+  socket.emit(
+    SocketRoom.playCard,
+    currentRoomId.value, card
   );
 }
 

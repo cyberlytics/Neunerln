@@ -4,6 +4,7 @@ import { Player } from "../types/player";
 import { PublicRoomData } from "../types/publicRoomData";
 import { SocketRoom } from "../types/socketRoom";
 import { Room } from "./room";
+import { Card } from "src/types/card";
 
 let RoomID: Room;
 
@@ -59,9 +60,9 @@ export class SocketManager {
     );
 
     socket.on(
-      SocketRoom.NextPlayer, (players: string, currentPlayer:string) =>
-      this.nextPlayer(players, currentPlayer),
-      );
+      SocketRoom.playCard, (roomId: string, card: Card) =>
+        this.playCard(socket, roomId, card)
+    );
 
       
     if (this.userConnectionLog) {
@@ -103,14 +104,65 @@ export class SocketManager {
     this.logRooms();
   }
 
+  playCard(socket: any, roomId: string, card: Card) {
+    let currentRoom = this.rooms.find((room) => room.id == roomId);
+    if (currentRoom == null) {
+      return;
+    }
+
+    // move functions to room/game class
+    // check if players turn
+    if (currentRoom?.currentPlayer?.id != socket.id) {
+      // send user feedback -> not his turn
+      socket.emit(
+        SocketRoom.cardMoveFeedback,
+        "Not your turn!"
+      );
+      return;
+    }
+
+    // check if card an be played
+    let lastDiscardCard = currentRoom.discardPile[currentRoom?.discardPile.length - 1]; 
+    if (lastDiscardCard?.color != card.color
+      && lastDiscardCard?.number != card.number) {
+        // && nine
+      // send user feedback -> invalid move
+      socket.emit(
+        SocketRoom.cardMoveFeedback,
+        "you can't place this card"
+      );
+      return;
+      }
+
+    // process cardmove
+    // * add card to discard pile
+    currentRoom.discardPile.push(card);
+
+    // * remove card from current player
+    if (currentRoom.currentPlayer == null) {
+      return;
+    }
+    currentRoom.currentPlayer.handCards = 
+      currentRoom.currentPlayer?.handCards
+        .filter((handcard) => !(handcard.color == card.color && handcard.number == card.number));
+
+    // * set new current player
+    const currentIndex = currentRoom.players.findIndex(player => player.id === socket.id);
+    const nextIndex = (currentIndex + 1) % currentRoom.players.length;
+    const nextPlayer = currentRoom.players[nextIndex];
+    currentRoom.currentPlayer = nextPlayer;
+
+    // update for everyone
+    this.updateGamedata(currentRoom);
+  }
+
   joinRoom(socket: any, roomId: string, userName: string) {
     const room = this.rooms.find((room) => room.id == roomId);
         if (!room
           || room.ingame) {
           return;
         }
-        const meins = this.RoomId(room);
-        console.log(meins);
+
         // add and subscribe player to room
         room.players.push(new Player(socket.id, userName));
         socket.join(room.id);
@@ -127,7 +179,7 @@ export class SocketManager {
           this.getLobbyData()
         );
   
-        this.updateGamedata(room,undefined);
+        this.updateGamedata(room);
   }
 
   leaveRoom(room: Room, userId: string) {
@@ -140,7 +192,7 @@ export class SocketManager {
     }
     // update room members
     else {
-      this.updateGamedata(room, undefined);
+      this.updateGamedata(room);
     }
 
     // update lobby data
@@ -150,57 +202,26 @@ export class SocketManager {
     ); 
   }
 
-  updateGamedata(room: Room, NextPlayer: string|undefined) {
+  updateGamedata(room: Room) {
     // get new game data
-    
-    
+    const cardsPerPlayer = room.players.reduce((result, player) => {
+      result[player.name] = player.handCards.length;
+      return result;
+    }, {} as { [userName: string]: number; })
 
-if(NextPlayer == undefined){
-
-  const cardsPerPlayer = room.players.reduce((result, player) => {
-    result[player.name] = player.handCards.length;
-    return result;
-  }, {} as { [userName: string]: number; })
-
-       const gameMetadata = new PublicGameMetadata(
-        cardsPerPlayer,
-        room.drawPile.length,
-        room.discardPile,
-        room.players.map((player) => player.name),
-        room.currentPlayer?.name,
-      )
-
-    
+        const gameMetadata = new PublicGameMetadata(
+          cardsPerPlayer,
+          room.drawPile.length,
+          room.discardPile,
+          room.players.map((player) => player.name),
+          room.currentPlayer?.name,
+        )
 
     // update room members with new game data
     this.io.to(room.id).emit(
       SocketRoom.gamedataPublished,
       gameMetadata
     );
-}else{
-  const nextPlayer = NextPlayer;
-  const cardsPerPlayer = room.players.reduce((result, player) => {
-    result[player.name] = player.handCards.length;
-    return result;
-  }, {} as { [userName: string]: number; })
-
-  const gameMetadata = new PublicGameMetadata(
-    cardsPerPlayer,
-    room.drawPile.length,
-    room.discardPile,
-    room.players.map((player) => player.name),
-    nextPlayer,
-  )
-  console.log(nextPlayer);
-
-
-
-// update room members with new game data
-this.io.to(room.id).emit(
-  SocketRoom.gamedataPublished,
-  gameMetadata
-);
-}
   }
 
   sendHandCards(socket: any, roomId: string) {
@@ -236,31 +257,5 @@ this.io.to(room.id).emit(
     }else{
       return RoomID;
     }
-  }
-  
-
-  nextPlayer(players: string, currentPlayer:string){
-
-    console.log(currentPlayer);
-    console.log(players.length);
-    const room = this.RoomId(null);
-    //console.log(room);
-    let Nextplayer = undefined;
-    for(let i = 0; i < players.length; i++){
-      if(currentPlayer == players[i]){
-        var a=i;
-        if(a++ < players.length-1){
-        Nextplayer = players[i+1];
-        break;
-        }else{
-          Nextplayer = players[0];
-          break;
-        }
-      }
-    }
-    console.log(Nextplayer);
-
-    this.updateGamedata(room, Nextplayer)
-    
   }
 }
