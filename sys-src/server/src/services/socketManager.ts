@@ -64,6 +64,11 @@ export class SocketManager {
         this.playCard(socket, roomId, card)
     );
 
+    socket.on(
+      SocketRoom.drawCard, (roomId: string, card: Card) =>
+        this.drawCard(socket, roomId, card)
+    );
+
       
     if (this.userConnectionLog) {
       console.log(`Client ${socket.id} connected. (${this.io.engine.clientsCount})`);
@@ -124,7 +129,8 @@ export class SocketManager {
     // check if card an be played
     let lastDiscardCard = currentRoom.discardPile[currentRoom?.discardPile.length - 1]; 
     if (lastDiscardCard?.color != card.color
-      && lastDiscardCard?.number != card.number) {
+      && lastDiscardCard?.number != card.number
+      && card.number != '9') {
         // && nine
       // send user feedback -> invalid move
       socket.emit(
@@ -134,9 +140,17 @@ export class SocketManager {
       return;
       }
 
+
+      if(card.number == '9') {
+        socket.emit(
+          SocketRoom.cardMoveFeedback,
+          "Wähle eine Farbe aus?"
+        );
+      }
     // process cardmove
     // * add card to discard pile
     currentRoom.discardPile.push(card);
+   
 
     // * remove card from current player
     if (currentRoom.currentPlayer == null) {
@@ -145,6 +159,42 @@ export class SocketManager {
     currentRoom.currentPlayer.handCards = 
       currentRoom.currentPlayer?.handCards
         .filter((handcard) => !(handcard.color == card.color && handcard.number == card.number));
+
+    // * set new current player
+    const currentIndex = currentRoom.players.findIndex(player => player.id === socket.id);
+    const nextIndex = (currentIndex + 1) % currentRoom.players.length;
+    const nextPlayer = currentRoom.players[nextIndex];
+    currentRoom.currentPlayer = nextPlayer;
+
+    // update for everyone
+    this.updateGamedata(currentRoom);
+  }
+
+  drawCard(socket: any, roomId: string, card: Card) {
+    let currentRoom = this.rooms.find((room) => room.id == roomId);
+    if (currentRoom == null) {
+      return;
+    }
+
+    // check if players turn
+    if (currentRoom?.currentPlayer?.id != socket.id) {
+      // send user feedback -> not his turn
+      socket.emit(
+        SocketRoom.cardMoveFeedback,
+        "Not your turn!"
+      );
+      return;
+    }
+
+    // declare the top card
+    let lastDrawCard = currentRoom.drawPile[currentRoom?.drawPile.length - 1]; 
+
+    // process cardmove
+    // * add draw pile to handcards
+    currentRoom.currentPlayer?.handCards.push(lastDrawCard);
+    
+     // * remove card from draw pile
+    currentRoom.drawPile.pop();
 
     // * set new current player
     const currentIndex = currentRoom.players.findIndex(player => player.id === socket.id);

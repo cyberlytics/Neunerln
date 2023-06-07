@@ -14,11 +14,14 @@
         </div>
         <div class="discard-pile">
             <div>
-         <!-- {{ publicGameMetadata?.discardPile.map(card => `${card.number}${card.color}`).join(', ') }}  -->
-                <CardFront class="drawingCards" :back="cardBack" v-for="card in publicGameMetadata?.drawingPileCount"/>
+                <!-- <CardFront class="drawingCards" :back="cardBack" v-for="card in publicGameMetadata?.drawingPileCount"
+                @click="drawCard(card)"/> -->
+
+                <CardFront class="drawingCards" :back="cardBack" v-for="card in publicGameMetadata?.discardPile"
+                @click="drawCard(card)"/>
             </div>
             <div class="discardPile">
-                <CardFront v-for="card in publicGameMetadata?.discardPile" :value="card.number" :color="card.color" />
+                <CardFront class="drawingCards" v-for="card in publicGameMetadata?.discardPile" :value="card.number" :color="card.color" />
             </div>
         </div>
     </div>
@@ -29,7 +32,6 @@
         <h3>player</h3>
         {{ userName }}: {{ publicGameMetadata?.cardCountPerPlayer[player || ''] }}<br>
         <div class="hand-cards">
-        <!-- {{ handCards?.map(card => `${card.number}${card.color}`).join(', ') }} -->
             <CardFront class="playerCards" v-if="handCards" v-for="card in handCards" :value="card.number" :color="card.color"
                 @click="playCard(card)"/>
         </div>
@@ -87,11 +89,16 @@ const orderedEnemies = computed(() => {
     return enemies;
 });
 
-const emit = defineEmits(['cardPlayed']);
+const emit = defineEmits(['cardPlayed', 'cardDrawn']);
 
 
 function playCard(card: Card) {
   emit('cardPlayed', card);
+}
+
+
+function drawCard(card: Card) {
+  emit('cardDrawn', card);
 }
 </script>
 
@@ -108,12 +115,6 @@ body > div {
     left: 9rem;
 }
 
-.enemies {
-    /* position: absolute;
-    inset: 0 0 150px 0; */
-    /* border: solid 2px turquoise; */
-    /* height: 150px; */
-}
 
 .hand-cards, .enemies-handcards{
     display: flex;
@@ -129,29 +130,5 @@ body > div {
 
 .enemiesCards, .playerCards {
     margin-right: -50px;
-}
-
-.player {
-    /* position: absolute;
-    inset: 475px 0 0 0; */
-    
-    /* border: solid 2px orange; */
-    /* height: fit-content; */
-}
-
-
-.table {
-    /* position: absolute;
-    inset: 150px 0 0 0; */
-    /* border: solid 2px green; */
-    /* height: 325px;*/
-} 
-
-.options {
-    /* position: absolute;
-    inset: 780px 0 0 0; */
-    
-    /* border: solid 2px blue; */
-    /* height: 150px; */
 }
 </style>
