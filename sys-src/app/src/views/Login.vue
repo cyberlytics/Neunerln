@@ -283,14 +283,14 @@ a {
   text-align: center;
 }
 .success {
-  font-size: xx-large;
+  font-size: large;
   padding: 5px;
   text-align: center;
   color: hsla(160, 100%, 37%, 1);
 }
 
 .fail {
-  font-size: xx-large;
+  font-size: large;
   padding: 5px;
   text-align: center;
   color: rgb(209, 44, 15);
