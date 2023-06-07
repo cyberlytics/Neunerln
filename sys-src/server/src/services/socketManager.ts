@@ -121,11 +121,18 @@ export class SocketManager {
       return;
     }
 
+    //Check for nine in specialcards and if nine is played
+    let nine:boolean = false;
+    if((currentRoom.specialCards.includes("nine")) && (card.number == "9")){
+      nine = true;
+    }
+
+    if(!nine){
     // check if card an be played
     let lastDiscardCard = currentRoom.discardPile[currentRoom?.discardPile.length - 1]; 
     if (lastDiscardCard?.color != card.color
       && lastDiscardCard?.number != card.number) {
-        // && nine
+
       // send user feedback -> invalid move
       socket.emit(
         SocketRoom.cardMoveFeedback,
@@ -133,7 +140,8 @@ export class SocketManager {
       );
       return;
       }
-
+    }
+    
     // process cardmove
     // * add card to discard pile
     currentRoom.discardPile.push(card);
@@ -146,15 +154,103 @@ export class SocketManager {
       currentRoom.currentPlayer?.handCards
         .filter((handcard) => !(handcard.color == card.color && handcard.number == card.number));
 
-    // * set new current player
-    const currentIndex = currentRoom.players.findIndex(player => player.id === socket.id);
-    const nextIndex = (currentIndex + 1) % currentRoom.players.length;
-    const nextPlayer = currentRoom.players[nextIndex];
-    currentRoom.currentPlayer = nextPlayer;
+
+        // * set new current player if card is not in special cards
+       let number:string = this.CardnumberToString(card);
+        if(currentRoom.specialCards.includes(number)){
+          console.log("is in special cards");
+          currentRoom.currentPlayer = this.SpecialMove(number, socket.id, currentRoom);
+
+          
+        }else{
+          console.log("is not in special card");
+          const currentIndex = currentRoom.players.findIndex(player => player.id === socket.id);
+          const nextIndex = (currentIndex + 1) % currentRoom.players.length;
+          const nextPlayer = currentRoom.players[nextIndex];
+          currentRoom.currentPlayer = nextPlayer;
+        }
+    
+        
+    
 
     // update for everyone
     this.updateGamedata(currentRoom);
   }
+
+  CardnumberToString(card: Card){
+    let cardnumber: string = "";
+    if(card.number == "6"){
+      cardnumber = "six";
+    }else if(card.number == "7"){
+      cardnumber = "seven";
+    }else if(card.number == "8"){
+      cardnumber = "eight";
+    }else if(card.number == "9"){
+      cardnumber = "nine";
+    }else if(card.number == "10"){
+      cardnumber = "ten";
+    }else if(card.number == "U"){
+      cardnumber = "unter";
+    }else if(card.number == "O"){
+      cardnumber = "ober";
+    }else if(card.number == "K"){
+      cardnumber = "king";
+    }else if(card.number == "A"){
+      cardnumber = "ace";
+    }
+
+    return cardnumber;
+  }
+
+
+//Add Special Moves (without nine)
+SpecialMove(Cardnumber: string, socketid : String, currentRoom: Room, ){
+
+var Nextplayer:Player;
+
+if(Cardnumber == "seven"){
+  console.log("is in seven");
+  //Next player has to take two cards
+  const currentIndex = currentRoom.players.findIndex(player => player.id === socketid);
+  const nextHandcardIndex = (currentIndex + 1) % currentRoom.players.length;
+  const Nexthandcardplayer = currentRoom.players[nextHandcardIndex];
+  //Take two cards
+  Nexthandcardplayer.handCards.push(<Card>currentRoom.drawPile.pop());
+  Nexthandcardplayer.handCards.push(<Card>currentRoom.drawPile.pop());
+
+  //Todo if other player has a 7 he can play it 
+
+}else if(Cardnumber == "eight"){
+  console.log("is in eight");
+  //Next player is skipped
+  const currentIndex = currentRoom.players.findIndex(player => player.id === socketid);
+  const nextIndex = (currentIndex + 2) % currentRoom.players.length;
+  Nextplayer = currentRoom.players[nextIndex];
+  return Nextplayer;
+
+
+}else if(Cardnumber == "ten"){
+  console.log("is in ten");
+  //Give the player of your choice one card
+  
+
+}else if(Cardnumber == "ace"){
+console.log("is in ace");
+  //You can play another card
+  const currentIndex = currentRoom.players.findIndex(player => player.id === socketid);
+  Nextplayer = currentRoom.players[currentIndex];
+  return Nextplayer;
+
+}
+
+const currentIndex = currentRoom.players.findIndex(player => player.id === socketid);
+const nextIndex = (currentIndex + 1) % currentRoom.players.length;
+Nextplayer = currentRoom.players[nextIndex];
+
+return Nextplayer
+
+}
+
 
   joinRoom(socket: any, roomId: string, userName: string) {
     const room = this.rooms.find((room) => room.id == roomId);
