@@ -33,7 +33,7 @@ export async function userExists(email: string) {
   return User.exists({ email: email })
 }
 
-//Update games played
+//Increase games played
 export async function increasePlayed(email: string) {
   const user = await findUserByEmail(email)
   if (user && user.played) {
@@ -45,6 +45,7 @@ export async function increasePlayed(email: string) {
   }
 }
 
+//Increase wins
 export async function increaseWon(email: string) {
   const user = await findUserByEmail(email)
   if (user && user.won) {
@@ -54,4 +55,9 @@ export async function increaseWon(email: string) {
   } else {
     throw new DatabaseError('Could not find email in database.')
   }
+}
+
+//returns names, games played, games won from all users, sorted by wins
+export async function getUsers() {
+  return User.find({}, "name played won").sort([["won", "desc"]]);
 }
