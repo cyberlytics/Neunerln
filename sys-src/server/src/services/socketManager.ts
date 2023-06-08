@@ -283,13 +283,37 @@ return Nextplayer
     // declare the top card
     let lastDrawCard = currentRoom.drawPile[currentRoom?.drawPile.length - 1];
     let lastDiscardCard = currentRoom.discardPile[currentRoom?.discardPile.length - 1]; 
+    let handcardLength: number = 0;
+    let handcardMatches = false;
 
-    // process cardmove
-    // * add draw pile to handcards
-    currentRoom.currentPlayer?.handCards.push(lastDrawCard);
+    // check if handcards are defined
+    if (currentRoom.currentPlayer?.handCards) {
+      handcardLength = currentRoom.currentPlayer.handCards.length;
+    }
+
+    // check if any handcard match to the discard card
+    for (let i = 0; i < handcardLength; i++) {
+      if (currentRoom.currentPlayer?.handCards[i].color == lastDiscardCard.color
+        || currentRoom.currentPlayer?.handCards[i].number == lastDiscardCard.number
+        || currentRoom.currentPlayer?.handCards[i].number == '9'){
+          handcardMatches = true;
+          socket.emit(
+            SocketRoom.cardMoveFeedback,
+            "Put one of your hand cards"
+          );
+          return;
+      }
+    }
+
+    // if handcard matches, then you can and should draw a card
+    if (handcardMatches == false){
+            // process cardmove
+        // * add draw pile to handcards
+        currentRoom.currentPlayer?.handCards.push(lastDrawCard);
     
-     // * remove card from draw pile
-    currentRoom.drawPile.pop();
+        // * remove card from draw pile
+        currentRoom.drawPile.pop();
+      }
 
     // * set new current player
     const currentIndex = currentRoom.players.findIndex(player => player.id === socket.id);
