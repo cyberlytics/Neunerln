@@ -281,7 +281,8 @@ return Nextplayer
     }
 
     // declare the top card
-    let lastDrawCard = currentRoom.drawPile[currentRoom?.drawPile.length - 1]; 
+    let lastDrawCard = currentRoom.drawPile[currentRoom?.drawPile.length - 1];
+    let lastDiscardCard = currentRoom.discardPile[currentRoom?.discardPile.length - 1]; 
 
     // process cardmove
     // * add draw pile to handcards
@@ -293,9 +294,21 @@ return Nextplayer
     // * set new current player
     const currentIndex = currentRoom.players.findIndex(player => player.id === socket.id);
 
-    //Spieler ist nach dem ziehen dirket nochmal dran, egal ob eine der Karten gepasst hätte oder nicht. Spieler kann unendlich oft ziehen.
-    const nextPlayer = currentRoom.players[currentIndex];
-    currentRoom.currentPlayer = nextPlayer;
+    // * if DiscardCard (number or color) is not the same as drawn card, the the nextplayer is next
+    if (lastDiscardCard?.color != lastDrawCard?.color
+      && lastDiscardCard?.number != lastDrawCard?.number
+      && lastDrawCard?.number != '9') {
+
+        const nextIndex = (currentIndex + 1) % currentRoom.players.length;
+        const nextPlayer = currentRoom.players[nextIndex];
+        currentRoom.currentPlayer = nextPlayer;
+
+    }
+    else {
+      const nextPlayer = currentRoom.players[currentIndex];
+      currentRoom.currentPlayer = nextPlayer;
+    }
+
 
     // update for everyone
     this.updateGamedata(currentRoom);
