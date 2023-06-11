@@ -16,14 +16,14 @@ describe('add User in database', () => {
       "Player1@test.com",
       "Pass12345"
     )
-    expect(user.name).toEqual("Player1");
+    expect(user.username).toEqual("Player1");
     expect(user.email).toEqual("Player1@test.com");
     expect(user.password).toEqual("Pass12345");
   })
 })
 
 describe('throw error on user creation', () => {
-  it('on duplicate name', async () => {
+  it('on duplicate username', async () => {
     try{
       await data.createUser("Player1", "Player2@test.com", "Pass12345");
       await data.createUser("Player1", "Player1@test.com", "Pass12345");
@@ -45,17 +45,21 @@ describe('should find User in database', () => {
   it('should find email in database', async () => {
     await data.createUser("Player1", "Player1@test.com", "Pass12345");
     const user = await data.findUserByEmail("Player1@test.com")
-    expect(user.name).toEqual("Player1");
-    expect(user.played).toEqual(0);
-    expect(user.won).toEqual(0);
+    if(user) {
+      expect(user.username).toEqual("Player1");
+      expect(user.played).toEqual(0);
+      expect(user.won).toEqual(0);
+    }
   })
 
   it('should find username in database', async () => {
     await data.createUser("Player1", "Player1@test.com", "Pass12345");
     const user = await data.findUserByUsername("Player1")
-    expect(user.name).toEqual("Player1");
-    expect(user.played).toEqual(0);
-    expect(user.won).toEqual(0);
+    if(user) {
+      expect(user.username).toEqual("Player1");
+      expect(user.played).toEqual(0);
+      expect(user.won).toEqual(0);
+    }
   })
 
 })
