@@ -12,6 +12,7 @@ import { errorHandler } from './middlewares/error-handler'
 // routes
 import { signoutRouter } from './routes/signout'
 import { signUpRouter } from './routes/signup'
+import { signinRouter } from './routes/signin'
 
 // create server
 const app = express()
@@ -54,6 +55,7 @@ app.use(
  */
 app.use(signoutRouter)
 app.use(signUpRouter)
+app.use(signinRouter)
 
 app.all('*', async () => {
   throw new NotFoundError()
