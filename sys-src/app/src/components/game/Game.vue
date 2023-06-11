@@ -8,23 +8,34 @@
     <div class="table">
         DrawingPile: {{ publicGameMetadata?.drawingPileCount }}<br>
         DiscardPile: {{ publicGameMetadata?.discardPile.length }}<br>
-        {{ publicGameMetadata?.discardPile.map(card => `${card.number}${card.color}`).join(', ') }}
+        <div class="discard-pile">
+         <!-- {{ publicGameMetadata?.discardPile.map(card => `${card.number}${card.color}`).join(', ') }}  -->
+        <CardFront :back="cardBack" />
+        <CardFront v-for="card in publicGameMetadata?.discardPile" :value="card.number" :color="card.color" />
+    </div>
         <br><br>
         Current player: {{ publicGameMetadata?.currentPlayerName }}
     </div>
     <div class="player">
         <h3>player</h3>
         {{ userName }}: {{ publicGameMetadata?.cardCountPerPlayer[player || ''] }}<br>
-        {{ handCards?.map(card => `${card.number}${card.color}`).join(', ') }}
-    </div>
+        <div class="hand-cards">
+        <!-- {{ handCards?.map(card => `${card.number}${card.color}`).join(', ') }} -->
+            <CardFront v-if="handCards" v-for="card in handCards" :value="card.number" :color="card.color" />
+        </div>
+   </div>
 </template>
 
 <script setup lang="ts">
 //#region imports
 import type { Card } from '@/types/card';
+import CardFront from '../game/CardFront.vue';
 import { PublicGameMetadata } from '@/types/publicGameMetadata';
 import { computed } from 'vue';
 //#endregion imports
+
+const cardBack= '../src/assets/card_back.svg';
+
 
 const props = defineProps({
     userName: String,
@@ -70,26 +81,33 @@ body > div {
     inset: 0;
 }
 
+.discard-pile {
+    display: flex;
+}
 .enemies {
     position: absolute;
-    inset: 0 0 auto 0;
-    
+    inset: 0 0 150px 0;
     border: solid 2px turquoise;
-    height: 100px;
+    height: 150px;
+}
+
+.hand-cards{
+    display: flex;
 }
 
 .player {
     position: absolute;
-    inset: auto 0 0 0;
+    inset: 475px 0 0 0;
     
     border: solid 2px orange;
-    height: 100px;
+    height: fit-content;
 }
 
 
 .table {
     position: absolute;
-    inset: 100px 0 100px 0;
+    inset: 150px 0 0 0;
     border: solid 2px green;
+    height: 325px;
 }
 </style>

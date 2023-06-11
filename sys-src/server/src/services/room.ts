@@ -80,16 +80,16 @@ export class Room {
             new Card(CardNumber.king, CardColor.herz),
             new Card(CardNumber.ace, CardColor.herz),
     
-            // blatt
-            new Card(CardNumber.six, CardColor.blatt),
-            new Card(CardNumber.seven, CardColor.blatt),
-            new Card(CardNumber.eight, CardColor.blatt),
-            new Card(CardNumber.nine, CardColor.blatt),
-            new Card(CardNumber.ten, CardColor.blatt),
-            new Card(CardNumber.unter, CardColor.blatt),
-            new Card(CardNumber.ober, CardColor.blatt),
-            new Card(CardNumber.king, CardColor.blatt),
-            new Card(CardNumber.ace, CardColor.blatt),
+            // gras
+            new Card(CardNumber.six, CardColor.gras),
+            new Card(CardNumber.seven, CardColor.gras),
+            new Card(CardNumber.eight, CardColor.gras),
+            new Card(CardNumber.nine, CardColor.gras),
+            new Card(CardNumber.ten, CardColor.gras),
+            new Card(CardNumber.unter, CardColor.gras),
+            new Card(CardNumber.ober, CardColor.gras),
+            new Card(CardNumber.king, CardColor.gras),
+            new Card(CardNumber.ace, CardColor.gras),
             
             // eichel
             new Card(CardNumber.six, CardColor.eichel),
