@@ -14,7 +14,7 @@
                 <CardFront class="drawingCard" :back="cardBack" v-for="card in publicGameMetadata?.discardPile"
                 @click="drawCard(card)"/>
             </div>
-            <div class="discardPile">
+            <div>
                 <CardFront class="drawingCards" v-for="card in publicGameMetadata?.discardPile" :value="card.number" :color="card.color" />
             </div>
         </div>
@@ -83,6 +83,8 @@ function playCard(card: Card) {
 function drawCard(card: Card) {
   emit('cardDrawn', card);
 }
+
+
 </script>
 
 <style>
@@ -112,9 +114,7 @@ function drawCard(card: Card) {
 }
 
 .draws {
-    margin-right: 15vh;
-  display: flex;
-    
+    margin-right: 25vh;    
 }
 
 .discard-pile {
@@ -131,12 +131,28 @@ function drawCard(card: Card) {
    
 }
 .hand-cards{
-    /* display: flex; */
     top: 0;
     left: 50%;
     transform: rotate(180deg) translateY(-70px);
 }
 
+
+.drawingCards:nth-child(4n+1){
+   
+    transform: translate(-0.5vh, -0.5vh) rotate(5deg);
+}
+.drawingCards:nth-child(4n+2){
+    transform: translate(-0.5vh, 0.5vh) rotate(-20deg);
+}
+.drawingCards:nth-child(4n+3){
+    transform: translate(0.5vh, -0.5vh) rotate(10deg);
+}
+.drawingCards:nth-child(4n+4){
+    transform: translate(0.5vh, 0.5vh) rotate(-15deg);
+}
+.drawingCards:first-child{
+    transform: rotate(0deg);
+}
 
 .enemies-handcards{
     left: 50%;
@@ -177,11 +193,7 @@ div.enemies-handcards:nth-child(4) {
     transform: translateX(-20vh) translateY(-50%) rotate(90deg);
 }
 
-/* .enemiesCards, .playerCards {
-    margin-right: -50px;
-} */
-
-.cards {
+.card {
     position: absolute;
 }
 
