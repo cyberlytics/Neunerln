@@ -46,7 +46,7 @@ app.use(
   cookieSession({
     // store session data within a cookie
     signed: false,
-    secure: process.env.NODE_ENV !== 'test'
+    secure: process.env.NODE_ENV === 'production' // should only be sent over https
   })
 )
 
