@@ -1,21 +1,24 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import axios from 'axios'
+import VueCookies from 'vue-cookies'
 
 const header = ref('Login')
 const showLoginParts = ref(true)
-const benutzername = ref('')
-const email = ref('')
-const password = ref('')
-const confirmPassword = ref('')
+const username = ref('NeunerlnTest')
+const email = ref('test@test.de')
+const password = ref('Password1!')
+const confirmPassword = ref('Password1!')
 const name = ref('')
 const showErrorOrSuccess = ref(true)
 const errorState = ref('')
+const token = ref('')
+//const $cookies = inject('$cookies')
 
 function handleInput(e: any, input: string) {
   switch (input) {
     case 'benutzername':
-      benutzername.value = e.target.value
+      username.value = e.target.value
       break
     case 'password':
       password.value = e.target.value
@@ -33,22 +36,20 @@ function handleInput(e: any, input: string) {
 }
 
 async function signup() {
-  if (!isEmailCorrect()) {
+  /*if (!isEmailCorrect()) {
     alert('Bitte korrekte Email Adresse eingeben.')
     return
   }
   if (!arePasswordsEqual()) {
     alert('Die Passwörter stimmen nicht überein!')
     return
-  }
+  }*/
   try {
     const res = await axios.post('http://localhost:3000/api/auth/signup', {
-      benutzername,
-      password,
-      confirmPassword,
-      email
+      username: username.value,
+      email: email.value,
+      password: password.value
     })
-    console.log(res.status)
     showErrorOrSuccess.value = true
   } catch (err: any) {
     if (err.response.status === 400)
@@ -60,18 +61,19 @@ async function signup() {
   }
   errorState.value = 'Registrierung war erfolgreich.'
   //TODO: Weiterleiten an Lobby
+  //TODO: JSON Web Token bekommt man zurück, diesen in Cookie speichern
 }
 
 async function login() {
   try {
     const res = await axios.post('http://localhost:3000/api/auth/signin', {
-      name,
-      password
+      name: name.value,
+      password: password.value
     })
     //console.log(res.status)
     showErrorOrSuccess.value = true
+    console.log(res)
   } catch (err: any) {
-    //TODO: Fehler dem User anzeigen
     if (err.response.status === 404) {
       errorState.value = 'Fehler beim Einloggen. Bitte überprüfen Sie die Eingaben.'
     } else if (err.response.status === 500)
@@ -79,7 +81,8 @@ async function login() {
     console.log(err)
     return
   }
-  errorState.value = 'Einloggen erfolgreich'
+  errorState.value = 'Einloggen war erfolgreich.'
+  //token.value = res.headers
   //TODO: Weiterleitung
 }
 
@@ -136,7 +139,7 @@ function arePasswordsEqual() {
         <td><label for="benutzername">Benutzername</label></td>
         <td>
           <input
-            :value="benutzername"
+            :value="username"
             id="benutzername"
             class="inputField"
             type="text"
@@ -190,8 +193,8 @@ function arePasswordsEqual() {
           <div
             v-if="showErrorOrSuccess"
             :class="{
-              success: !errorState.includes('Fehler'),
-              fail: errorState.includes('Fehler')
+              success: errorState.includes('erfolgreich'),
+              fail: !errorState.includes('erfolgreich')
             }"
           >
             {{ errorState }}
