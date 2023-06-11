@@ -38,7 +38,6 @@ router.post(
       throw new BadRequestError('Invalid credentials', ['Change email or password.'])
     }
 
-    console.log(process.env.JWT_KEY)
     // Generate JWT
     const userJwt = jwt.sign(
       {
