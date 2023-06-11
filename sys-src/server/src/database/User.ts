@@ -2,10 +2,10 @@ import { DatabaseError } from '../errors/database-error'
 import User from '../model/User'
 
 // Create a new User and insert into database
-export async function createUser(name: string, email: string, password: string) {
+export async function createUser(username: string, email: string, password: string) {
   try {
     return User.create({
-      name,
+      username,
       email,
       password
     })
@@ -17,7 +17,7 @@ export async function createUser(name: string, email: string, password: string) 
 //Find data
 //by email
 export async function findUserByEmail(email: string) {
-  const user = await User.findOne({ email }, 'name played won')
+  const user = await User.findOne({ email }, 'username played won')
   if(user)
   {
     return user;
@@ -26,8 +26,8 @@ export async function findUserByEmail(email: string) {
   }
 }
 
-export async function findUserByUsername(name: string) {
-  const user = await User.findOne({ name }, 'name played won')
+export async function findUserByUsername(username: string) {
+  const user = await User.findOne({ username }, 'username played won')
   if(user) {
     return user;
   } else {
@@ -75,5 +75,5 @@ export async function increaseWon(email: string) {
 
 //returns names, games played, games won from all users, sorted by wins
 export async function getUsers() {
-  return User.find({}, "name played won").sort([["won", "desc"]]);
+  return User.find({}, "username played won").sort([["won", "desc"]]);
 }
