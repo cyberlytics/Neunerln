@@ -5,6 +5,9 @@ import 'dotenv/config'
 
 const start = async () => {
   try {
+    if (!process.env.JWT_KEY) {
+      throw new Error('JWT_KEY must be defined')
+    }
     // connect to database here
     await mongoose.connect(
       'mongodb+srv://Admin:ebewnO8vJqdoKnVp@neunerln.hipwzzh.mongodb.net/Neunerln?retryWrites=true&w=majority'
