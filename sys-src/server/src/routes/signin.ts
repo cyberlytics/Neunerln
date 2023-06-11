@@ -21,7 +21,7 @@ router.post(
   validateRequest,
   async (req: Request, res: Response) => {
     const { email, password } = req.body
-    const existingUser = await User.findOne({ where: { email } })
+    const existingUser = await User.findOne({ email })
 
     /*
      * This code will go through the same process no matter what the user or the password is,
@@ -38,6 +38,7 @@ router.post(
       throw new BadRequestError('Invalid credentials', ['Change email or password.'])
     }
 
+    console.log(process.env.JWT_KEY)
     // Generate JWT
     const userJwt = jwt.sign(
       {
@@ -47,6 +48,7 @@ router.post(
       process.env.JWT_KEY!
     )
     // Store it on session object
+    //@ts-ignore
     req.session = {
       jwt: userJwt
     }

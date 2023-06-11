@@ -1,6 +1,7 @@
 import { app } from './app'
 import mongoose from 'mongoose'
-import { SocketManager } from './services/socketManager';
+import { SocketManager } from './services/socketManager'
+import 'dotenv/config'
 
 const start = async () => {
   try {
@@ -10,7 +11,7 @@ const start = async () => {
     )
 
     // initialize SocketManager
-    new SocketManager().initialize();
+    new SocketManager().initialize()
   } catch (err) {
     // close server
     console.error(err)
