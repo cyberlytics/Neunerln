@@ -23,6 +23,7 @@ export class SocketManager {
       this.connectUser(socket)
     );
 
+    console.log('SocketManager initialized');
     return this;
   }
 

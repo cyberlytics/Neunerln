@@ -15,7 +15,7 @@ import { signUpRouter } from './routes/signup'
 import { signinRouter } from './routes/signin'
 
 // create server
-const app = express()
+var app = express()
 
 /**
  * The code below will configure
@@ -65,5 +65,8 @@ app.all('*', async () => {
  * Error handling
  */
 app.use(errorHandler)
+
+// socket.io requires a http.Server instance
+app = require('http').Server(app);
 
 export { app }
