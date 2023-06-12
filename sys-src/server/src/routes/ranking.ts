@@ -10,7 +10,7 @@ router.get('/api/rankings', async (req: Request, res: Response) => {
     const all = await getUsers()
     const responseData = all.map((user, index) => ({
       rank: index + 1,
-      username: user.name,
+      username: user.username,
       played: user.played,
       wins: user.won,
       winrate: calcWR(user.won, user.played)
@@ -31,3 +31,5 @@ function calcWR(wins: any, games: any) {
   }
   return (wins / games) * 100
 }
+
+export { router as rankingRouter }

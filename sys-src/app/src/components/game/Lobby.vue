@@ -1,7 +1,10 @@
 <template>
   <div>
     <h3>{{ userName }}</h3>
-    <hr><br>
+    <hr />
+    <br />
+
+    <button @click="retrieveRankings()">Rankings</button>
 
     <h2>Create</h2>
 
@@ -60,13 +63,13 @@
     <input type="radio" id="four" value="4" v-model="maxPlayers" />
     <label for="four">4</label>
 
-    <br>
+    <br />
     <button @click="createRoom()">Create room</button>
 
-    <br><br>
+    <br /><br />
     <!-- <hr> -->
-    <br>
-    
+    <br />
+
     <h2>Open Rooms</h2>
     <ul>
       <li v-for="room in props.rooms" :key="room.id">
@@ -78,30 +81,48 @@
     </ul>
   </div>
 </template>
-  
+
 <script setup lang="ts">
 //#region imports
-import type { PublicRoomData } from '@/types/publicRoomData';
-import CardFront from '../game/CardFront.vue';
-import { ref } from 'vue';
+import type { PublicRoomData } from '@/types/publicRoomData'
+import CardFront from '../game/CardFront.vue'
+import { ref } from 'vue'
+import axios from 'axios'
 //#endregion imports
 
-const specialCards = ref(["seven", "eight", "nine", "ten", "ace"]);
-const maxPlayers = ref(2);
+const specialCards = ref(['seven', 'eight', 'nine', 'ten', 'ace'])
+const maxPlayers = ref(2)
+const showErrorOrSuccess = ref(true)
+const errorState = ref('')
 
 const props = defineProps({
   rooms: Array<PublicRoomData>,
   userName: String
-});
-const emit = defineEmits(['createRoom', 'joinRoom']);
-
+})
+const emit = defineEmits(['createRoom', 'joinRoom'])
 
 function createRoom() {
-  emit('createRoom', specialCards.value, maxPlayers.value);
+  emit('createRoom', specialCards.value, maxPlayers.value)
 }
 
 function joinRoom(roomId: string) {
-  emit('joinRoom', roomId);
+  emit('joinRoom', roomId)
+}
+
+async function retrieveRankings() {
+  try {
+    const res = await axios.get('http://localhost:3000/api/rankings')
+    console.log(res.data)
+    showErrorOrSuccess.value = true
+  } catch (err: any) {
+    //TODO: Fehler dem User anzeigen
+    if (err.response.status === 500)
+      errorState.value = 'Verbindung zum Server fehlgeschlagen. Bitte erneut versuchen.'
+    console.log(err)
+    return
+  }
+  errorState.value = 'Einloggen erfolgreich'
+  //TODO: Weiterleitung
 }
 </script>
 
