@@ -12,9 +12,10 @@ import { errorHandler } from './middlewares/error-handler'
 // routes
 import { signoutRouter } from './routes/signout'
 import { signUpRouter } from './routes/signup'
+import { signinRouter } from './routes/signin'
 
 // create server
-const app = express()
+var app = express()
 
 /**
  * The code below will configure
@@ -52,7 +53,7 @@ app.use(
   cookieSession({
     // store session data within a cookie
     signed: false,
-    secure: process.env.NODE_ENV !== 'test'
+    secure: process.env.NODE_ENV === 'production' // should only be sent over https
   })
 )
 
@@ -61,6 +62,7 @@ app.use(
  */
 app.use(signoutRouter)
 app.use(signUpRouter)
+app.use(signinRouter)
 
 app.all('*', async () => {
   throw new NotFoundError()
@@ -70,5 +72,8 @@ app.all('*', async () => {
  * Error handling
  */
 app.use(errorHandler)
+
+// socket.io requires a http.Server instance
+app = require('http').Server(app);
 
 export { app }

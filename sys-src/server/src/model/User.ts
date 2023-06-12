@@ -3,7 +3,7 @@ const { Schema, model } = mongoose
 
 // Document interface
 interface IUser {
-  name: string
+  username: string
   email: string
   password: string
   played?: number
@@ -12,7 +12,7 @@ interface IUser {
 
 // Schema
 const userSchema = new Schema<IUser>({
-  name: {
+  username: {
     type: String,
     required: true,
     unique: true
