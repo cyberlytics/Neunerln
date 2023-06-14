@@ -5,6 +5,7 @@ import { PublicRoomData } from "../types/publicRoomData";
 import { SocketRoom } from "../types/socketRoom";
 import { Room } from "./room";
 import { Card } from "src/types/card";
+import { shuffle } from "./helperFunctions";
 
 let RoomID: Room;
 
@@ -65,8 +66,8 @@ export class SocketManager {
     );
 
     socket.on(
-      SocketRoom.drawCard, (roomId: string, card: Card) =>
-        this.drawCard(socket, roomId, card)
+      SocketRoom.drawCard, (roomId: string) =>
+        this.drawCard(socket, roomId)
     );
 
     socket.on(
@@ -268,7 +269,7 @@ return Nextplayer
 
 }
 
-  drawCard(socket: any, roomId: string, card: Card) {
+  drawCard(socket: any, roomId: string) {
     let currentRoom = this.rooms.find((room) => room.id == roomId);
     if (currentRoom == null) {
       return;
@@ -318,9 +319,27 @@ return Nextplayer
         // * remove card from draw pile
         currentRoom.drawPile.pop();
       }
+      // if drawPile is < 2, then shuffle
+      if(currentRoom?.drawPile.length <= 2) {
+
+        this.io.emit(
+          SocketRoom.cardMoveFeedback,
+          "Der Ziehstapel wird neu gemischt"
+        );
+        // discardPile without topcard
+        let newDeck = currentRoom?.discardPile.slice(0, -1); 
+        // topcard of discardPile
+        let lastCard = currentRoom?.discardPile.slice(-1);      
+        // drawpile + newDeck
+        currentRoom.drawPile.push(...newDeck);
+        shuffle(currentRoom.drawPile);
+        // only one discardPile
+        currentRoom.discardPile = lastCard;
+      }
 
     // * set new current player
     const currentIndex = currentRoom.players.findIndex(player => player.id === socket.id);
+
 
     // * if DiscardCard (number or color) is not the same as drawn card, the the nextplayer is next
     if (lastDiscardCard?.color != lastDrawCard?.color
@@ -336,6 +355,7 @@ return Nextplayer
       const nextPlayer = currentRoom.players[currentIndex];
       currentRoom.currentPlayer = nextPlayer;
     }
+
 
 
     // update for everyone

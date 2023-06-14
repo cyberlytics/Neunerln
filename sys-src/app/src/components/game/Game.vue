@@ -17,8 +17,7 @@
                 <!-- <CardFront class="drawingCards" :back="cardBack" v-for="card in publicGameMetadata?.drawingPileCount"
                 @click="drawCard(card)"/> -->
 
-                <CardFront class="drawingCards" :back="cardBack" v-for="card in publicGameMetadata?.discardPile"
-                @click="drawCard(card)"/>
+                <CardFront class="drawingCards" :back="cardBack" @click="drawCard()"/>
             </div>
             <div class="discardPile">
                 <CardFront class="drawingCards" v-for="card in publicGameMetadata?.discardPile" :value="card.number" :color="card.color" />
@@ -99,8 +98,8 @@ function playCard(card: Card) {
 }
 
 
-function drawCard(card: Card) {
-  emit('cardDrawn', card);
+function drawCard() {
+  emit('cardDrawn');
 }
 
 function setReadyState() {

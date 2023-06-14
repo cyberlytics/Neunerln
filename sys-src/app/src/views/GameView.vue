@@ -117,7 +117,7 @@ function showOnScreenMessage(message: string) {
 
   timeout = setTimeout(() => {
     onScreenMessageVisible.value = false;
-  }, 1000);
+  }, 2000);
 }
 
 // ToDo: remove later on, just for testing purpose
