@@ -1,4 +1,5 @@
 <template>
+    <div v-if="onScreenMessageVisible" class="onScreenMessage">{{ onScreenMessage }}</div>
     <Lobby v-if="!currentRoomId"
       :rooms="roomData" :userName="userName"
       @createRoom="createRoom" @joinRoom="joinRoom"
@@ -30,6 +31,9 @@ const publicGameMetadata = ref<PublicGameMetadata>();
 const handCards = ref<Card[]>();
 const userName = ref<string>(getRandomName());
 
+const onScreenMessage = ref('');
+const onScreenMessageVisible = ref(false);
+
 
 //#region subscribe
 
@@ -52,7 +56,7 @@ socket.on(SocketRoom.handCardsPublished, (cards: Card[]) => {
 });
 
 socket.on(SocketRoom.cardMoveFeedback, (message: string) => {
-  alert(message);
+  showOnScreenMessage(message);
 });
 
 
@@ -96,6 +100,18 @@ function cardDrawn(card: Card) {
 
 //#endregion publish
 
+let timeout: number;
+function showOnScreenMessage(message: string) {
+  clearTimeout(timeout); // clear previous timeout
+
+  onScreenMessage.value = message;
+  onScreenMessageVisible.value = true;
+
+  timeout = setTimeout(() => {
+    onScreenMessageVisible.value = false;
+  }, 1000);
+}
+
 // ToDo: remove later on, just for testing purpose
 function getRandomName() {
   const randomNumber = Math.floor(Math.random() * 100);
@@ -103,3 +119,21 @@ function getRandomName() {
 }
 
 </script>
+
+<style>
+
+.onScreenMessage {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  translate: -50% -50%;
+  z-index: 100;
+  padding: 10px;
+  border-radius: 30px;
+
+  font-family: 'Courier New', Courier, monospace;
+  text-align: center;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+</style>
