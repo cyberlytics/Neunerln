@@ -6,7 +6,7 @@
     />
     <Game v-else
       :userName="userName" :publicGameMetadata="publicGameMetadata" :handCards="handCards"
-      @cardPlayed="cardPlayed" @cardDrawn="cardDrawn"
+      @cardPlayed="cardPlayed" @cardDrawn="cardDrawn" @ready="ready"
     />
 </template>
 
@@ -95,6 +95,14 @@ function cardDrawn(card: Card) {
   socket.emit(
     SocketRoom.drawCard,
     currentRoomId.value, card
+  );
+}
+
+function ready() {
+  // sent ready signal to backend
+  socket.emit(
+    SocketRoom.ready,
+    currentRoomId.value
   );
 }
 

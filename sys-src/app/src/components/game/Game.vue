@@ -36,6 +36,8 @@
                 @click="playCard(card)"/>
         </div>
     </div>
+
+    <button v-if="!playerIsReady" @click="setReadyState">Ready</button>
 </template>
 
 <script setup lang="ts">
@@ -43,11 +45,11 @@
 import type { Card } from '@/types/card';
 import CardFront from '../game/CardFront.vue';
 import { PublicGameMetadata } from '@/types/publicGameMetadata';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 //#endregion imports
 
 const cardBack= '../src/assets/card_back.svg';
-
+const playerIsReady = ref(false);
 
 const props = defineProps({
     userName: String,
@@ -89,7 +91,7 @@ const orderedEnemies = computed(() => {
     return enemies;
 });
 
-const emit = defineEmits(['cardPlayed', 'cardDrawn']);
+const emit = defineEmits(['cardPlayed', 'cardDrawn', 'ready']);
 
 
 function playCard(card: Card) {
@@ -100,6 +102,12 @@ function playCard(card: Card) {
 function drawCard(card: Card) {
   emit('cardDrawn', card);
 }
+
+function setReadyState() {
+    playerIsReady.value = true;
+    emit('ready');
+}
+
 </script>
 
 <style>

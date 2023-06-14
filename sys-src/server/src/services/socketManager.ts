@@ -69,6 +69,10 @@ export class SocketManager {
         this.drawCard(socket, roomId, card)
     );
 
+    socket.on(
+      SocketRoom.ready, (roomId: string) =>
+      this.setPlayerReadyState(socket, roomId)
+    );
       
     if (this.userConnectionLog) {
       console.log(`Client ${socket.id} connected. (${this.io.engine.clientsCount})`);
@@ -348,12 +352,6 @@ return Nextplayer
         // add and subscribe player to room
         room.players.push(new Player(socket.id, userName));
         socket.join(room.id);
-  
-        // start game if full
-        if (room.isFull()) {
-          room.startGame();
-          this.io.to(room.id).emit(SocketRoom.gameStarted);
-        }
 
         // update lobby rooms
         this.io.emit(
@@ -416,6 +414,38 @@ return Nextplayer
       SocketRoom.handCardsPublished,
       handCards
     );
+  }
+
+  setPlayerReadyState(socket: any, roomId: string) {
+    // get room
+    const room = this.rooms.find((room) => room.id == roomId);
+    if (!room
+      || room.ingame) {
+      return;
+    }
+
+    // get player
+    const player = room.players.find((player) => player.id == socket.id);
+    if (!player) {
+      return;
+    }
+
+    // set player ready
+    player.ready = true;
+
+    // start game if room full and every player ready
+    if (room.isFull() && room.isEveryPlayerReady()) {
+      room.startGame();
+      this.io.to(room.id).emit(SocketRoom.gameStarted);
+    }
+
+    // update lobby rooms
+    this.io.emit(
+      SocketRoom.lobbyRoomsChanged,
+      this.getLobbyData()
+    );
+
+    this.updateGamedata(room);
   }
 
   getLobbyData() {
