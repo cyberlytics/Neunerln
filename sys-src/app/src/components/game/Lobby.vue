@@ -8,35 +8,35 @@
     <div>special cards: {{ specialCards }}</div>
     <div class="specCards">
       <div class="specCard">
-        <CardFront
+        <CardFront class="card-lobby"
           value="7"
           descrip="Der nächste Spieler muss zwei Karten vom Ziehstapel ziehen. Er kann allerdings selbst eine 7 auf die zuvor Gespielte legen."
         />
         <input type="checkbox" id="seven" value="seven" v-model="specialCards" />
       </div>
       <div class="specCard">
-        <CardFront
+        <CardFront class="card-lobby"
           value="8"
           descrip="Der nächste Spieler muss aussetzen und der darauffolgende Spieler kommt an die Reihe."
         />
         <input type="checkbox" id="eight" value="eight" v-model="specialCards" />
       </div>
       <div class="specCard">
-        <CardFront
+        <CardFront class="card-lobby"
           value="9"
           descrip="Diese Karte darf auf jede Karte gelegt werden, unabhängig von Farbe oder Zahl. Der Spieler darf sich eine Farbe wünschen."
         />
         <input type="checkbox" id="nine" value="nine" v-model="specialCards" />
       </div>
       <div class="specCard">
-        <CardFront
+        <CardFront class="card-lobby"
           value="10"
           descrip="Der Spieler darf eine Karte verdeckt an einen Mitspieler weitergeben, der diese aufnehmen muss."
         />
         <input type="checkbox" id="ten" value="ten" v-model="specialCards" />
       </div>
       <div class="specCard">
-        <CardFront value="A" descrip="Der Spieler ist direkt noch einmal an der Reihe." />
+        <CardFront class="card-lobby" value="A" descrip="Der Spieler ist direkt noch einmal an der Reihe." />
         <input type="checkbox" id="ace" value="ace" v-model="specialCards" />
       </div>
     </div>
@@ -112,5 +112,8 @@ function joinRoom(roomId: string) {
 }
 .specCard {
   margin-right: 1em;
+}
+.card-lobby {
+  position: relative;
 }
 </style>

@@ -20,18 +20,19 @@
         </div>
     </div>
     <br>
+    <!--
     Current player: {{ publicGameMetadata?.currentPlayerName }}<br>
 
-    <div class="player">
+     <div class="player">
         <h3>player</h3>
         {{ userName }}: {{ publicGameMetadata?.cardCountPerPlayer[player || ''] }}<br>
         <div class="hand-cards">
             <CardFront class="playerCards" v-if="handCards" v-for="card in handCards" :value="card.number" :color="card.color"
                 @click="playCard(card)"/>
         </div>
-    </div>
+    </div> -->
 
-    <button v-if="!playerIsReady" @click="setReadyState">Ready</button>
+    <button class="readyGame" v-if="!playerIsReady" @click="setReadyState">Ready</button>
 </template>
 
 <script setup lang="ts">
@@ -218,5 +219,9 @@ div.enemies-handcards:nth-child(4) {
     top: 40%;
 left: 42%;
 position: absolute;
+}
+
+.readyGame {
+    position: absolute;
 }
 </style>
