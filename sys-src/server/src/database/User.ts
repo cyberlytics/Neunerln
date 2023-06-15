@@ -24,15 +24,6 @@ export async function findUserByUsername(username: string) {
   return await User.findOne({ username }, 'username played won')
 }
 
-export async function findEmailAndPass(email: string, password: string) {
-  return await User.findOne({ email: email, password: password })
-}
-
-//exists() returns null or ObjectId of first item that matches criteria
-export async function userExists(email: string) {
-  return User.exists({ email: email })
-}
-
 //Increase games played
 export async function increasePlayed(email: string) {
   const user = await findUserByEmail(email)
@@ -41,7 +32,7 @@ export async function increasePlayed(email: string) {
     await user.save()
     return user
   } else {
-    throw new DatabaseError('something went wrong with user.played')
+    throw new DatabaseError('could not find email')
   }
 }
 
@@ -53,7 +44,7 @@ export async function increaseWon(email: string) {
     await user.save()
     return user
   } else {
-    throw new DatabaseError('something went wrong with user.won.')
+    throw new DatabaseError('could not find email.')
   }
 }
 
