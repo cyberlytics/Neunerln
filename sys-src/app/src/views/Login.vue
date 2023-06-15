@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import axios from 'axios'
+import Vue from 'vue'
 import VueCookies from 'vue-cookies'
 
 const header = ref('Login')
@@ -12,8 +13,7 @@ const confirmPassword = ref('Password1!')
 const name = ref('')
 const showErrorOrSuccess = ref(true)
 const errorState = ref('')
-const token = ref('')
-//const $cookies = inject('$cookies')
+const isloading = ref(false)
 
 function handleInput(e: any, input: string) {
   switch (input) {
@@ -44,6 +44,7 @@ async function signup() {
     alert('Die Passwörter stimmen nicht überein!')
     return
   }*/
+  isloading.value = !isloading.value
   try {
     const res = await axios.post('http://localhost:3000/api/auth/signup', {
       username: username.value,
@@ -51,7 +52,10 @@ async function signup() {
       password: password.value
     })
     showErrorOrSuccess.value = true
+    const sessionToken = res.headers['set-cookie']
+    VueCookies.VueCookies.set('sessionToken', sessionToken)
   } catch (err: any) {
+    isloading.value = !isloading.value
     if (err.response.status === 400)
       errorState.value = 'Fehler beim Registieren. Bitte überprüfen Sie die Eingaben.'
     else if (err.response.status === 500)
@@ -65,6 +69,7 @@ async function signup() {
 }
 
 async function login() {
+  isloading.value = !isloading.value
   try {
     const res = await axios.post('http://localhost:3000/api/auth/signin', {
       name: name.value,
@@ -73,7 +78,10 @@ async function login() {
     //console.log(res.status)
     showErrorOrSuccess.value = true
     console.log(res)
+    const sessionToken = res.headers['set-cookie']
+    VueCookies.VueCookies.set('sessionToken', sessionToken)
   } catch (err: any) {
+    isloading.value = !isloading.value
     if (err.response.status === 404) {
       errorState.value = 'Fehler beim Einloggen. Bitte überprüfen Sie die Eingaben.'
     } else if (err.response.status === 500)
@@ -82,7 +90,7 @@ async function login() {
     return
   }
   errorState.value = 'Einloggen war erfolgreich.'
-  //token.value = res.headers
+
   //TODO: Weiterleitung
 }
 
@@ -203,8 +211,9 @@ function arePasswordsEqual() {
       </tr>
       <tr>
         <td colspan="2">
+          <div v-if="isloading" class="container"><div class="loader"></div></div>
           <button
-            v-if="showLoginParts"
+            v-if="showLoginParts && !isloading"
             class="button"
             type="submit"
             form="LoginForm"
@@ -214,7 +223,7 @@ function arePasswordsEqual() {
           </button>
           <!-- TODO: Ladeanimation im Button anzeigen-->
           <button
-            v-if="!showLoginParts"
+            v-if="!showLoginParts && !isloading"
             class="button"
             type="submit"
             form="LoginForm"
@@ -275,9 +284,6 @@ a {
   font-size: 16px;
   margin: 0 auto;
   display: block;
-  animation-name: loading;
-  animation-duration: 2s;
-  animation-iteration-count: 5;
 }
 .heading {
   position: relative;
@@ -298,27 +304,33 @@ a {
   text-align: center;
   color: rgb(209, 44, 15);
 }
-.container {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  margin: auto;
-  padding: 5px;
-  transform: translate(-50%, -50%);
-}
 .inputField {
   background: whitesmoke;
   border-radius: calc(5.8rem * 0.3);
   padding: calc(5.8rem * 0.2);
   box-shadow: 0 0 2rem rgb(0, 0, 0, 20%);
 }
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.loader {
+  z-index: 1;
+  border: 16px solid #f3f3f3;
+  border-top: 16px solid #21d427;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: loading 2s linear infinite;
+}
 
 @keyframes loading {
-  from {
-    background-color: blue;
+  0% {
+    transform: rotate(0deg);
   }
-  to {
-    background-color: darkorchid;
+  100% {
+    transform: rotate(360deg);
   }
 }
 </style>
