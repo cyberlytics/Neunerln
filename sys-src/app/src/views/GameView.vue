@@ -1,5 +1,6 @@
 <template>
     <div v-if="onScreenMessageVisible" class="onScreenMessage">{{ onScreenMessage }}</div>
+    <div v-if="onFinishMessageVisible" class="onFinishMessage">{{ onFinishMessage }}</div>
     <Lobby v-if="!currentRoomId"
       :rooms="roomData" :userName="userName"
       @createRoom="createRoom" @joinRoom="joinRoom"
@@ -34,6 +35,8 @@ const userName = ref<string>(getRandomName());
 const onScreenMessage = ref('');
 const onScreenMessageVisible = ref(false);
 
+const onFinishMessage = ref('');
+const onFinishMessageVisible = ref(false);
 
 //#region subscribe
 
@@ -57,6 +60,10 @@ socket.on(SocketRoom.handCardsPublished, (cards: Card[]) => {
 
 socket.on(SocketRoom.cardMoveFeedback, (message: string) => {
   showOnScreenMessage(message);
+});
+
+socket.on(SocketRoom.gameFinishedFeedback, (message: string) => {
+  showOnFinishMessage(message);
 });
 
 
@@ -120,6 +127,19 @@ function showOnScreenMessage(message: string) {
   }, 2000);
 }
 
+let timeFinish: number;
+
+function showOnFinishMessage(message: string) {
+  clearTimeout(timeFinish); // clear previous timeout
+
+  onFinishMessage.value = message;
+  onFinishMessageVisible.value = true;
+
+  timeFinish = setTimeout(() => {
+    onFinishMessageVisible.value = false;
+  }, 5000);
+}
+
 // ToDo: remove later on, just for testing purpose
 function getRandomName() {
   const randomNumber = Math.floor(Math.random() * 100);
@@ -142,6 +162,19 @@ function getRandomName() {
   text-align: center;
   color: white;
   background-color: rgba(0, 0, 0, 0.5);
+}
+
+.onFinishMessage {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  translate: -50% -50%;
+  font-size: 5vh;
+  z-index: 100;
+  padding: 30px;
+  border-radius: 30px;
+  text-align: center;
+  color: white;
+  background-color: #f29400;
 }
 
 </style>
