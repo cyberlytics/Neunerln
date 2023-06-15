@@ -13,20 +13,15 @@ const props = defineProps({
         </div>
 
         <div class="ranking-body">
-          <div class="ranking-entry">
-            <div>Rank</div>
-            <div>Username</div>
-            <div>Wins</div>
-            <div>Games</div>
-            <div>Winrate</div>
-          </div>
-          <div class="ranking-entry">
-            <div>#1</div>
-            <div>FastDiscard</div>
-            <div>2</div>
-            <div>3</div>
-            <div>66.66%</div>
-          </div>
+          <slot name="body">
+            <div class="ranking-entry">
+              <div>Rank</div>
+              <div>Username</div>
+              <div>Wins</div>
+              <div>Games</div>
+              <div>Winrate</div>
+            </div>
+          </slot>
         </div>
 
         <div class="ranking-footer">

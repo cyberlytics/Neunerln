@@ -7,7 +7,30 @@
     <button id="showRankings" @click="showModal = true">Rankings</button>
 
     <Teleport to="body">
-      <modal :show="showModal" @Close="showModal = false"> </modal>
+      <modal :show="showModal" @Close="showModal = false"
+        ><template #body>
+          <div class="ranking-body">
+            <slot name="body">
+              <div class="ranking-entry">
+                <div>Rank</div>
+                <div>Username</div>
+                <div>Wins</div>
+                <div>Games</div>
+                <div>Winrate</div>
+              </div>
+              <div v-for="user in users">
+                <div class="ranking-entry">
+                  <div>{{ user.rank }}</div>
+                  <div>{{ user.username }}</div>
+                  <div>{{ user.played }}</div>
+                  <div>{{ user.wins }}</div>
+                  <div>{{ user.winrate }}</div>
+                </div>
+              </div>
+            </slot>
+          </div>
+        </template></modal
+      >
     </Teleport>
 
     <h2>Create</h2>
@@ -100,6 +123,7 @@ const maxPlayers = ref(2)
 const showErrorOrSuccess = ref(true)
 const errorState = ref('')
 const showModal = ref(false)
+let users = retrieveRankings()
 
 const props = defineProps({
   rooms: Array<PublicRoomData>,
@@ -120,6 +144,7 @@ async function retrieveRankings() {
     const res = await axios.get('http://localhost:3000/api/rankings')
     console.log(res.data)
     showErrorOrSuccess.value = true
+    return res.data.ranking
   } catch (err: any) {
     //TODO: Fehler dem User anzeigen
     if (err.response.status === 500)
