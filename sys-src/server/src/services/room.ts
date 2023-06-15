@@ -39,6 +39,10 @@ export class Room {
         return (this.playerCount() >= this.maxPlayers);
     }
 
+    isEveryPlayerReady() {
+        return this.players.every(player => player.ready);
+    }
+
     startGame() {
         this.ingame = true;
         

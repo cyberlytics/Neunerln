@@ -16,5 +16,7 @@ export enum SocketRoom {
     nextPlayer = 'nextPlayer',
     drawCard = 'drawCard',
     playCard = 'playCard',
-    cardMoveFeedback = 'cardMoveFeedback'
+    cardMoveFeedback = 'cardMoveFeedback',
+    gameFinishedFeedback = 'gameFinishedFeedback',
+    ready = 'ready'
 }

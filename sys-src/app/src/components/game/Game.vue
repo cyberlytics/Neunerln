@@ -12,13 +12,26 @@
         <div class="discard-pile">
             <div class="draws">
                 <CardFront class="drawingCard" :back="cardBack" v-for="card in publicGameMetadata?.discardPile"
-                @click="drawCard(card)"/>
+                @click="drawCard()"/>
             </div>
             <div>
                 <CardFront class="drawingCards" v-for="card in publicGameMetadata?.discardPile" :value="card.number" :color="card.color" />
             </div>
         </div>
     </div>
+    <br>
+    Current player: {{ publicGameMetadata?.currentPlayerName }}<br>
+
+    <div class="player">
+        <h3>player</h3>
+        {{ userName }}: {{ publicGameMetadata?.cardCountPerPlayer[player || ''] }}<br>
+        <div class="hand-cards">
+            <CardFront class="playerCards" v-if="handCards" v-for="card in handCards" :value="card.number" :color="card.color"
+                @click="playCard(card)"/>
+        </div>
+    </div>
+
+    <button v-if="!playerIsReady" @click="setReadyState">Ready</button>
 </template>
 
 <script setup lang="ts">
@@ -26,11 +39,11 @@
 import type { Card } from '@/types/card';
 import CardFront from '../game/CardFront.vue';
 import { PublicGameMetadata } from '@/types/publicGameMetadata';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 //#endregion imports
 
 const cardBack= '../src/assets/card_back.svg';
-
+const playerIsReady = ref(false);
 
 const props = defineProps({
     userName: String,
@@ -72,7 +85,7 @@ const orderedEnemies = computed(() => {
     return enemies;
 });
 
-const emit = defineEmits(['cardPlayed', 'cardDrawn']);
+const emit = defineEmits(['cardPlayed', 'cardDrawn', 'ready']);
 
 
 function playCard(card: Card) {
@@ -80,10 +93,14 @@ function playCard(card: Card) {
 }
 
 
-function drawCard(card: Card) {
-  emit('cardDrawn', card);
+function drawCard() {
+  emit('cardDrawn');
 }
 
+function setReadyState() {
+    playerIsReady.value = true;
+    emit('ready');
+}
 
 </script>
 

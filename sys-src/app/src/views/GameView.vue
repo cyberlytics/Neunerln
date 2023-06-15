@@ -1,11 +1,13 @@
 <template>
+    <div v-if="onScreenMessageVisible" class="onScreenMessage">{{ onScreenMessage }}</div>
+    <div v-if="onFinishMessageVisible" class="onFinishMessage">{{ onFinishMessage }}</div>
     <Lobby v-if="!currentRoomId"
       :rooms="roomData" :userName="userName"
       @createRoom="createRoom" @joinRoom="joinRoom"
     />
     <Game v-else
       :userName="userName" :publicGameMetadata="publicGameMetadata" :handCards="handCards"
-      @cardPlayed="cardPlayed" @cardDrawn="cardDrawn"
+      @cardPlayed="cardPlayed" @cardDrawn="cardDrawn" @ready="ready"
     />
 </template>
 
@@ -30,6 +32,11 @@ const publicGameMetadata = ref<PublicGameMetadata>();
 const handCards = ref<Card[]>();
 const userName = ref<string>(getRandomName());
 
+const onScreenMessage = ref('');
+const onScreenMessageVisible = ref(false);
+
+const onFinishMessage = ref('');
+const onFinishMessageVisible = ref(false);
 
 //#region subscribe
 
@@ -52,7 +59,11 @@ socket.on(SocketRoom.handCardsPublished, (cards: Card[]) => {
 });
 
 socket.on(SocketRoom.cardMoveFeedback, (message: string) => {
-  alert(message);
+  showOnScreenMessage(message);
+});
+
+socket.on(SocketRoom.gameFinishedFeedback, (message: string) => {
+  showOnFinishMessage(message);
 });
 
 
@@ -94,7 +105,40 @@ function cardDrawn(card: Card) {
   );
 }
 
+function ready() {
+  // sent ready signal to backend
+  socket.emit(
+    SocketRoom.ready,
+    currentRoomId.value
+  );
+}
+
 //#endregion publish
+
+let timeout: number;
+function showOnScreenMessage(message: string) {
+  clearTimeout(timeout); // clear previous timeout
+
+  onScreenMessage.value = message;
+  onScreenMessageVisible.value = true;
+
+  timeout = setTimeout(() => {
+    onScreenMessageVisible.value = false;
+  }, 2000);
+}
+
+let timeFinish: number;
+
+function showOnFinishMessage(message: string) {
+  clearTimeout(timeFinish); // clear previous timeout
+
+  onFinishMessage.value = message;
+  onFinishMessageVisible.value = true;
+
+  timeFinish = setTimeout(() => {
+    onFinishMessageVisible.value = false;
+  }, 5000);
+}
 
 // ToDo: remove later on, just for testing purpose
 function getRandomName() {
@@ -103,3 +147,34 @@ function getRandomName() {
 }
 
 </script>
+
+<style>
+
+.onScreenMessage {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  translate: -50% -50%;
+  z-index: 100;
+  padding: 10px;
+  border-radius: 30px;
+
+  font-family: 'Courier New', Courier, monospace;
+  text-align: center;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.onFinishMessage {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  translate: -50% -50%;
+  font-size: 5vh;
+  z-index: 100;
+  padding: 30px;
+  border-radius: 30px;
+  text-align: center;
+  color: white;
+  background-color: #f29400;
+}
+
+</style>
