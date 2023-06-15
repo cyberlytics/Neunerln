@@ -13,6 +13,7 @@ import { errorHandler } from './middlewares/error-handler'
 import { signoutRouter } from './routes/signout'
 import { signUpRouter } from './routes/signup'
 import { signinRouter } from './routes/signin'
+import { rankingRouter } from './routes/ranking'
 
 // create server
 var app = express()
@@ -63,6 +64,7 @@ app.use(
 app.use(signoutRouter)
 app.use(signUpRouter)
 app.use(signinRouter)
+app.use(rankingRouter)
 
 app.all('*', async () => {
   throw new NotFoundError()
@@ -74,6 +76,6 @@ app.all('*', async () => {
 app.use(errorHandler)
 
 // socket.io requires a http.Server instance
-app = require('http').Server(app);
+app = require('http').Server(app)
 
 export { app }
