@@ -36,7 +36,7 @@ export async function userExists(email: string) {
 //Increase games played
 export async function increasePlayed(email: string) {
   const user = await findUserByEmail(email)
-  if (user && typeof user.played==="number") {
+  if (user && typeof user.played === 'number') {
     user.played = user.played + 1
     await user.save()
     return user
@@ -48,7 +48,7 @@ export async function increasePlayed(email: string) {
 //Increase wins
 export async function increaseWon(email: string) {
   const user = await findUserByEmail(email)
-  if (user && typeof user.won==="number") {
+  if (user && typeof user.won === 'number') {
     user.won = user.won + 1
     await user.save()
     return user
@@ -59,5 +59,5 @@ export async function increaseWon(email: string) {
 
 //returns names, games played, games won from all users, sorted by wins
 export async function getUsers() {
-  return User.find({}, "username played won").sort([["won", "desc"]]);
+  return User.find({}, 'username played won').sort([['won', 'desc']])
 }

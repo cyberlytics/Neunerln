@@ -42,6 +42,13 @@ if (process.env.NODE_ENV !== 'test') {
 
 app.use(express.json()) // parse body
 
+// Allow CORS from localhost
+app.use(
+  cors({
+    origin: 'http://localhost:5173/'
+  })
+)
+
 app.use(
   cookieSession({
     // store session data within a cookie

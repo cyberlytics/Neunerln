@@ -29,7 +29,7 @@ router.post(
       .isLength({ min: BCRYPT_MIN_LENGTH, max: BCRYPT_MAX_LENGTH })
       .matches(passwordRegex)
       .withMessage('Password must be between 8 and 64 characters long.'),
-    body(['username']).notEmpty().withMessage('Username must be atleast one character long.')
+    body('username').notEmpty().withMessage('Username must be atleast one character long.')
   ],
   validateRequest,
   async (req: Request, res: Response) => {
