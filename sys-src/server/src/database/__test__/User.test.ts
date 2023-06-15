@@ -1,4 +1,5 @@
 import * as data from "../User";
+import {increasePlayed, increaseWon} from "../User";
 
 
 const db = require("./db");
@@ -24,16 +25,16 @@ describe('add User in database', () => {
 
 describe('throw error on user creation', () => {
   it('on duplicate username', async () => {
+    await data.createUser("Player1", "Player2@test.com", "Pass12345");
     try{
-      await data.createUser("Player1", "Player2@test.com", "Pass12345");
       await data.createUser("Player1", "Player1@test.com", "Pass12345");
     }catch(err:any){
       expect(err).toBeDefined()
     }
   })
   it('on duplicate email', async () => {
+    await data.createUser("Player1", "Player1@test.com", "Pass12345");
     try{
-      await data.createUser("Player1", "Player1@test.com", "Pass12345");
       await data.createUser("Player2", "Player1@test.com", "Pass12345")
     }catch(err:any){
       expect(err).toBeDefined()
@@ -61,5 +62,44 @@ describe('should find User in database', () => {
       expect(user.won).toEqual(0);
     }
   })
+})
 
+describe('increase games and wins', () => {
+  it('should increase games played', async () => {
+    await data.createUser("Player1", "Player1@test.com", "Pass12345");
+    const user = await increasePlayed("Player1@test.com",);
+    expect(user.played).toEqual(1);
+    expect(user.won).toEqual(0);
+  })
+  it('should increase games won', async () => {
+    await data.createUser("Player1", "Player1@test.com", "Pass12345");
+    const user = await increaseWon("Player1@test.com");
+    expect(user.won).toEqual(1);
+  })
+  it('should throw error on increase played', async () => {
+    await data.createUser("Player1", "Player1@test.com", "Pass12345");
+    try{
+      await increasePlayed("emailNotInData");
+    }catch(err:any){
+      expect(err).toBeDefined()
+    }
+  })
+  it('should throw error on increase won', async () => {
+    await data.createUser("Player1", "Player1@test.com", "Pass12345");
+    try{
+      await increaseWon("emailNotInData");
+    }catch(err:any){
+      expect(err).toBeDefined()
+    }
+  })
+})
+
+describe('getUsers()', () => {
+  it('should return all users in database', async () => {
+    await data.createUser("Player1", "Player1@test.com", "Pass12345");
+    await data.createUser("Player2", "Player2@test.com", "Pass12345");
+    const users = await data.getUsers()
+    expect(users[0].username).toEqual("Player1");
+    expect(users[1].username).toEqual("Player2");
+  })
 })
