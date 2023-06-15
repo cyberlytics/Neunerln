@@ -4,7 +4,11 @@
     <hr />
     <br />
 
-    <button @click="retrieveRankings()">Rankings</button>
+    <button id="showRankings" @click="showModal = true">Rankings</button>
+
+    <Teleport to="body">
+      <modal :show="showModal" @Close="showModal = false"> </modal>
+    </Teleport>
 
     <h2>Create</h2>
 
@@ -86,6 +90,7 @@
 //#region imports
 import type { PublicRoomData } from '@/types/publicRoomData'
 import CardFront from '../game/CardFront.vue'
+import Modal from '../game/Ranking.vue'
 import { ref } from 'vue'
 import axios from 'axios'
 //#endregion imports
@@ -94,6 +99,7 @@ const specialCards = ref(['seven', 'eight', 'nine', 'ten', 'ace'])
 const maxPlayers = ref(2)
 const showErrorOrSuccess = ref(true)
 const errorState = ref('')
+const showModal = ref(false)
 
 const props = defineProps({
   rooms: Array<PublicRoomData>,
