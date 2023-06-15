@@ -17,30 +17,15 @@ export async function createUser(username: string, email: string, password: stri
 //Find data
 //by email
 export async function findUserByEmail(email: string) {
-  const user = await User.findOne({ email }, 'username played won')
-  if (user) {
-    return user
-  } else {
-    return null
-  }
+  return await User.findOne({ email }, 'username played won')
 }
 
 export async function findUserByUsername(username: string) {
-  const user = await User.findOne({ username }, 'username played won')
-  if (user) {
-    return user
-  } else {
-    return null
-  }
+  return await User.findOne({ username }, 'username played won')
 }
 
 export async function findEmailAndPass(email: string, password: string) {
-  const user = await User.findOne({ email: email, password: password })
-  if (user) {
-    return user
-  } else {
-    throw new DatabaseError('Could not find user in database.')
-  }
+  return await User.findOne({ email: email, password: password })
 }
 
 //exists() returns null or ObjectId of first item that matches criteria
