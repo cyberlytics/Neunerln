@@ -13,14 +13,14 @@ const props = defineProps({
         </div>
 
         <div class="ranking-body">
-          <div>
+          <div class="ranking-entry">
             <div>Rank</div>
             <div>Username</div>
             <div>Wins</div>
             <div>Games</div>
             <div>Winrate</div>
           </div>
-          <div>
+          <div class="ranking-entry">
             <div>#1</div>
             <div>FastDiscard</div>
             <div>2</div>
@@ -38,3 +38,36 @@ const props = defineProps({
     </div>
   </Transition>
 </template>
+
+<style>
+.ranking-container {
+  border: solid;
+  border-radius: 1vw;
+  position: absolute;
+  z-index: 2;
+  top: 10vh;
+  left: 10vw;
+  width: 80vw;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.ranking-header {
+  margin-top: 3vh;
+  margin-bottom: 3vh;
+}
+.ranking-footer {
+  margin-top: 3vh;
+  margin-bottom: 1vh;
+}
+.ranking-body {
+  width: 100%;
+}
+.ranking-entry {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  justify-items: center;
+  margin-bottom: 1vh;
+}
+</style>
