@@ -171,14 +171,14 @@ export class SocketManager {
     currentRoom.currentPlayer.handCards = 
       currentRoom.currentPlayer?.handCards
         .filter((handcard) => !(handcard.color == card.color && handcard.number == card.number));
-
+        
+        this.checkGameFinished(currentRoom.id, card);
    
         // * set new current player if card is not in special cards
        let number:string = this.CardnumberToString(card);
         if(currentRoom.specialCards.includes(number)){
 
           currentRoom.currentPlayer = this.SpecialMove(socket, number, socket.id, currentRoom);
-
           
         }else{
           const currentIndex = currentRoom.players.findIndex(player => player.id === socket.id);
@@ -186,6 +186,7 @@ export class SocketManager {
           const nextPlayer = currentRoom.players[nextIndex];
           currentRoom.currentPlayer = nextPlayer;
         }
+
 
     // update for everyone
     this.updateGamedata(currentRoom);
@@ -222,6 +223,7 @@ SpecialMove(socket:any, Cardnumber: string, socketid : String, currentRoom: Room
 var Nextplayer:Player;
 
 if(Cardnumber == "seven"){
+  this.shuffleDrawingPile(currentRoom.id);
   console.log("is in seven");
   //Next player has to take two cards
   const currentIndex = currentRoom.players.findIndex(player => player.id === socketid);
@@ -305,7 +307,7 @@ return Nextplayer
     for (let i = 0; i < handcardLength; i++) {
       if (currentRoom.currentPlayer?.handCards[i].color == lastDiscardCard.color
         || currentRoom.currentPlayer?.handCards[i].number == lastDiscardCard.number
-        || currentRoom.currentPlayer?.handCards[i].number == '9'){
+        || (currentRoom.specialCards.includes("nine") && currentRoom.currentPlayer?.handCards[i].number == '9')){
           handcardMatches = true;
           socket.emit(
             SocketRoom.cardMoveFeedback,
@@ -324,43 +326,44 @@ return Nextplayer
         // * remove card from draw pile
         currentRoom.drawPile.pop();
       }
-      // if drawPile is < 2, then shuffle
-      if(currentRoom?.drawPile.length <= 2) {
 
-        this.io.emit(
-          SocketRoom.cardMoveFeedback,
-          "Der Ziehstapel wird neu gemischt"
-        );
-        // discardPile without topcard
-        let newDeck = currentRoom?.discardPile.slice(0, -1); 
-        // topcard of discardPile
-        let lastCard = currentRoom?.discardPile.slice(-1);      
-        // drawpile + newDeck
-        currentRoom.drawPile.push(...newDeck);
-        shuffle(currentRoom.drawPile);
-        // only one discardPile
-        currentRoom.discardPile = lastCard;
-      }
+      this.shuffleDrawingPile(roomId);
 
     // * set new current player
     const currentIndex = currentRoom.players.findIndex(player => player.id === socket.id);
 
 
     // * if DiscardCard (number or color) is not the same as drawn card, the the nextplayer is next
-    if (lastDiscardCard?.color != lastDrawCard?.color
-      && lastDiscardCard?.number != lastDrawCard?.number
-      && lastDrawCard?.number != '9') {
+    if (lastDiscardCard?.color == lastDrawCard?.color
+      || lastDiscardCard?.number == lastDrawCard?.number
+      || (lastDrawCard?.number == '9' && currentRoom.specialCards.includes("nine"))) {
 
-        const nextIndex = (currentIndex + 1) % currentRoom.players.length;
-        const nextPlayer = currentRoom.players[nextIndex];
-        currentRoom.currentPlayer = nextPlayer;
-
+        const nextPlayer = currentRoom.players[currentIndex];
+        currentRoom.currentPlayer = nextPlayer;   
     }
     else {
-      const nextPlayer = currentRoom.players[currentIndex];
+      const nextIndex = (currentIndex + 1) % currentRoom.players.length;
+      const nextPlayer = currentRoom.players[nextIndex];
       currentRoom.currentPlayer = nextPlayer;
     }
 
+
+    // if (lastDiscardCard?.color != lastDrawCard?.color
+    //   && lastDiscardCard?.number != lastDrawCard?.number
+    //   && lastDrawCard?.number != '9') {
+
+
+    //     (currentRoom.specialCards.includes("nine") && currentRoom.currentPlayer?.handCards[i].number == '9')
+
+    //     const nextIndex = (currentIndex + 1) % currentRoom.players.length;
+    //     const nextPlayer = currentRoom.players[nextIndex];
+    //     currentRoom.currentPlayer = nextPlayer;
+
+    // }
+    // else {
+    //   const nextPlayer = currentRoom.players[currentIndex];
+    //   currentRoom.currentPlayer = nextPlayer;
+    // }
 
 
     // update for everyone
@@ -440,6 +443,81 @@ return Nextplayer
       handCards
     );
   }
+
+  shuffleDrawingPile(roomId: string) {
+      // if drawPile is < 2, then shuffle
+      let currentRoom = this.rooms.find((room) => room.id == roomId);
+      if (currentRoom == null) {
+        return;
+      }
+      if(currentRoom?.drawPile?.length <= 2) {
+        this.io.to(roomId).emit(
+          SocketRoom.cardMoveFeedback,
+          "Der Ziehstapel wird neu gemischt"
+        );
+        // discardPile without topcard
+        let newDeck = currentRoom?.discardPile.slice(0, -1); 
+        // topcard of discardPile
+        let lastCard = currentRoom?.discardPile.slice(-1);      
+        // drawpile + newDeck
+        currentRoom.drawPile.push(...newDeck);
+        shuffle(currentRoom.drawPile);
+        // only one discardPile
+        currentRoom.discardPile = lastCard;
+      }
+  }
+
+  // check if game is finished
+  checkGameFinished(roomId: string, card: Card) {
+    let currentRoom = this.rooms.find((room) => room.id == roomId);
+    if (currentRoom == null) {
+      return;
+    }
+    // if handcards empty
+    if (currentRoom?.currentPlayer?.handCards.length === 0) {
+      // check you last card which now is on the discard pile
+      if (card.number == "8" || card.number == "A") {
+        // check if lobby is 3 or 4
+        if (currentRoom.players.length > 2) {
+          // check if ace is in specialcards
+          if ((currentRoom.specialCards.includes("ace")) && card.number == "A") {
+            console.log("not finished_ace3or4players");
+          }
+          else {
+            console.log("finished_3or4players");
+            this.messageGameFinished(roomId);
+          }
+        }
+        // lobby with 2 players
+        if (currentRoom.players.length === 2) {
+          // check if eight is in specialcards
+          if ((currentRoom.specialCards.includes("eight")) && card.number == "8") {
+            console.log("not finished_eight2players");
+          }
+          // check if ace is in specialcards
+          else if ((currentRoom.specialCards.includes("ace")) && card.number == "A") {
+            console.log("not finished_ace2players");
+          }
+          else {
+            console.log("finished_2players");
+            this.messageGameFinished(roomId);
+          }
+        }
+      }
+      else {
+        console.log("finished not last card 8 or A");
+        this.messageGameFinished(roomId);
+      }
+    }
+  }
+
+  messageGameFinished(roomId: string) {
+    this.io.to(roomId).emit(
+      SocketRoom.gameFinishedFeedback,
+      "Game Finished"
+    );
+  }
+
 
   setPlayerReadyState(socket: any, roomId: string) {
     // get room
