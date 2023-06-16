@@ -74,6 +74,11 @@ export class SocketManager {
       SocketRoom.ready, (roomId: string) =>
       this.setPlayerReadyState(socket, roomId)
     );
+
+    socket.on(
+      SocketRoom.nineColor, (Color: string, roomId:string) =>
+      this.ChooseColor(Color, roomId)
+    );
       
     if (this.userConnectionLog) {
       console.log(`Client ${socket.id} connected. (${this.io.engine.clientsCount})`);
@@ -188,7 +193,7 @@ export class SocketManager {
 
   CardnumberToString(card: Card){
     let cardnumber: string = "";
-    if(card.number == "6"){
+    if(card.number == "6"){ 
       cardnumber = "six";
     }else if(card.number == "7"){
       cardnumber = "seven";
@@ -242,7 +247,7 @@ if(Cardnumber == "seven"){
   //ToDo
   //Player can decide color of next card
   socket.emit(
-          SocketRoom.cardMoveFeedback,
+          SocketRoom.nineColor,
           "Wähle eine Farbe aus?"
         );
   
@@ -490,4 +495,16 @@ return Nextplayer
       return RoomID;
     }
   }
+
+ ChooseColor(color: string, roomId:string){
+  
+  let currentRoom = this.rooms.find((room) => room.id == roomId);
+  if (currentRoom == null) {
+    return;
+  }
+  let lastDiscardCard = currentRoom.discardPile[currentRoom?.discardPile.length - 1]; 
+  console.log('Fuckcolor' + lastDiscardCard.color);
+  console.log(color);
+ }
+
 }

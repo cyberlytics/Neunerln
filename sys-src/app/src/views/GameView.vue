@@ -1,12 +1,19 @@
 <template>
     <div v-if="onScreenMessageVisible" class="onScreenMessage">{{ onScreenMessage }}</div>
+    <div v-if="ChooseColorVisible" class="onScreenMessage">{{ onScreenMessage }}</div>
+    <div class="NineColor" v-if="chooseAColor">
+        <button  @click="NineColor('Schellen')">Schellen</button>
+        <button  @click="NineColor('Eichel')">Eichel</button>
+        <button  @click="NineColor('Blatt')">Blatt</button>
+        <button  @click="NineColor('Herz')">Herz</button>
+    </div>
     <Lobby v-if="!currentRoomId"
       :rooms="roomData" :userName="userName"
       @createRoom="createRoom" @joinRoom="joinRoom"
     />
     <Game v-else
       :userName="userName" :publicGameMetadata="publicGameMetadata" :handCards="handCards"
-      @cardPlayed="cardPlayed" @cardDrawn="cardDrawn" @ready="ready"
+      @cardPlayed="cardPlayed" @cardDrawn="cardDrawn" @ready="ready" @Color="NineColor"
     />
 </template>
 
@@ -33,6 +40,8 @@ const userName = ref<string>(getRandomName());
 
 const onScreenMessage = ref('');
 const onScreenMessageVisible = ref(false);
+const ChooseColorVisible = ref(false);
+const chooseAColor = ref(false);
 
 
 //#region subscribe
@@ -57,6 +66,13 @@ socket.on(SocketRoom.handCardsPublished, (cards: Card[]) => {
 
 socket.on(SocketRoom.cardMoveFeedback, (message: string) => {
   showOnScreenMessage(message);
+});
+
+socket.on(SocketRoom.nineColor, (message: string) => {
+  showOnScreenMessage(message);
+  console.log("bindrinimFucki");
+  chooseAColor.value = true;
+
 });
 
 
@@ -103,6 +119,15 @@ function ready() {
   socket.emit(
     SocketRoom.ready,
     currentRoomId.value
+  );
+}
+
+function NineColor(color: string){
+  //sent Color to backend
+chooseAColor.value=false;
+  socket.emit(
+    SocketRoom.nineColor,
+    color, currentRoomId.value
   );
 }
 

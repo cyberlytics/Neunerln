@@ -37,6 +37,7 @@
     </div>
 
     <button v-if="!playerIsReady" @click="setReadyState">Ready</button>
+    
 </template>
 
 <script setup lang="ts">
@@ -49,6 +50,7 @@ import { computed, ref } from 'vue';
 
 const cardBack= '../src/assets/card_back.svg';
 const playerIsReady = ref(false);
+
 
 const props = defineProps({
     userName: String,
