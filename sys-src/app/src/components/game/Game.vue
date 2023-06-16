@@ -33,7 +33,7 @@
         </div>
     </div> -->
 
-    <button class="readyGame" v-if="!playerIsReady" @click="setReadyState">Ready</button>
+    <button class="readyGame" v-if="!playerIsReady" @click="setReadyState(true)">Ready</button>
 </template>
 
 <script setup lang="ts">
@@ -45,17 +45,13 @@ import { computed, ref } from 'vue';
 //#endregion imports
 
 const cardBack= '../src/assets/card_back.svg';
-const playerIsReady = ref(false);
 
 const props = defineProps({
     userName: String,
     publicGameMetadata: PublicGameMetadata,
     handCards: Array<Card>,
- 
+    playerIsReady: Boolean
 });
-
-
-
 
 const player = computed(() => {
     return props.publicGameMetadata?.players
@@ -87,8 +83,7 @@ const orderedEnemies = computed(() => {
     return enemies;
 });
 
-const emit = defineEmits(['cardPlayed', 'cardDrawn', 'ready']);
-
+const emit = defineEmits(['cardPlayed', 'cardDrawn', 'setReadyState']);
 
 function playCard(card: Card) {
   emit('cardPlayed', card);
@@ -99,11 +94,9 @@ function drawCard() {
   emit('cardDrawn');
 }
 
-function setReadyState() {
-    playerIsReady.value = true;
-    emit('ready');
-}
-
+function setReadyState(state: boolean) {
+    emit('setReadyState', state);
+};
 </script>
 
 <style>

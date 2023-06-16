@@ -6,9 +6,10 @@
       @createRoom="createRoom" @joinRoom="joinRoom"
     />
     <Game v-else
-      :userName="userName" :publicGameMetadata="publicGameMetadata" :handCards="handCards"
-      @cardPlayed="cardPlayed" @cardDrawn="cardDrawn" @ready="ready"
+      :userName="userName" :publicGameMetadata="publicGameMetadata" :handCards="handCards" :playerIsReady="playerIsReady"
+      @cardPlayed="cardPlayed" @cardDrawn="cardDrawn" @setReadyState="setReadyState"
     />
+    <button id="debug" @click="debug">debug button</button>
 </template>
 
 <script setup lang="ts">
@@ -31,12 +32,15 @@ const currentRoomId = ref<string>();
 const publicGameMetadata = ref<PublicGameMetadata>();
 const handCards = ref<Card[]>();
 const userName = ref<string>(getRandomName());
+const playerIsReady = ref(false);
 
 const onScreenMessage = ref('');
 const onScreenMessageVisible = ref(false);
 
 const onFinishMessage = ref('');
 const onFinishMessageVisible = ref(false);
+
+const emit = defineEmits(['gameFinished']);
 
 //#region subscribe
 
@@ -64,6 +68,7 @@ socket.on(SocketRoom.cardMoveFeedback, (message: string) => {
 
 socket.on(SocketRoom.gameFinishedFeedback, (message: string) => {
   showOnFinishMessage(message);
+  setReadyState(false);
 });
 
 
@@ -105,12 +110,21 @@ function cardDrawn(card: Card) {
   );
 }
 
-function ready() {
+function setReadyState(state: boolean) {
+  playerIsReady.value = state;
+  
   // sent ready signal to backend
   socket.emit(
     SocketRoom.ready,
-    currentRoomId.value
+    currentRoomId.value, state
   );
+}
+
+function debug() {
+  socket.emit(
+    SocketRoom.debug,
+    currentRoomId.value
+  );  
 }
 
 //#endregion publish
@@ -175,6 +189,11 @@ function getRandomName() {
   text-align: center;
   color: white;
   background-color: #f29400;
+}
+
+#debug {
+  position: absolute;
+  inset: 0 0 auto auto;
 }
 
 </style>
