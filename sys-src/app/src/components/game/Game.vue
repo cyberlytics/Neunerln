@@ -11,8 +11,9 @@
     <div class="pile">
         <div class="discard-pile">
             <div class="draws">
-                <CardFront class="drawingCard" :back="cardBack" v-for="card in publicGameMetadata?.discardPile"
+                <CardFront class="drawingCard" :back="cardBack"
                 @click="drawCard()"/>
+                <span>{{ publicGameMetadata?.drawingPileCount }}</span>
             </div>
             <div>
                 <CardFront class="drawingCards" v-for="card in publicGameMetadata?.discardPile" :value="card.number" :color="card.color" />
@@ -133,6 +134,16 @@ function setReadyState() {
 
 .draws {
     margin-right: 25vh;    
+}
+.draws > span {
+    position: absolute;
+    inset: -25px auto auto 4rem;
+    text-align: center;
+    font-size: larger;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    translate: -50% 0;
+
 }
 
 .discard-pile {
