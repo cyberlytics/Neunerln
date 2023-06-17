@@ -93,6 +93,8 @@ export class SocketManager {
     );
 
     this.logRooms();
+
+    return newRoom.id;
   }
 
   joinRoom(socket: any, roomId: string, userName: string) {
