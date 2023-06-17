@@ -4,34 +4,10 @@
     <hr />
     <br />
 
-    <button id="showRankings" @click="showModal = true">Rankings</button>
-
-    <Teleport to="body">
-      <modal :show="showModal" @Close="showModal = false"
-        ><template #body>
-          <div class="ranking-body">
-            <slot name="body">
-              <div class="ranking-entry">
-                <div>Rank</div>
-                <div>Username</div>
-                <div>Wins</div>
-                <div>Games</div>
-                <div>Winrate</div>
-              </div>
-              <div v-for="user in users">
-                <div class="ranking-entry">
-                  <div>{{ user.rank }}</div>
-                  <div>{{ user.username }}</div>
-                  <div>{{ user.played }}</div>
-                  <div>{{ user.wins }}</div>
-                  <div>{{ user.winrate }}</div>
-                </div>
-              </div>
-            </slot>
-          </div>
-        </template></modal
-      >
-    </Teleport>
+    <button id="showRankings" @click="toggleModal()" :showModal="showModal">Rankings</button>
+    <dialog>
+      <Ranking @closeModal="toggleModal"></Ranking>
+    </dialog>
 
     <h2>Create</h2>
 
@@ -113,9 +89,8 @@
 //#region imports
 import type { PublicRoomData } from '@/types/publicRoomData'
 import CardFront from '../game/CardFront.vue'
-import Modal from '../game/Ranking.vue'
+import Ranking from '../game/Ranking.vue'
 import { ref } from 'vue'
-import axios from 'axios'
 //#endregion imports
 
 const specialCards = ref(['seven', 'eight', 'nine', 'ten', 'ace'])
@@ -123,7 +98,6 @@ const maxPlayers = ref(2)
 const showErrorOrSuccess = ref(true)
 const errorState = ref('')
 const showModal = ref(false)
-let users = retrieveRankings()
 
 const props = defineProps({
   rooms: Array<PublicRoomData>,
@@ -139,21 +113,14 @@ function joinRoom(roomId: string) {
   emit('joinRoom', roomId)
 }
 
-async function retrieveRankings() {
-  try {
-    const res = await axios.get('http://localhost:3000/api/rankings')
-    console.log(res.data)
-    showErrorOrSuccess.value = true
-    return res.data.ranking
-  } catch (err: any) {
-    //TODO: Fehler dem User anzeigen
-    if (err.response.status === 500)
-      errorState.value = 'Verbindung zum Server fehlgeschlagen. Bitte erneut versuchen.'
-    console.log(err)
-    return
+function toggleModal() {
+  showModal.value = !showModal.value
+  console.log(showModal.value)
+  if (showModal.value) {
+    document.querySelector('dialog')?.showModal()
+  } else {
+    document.querySelector('dialog')?.close()
   }
-  errorState.value = 'Einloggen erfolgreich'
-  //TODO: Weiterleitung
 }
 </script>
 
@@ -164,5 +131,12 @@ async function retrieveRankings() {
 }
 .specCard {
   margin-right: 1em;
+}
+
+dialog {
+  border: solid;
+  border-radius: 1vw;
+  width: 80vw;
+  background: white;
 }
 </style>
