@@ -8,6 +8,7 @@ import { Card } from "src/types/card";
 import { shuffle } from "./helperFunctions";
 
 let RoomID: Room;
+let ChoosenColor: string = '';
 
 export class SocketManager {
   // logging
@@ -141,10 +142,24 @@ export class SocketManager {
     if((currentRoom.specialCards.includes("nine")) && (card.number == "9")){
       nine = true;
     }
-
+let playedninebefor = false;
     if(!nine){
     // check if card an be played
-    let lastDiscardCard = currentRoom.discardPile[currentRoom?.discardPile.length - 1]; 
+    let lastDiscardCard = currentRoom.discardPile[currentRoom?.discardPile.length - 1];
+    if(lastDiscardCard?.number == '9') {
+      let wishedthisninecolor= this.checkforninecolor();
+      console.log(wishedthisninecolor+ ' = ninecolor, '+ card.color + ' =color')
+      playedninebefor = true;
+      if(wishedthisninecolor !=  card.color){   
+        socket.emit(
+          SocketRoom.cardMoveFeedback,
+          "you can't place this card"
+        );
+        return;
+      }
+
+    }
+    if(!playedninebefor){
     if (lastDiscardCard?.color != card.color
       && lastDiscardCard?.number != card.number) {
 
@@ -155,6 +170,7 @@ export class SocketManager {
       );
       return;
       }
+    }
     }
 
 
@@ -583,6 +599,24 @@ return Nextplayer
   let lastDiscardCard = currentRoom.discardPile[currentRoom?.discardPile.length - 1]; 
   console.log('Fuckcolor' + lastDiscardCard.color);
   console.log(color);
+  ChoosenColor = color;
  }
 
+ checkforninecolor(){
+  console.log(ChoosenColor + " = farbe gewählt");
+  let wishedninecolor:string = '';
+  if(ChoosenColor=='Eichel'){
+    wishedninecolor='../src/assets/Bay_eichel.svg';
+    return wishedninecolor;
+  }else if(ChoosenColor=='Schellen'){
+    wishedninecolor='../src/assets/Bay_schellen.svg';
+    return wishedninecolor;
+  }else if(ChoosenColor=='Herz'){
+    wishedninecolor='../src/assets/Bay_herz.svg';
+    return wishedninecolor;
+  }else{
+    wishedninecolor='../src/assets/Bay_gras.svg';
+    return wishedninecolor;
+  }
+ }
 }
