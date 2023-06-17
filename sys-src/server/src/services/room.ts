@@ -3,6 +3,7 @@ import { CardColor } from "../types/cardColor";
 import { CardNumber } from "../types/cardNumber";
 import { Player } from "src/types/player";
 import { getRandomElementFromArray, shuffle } from "./helperFunctions";
+import { randomUUID } from 'crypto';
 
 export class Room {
     // room
@@ -19,8 +20,8 @@ export class Room {
     discardPile: Card[];
     currentPlayer: Player | null;
 
-    constructor(id: string, name: string, specialCards: string[], maxPlayers: number) {
-        this.id = id;
+    constructor(name: string, specialCards: string[], maxPlayers: number) {
+        this.id = randomUUID();
         this.name = name;
         this.specialCards = specialCards;
         this.players = [];

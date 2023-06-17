@@ -2,6 +2,7 @@ export enum SocketRoom {
     connection = 'connection',
     disconnected = 'disconnect',
 
+    createRoom = 'createRoom',
     roomCreated = 'roomCreated',
     roomJoined = 'roomJoined',
     gameStarted = "gameStarted",

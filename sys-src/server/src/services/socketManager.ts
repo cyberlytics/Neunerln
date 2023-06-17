@@ -34,8 +34,8 @@ export class SocketManager {
       this.getLobbyData());
       
     socket.on(
-      SocketRoom.roomCreated, (userName: string, specialCards: string[], maxPlayers: number) =>
-      this.createRoom(socket.id, userName, specialCards, maxPlayers)
+      SocketRoom.createRoom, (userName: string, specialCards: string[], maxPlayers: number) =>
+      this.createRoom(socket, userName, specialCards, maxPlayers)
     );
 
     socket.on(
@@ -71,16 +71,21 @@ export class SocketManager {
     }
   }
   
-  createRoom(userId: string, userName: string, specialCards: string[], maxPlayers: number) {
+  createRoom(socket: any, userName: string, specialCards: string[], maxPlayers: number) {
     // create and save new room
     const newRoom: Room = new Room(
-      userId,
       `Room of ${userName}`,
       specialCards,
       maxPlayers
     );
     this.rooms.push(newRoom);
     
+    // send feedback to creator
+    socket.emit(
+      SocketRoom.roomCreated,
+      newRoom.id
+    );
+
     // send updated lobby rooms to clients
     this.io.emit(
       SocketRoom.lobbyRoomsChanged,
@@ -122,8 +127,11 @@ export class SocketManager {
 
     // close room if empty
     if (room.players.length == 0) {
-      this.rooms = this.rooms.filter(room => room.id != room.id);
+      this.logRooms();
+      this.rooms = this.rooms.filter(r => r.id != room.id);
+      this.logRooms();
     }
+
     // update room members
     else {
       this.updateGamedata(room);

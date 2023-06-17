@@ -36,6 +36,11 @@ socket.on(SocketRoom.lobbyRoomsChanged, (openRooms: PublicRoomData[]) => {
   roomData.value = openRooms;
 });
 
+socket.on(
+  SocketRoom.roomCreated,
+  (roomId: string) => joinRoom(roomId)
+)
+
 socket.on(SocketRoom.gameStarted, () => {
   // do something
 });
@@ -56,11 +61,9 @@ socket.on(SocketRoom.handCardsPublished, (cards: Card[]) => {
 
 function createRoom(specialCards: string[], maxPlayers: number) {
   socket.emit(
-    SocketRoom.roomCreated, 
+    SocketRoom.createRoom, 
     userName.value, specialCards, maxPlayers
   );
-
-  joinRoom(socket.id);
 }
 
 function joinRoom(roomId: string) {
