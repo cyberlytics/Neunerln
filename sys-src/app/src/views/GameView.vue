@@ -71,6 +71,11 @@ socket.on(SocketRoom.cardMoveFeedback, (message: string) => {
   showOnScreenMessage(message);
 });
 
+socket.on(SocketRoom.nineColor, (message:string)=>{
+  chooseAColor.value = true; 
+  showOnScreenMessage(message);
+});
+
 
 //#endregion subscribe
 
