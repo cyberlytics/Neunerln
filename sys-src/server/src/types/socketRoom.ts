@@ -12,4 +12,13 @@ export enum SocketRoom {
     handCardsPublished = 'getHandCards',
     
     gamedataPublished = 'gamedataPublished',
+    
+    nextPlayer = 'nextPlayer',
+    drawCard = 'drawCard',
+    playCard = 'playCard',
+    cardMoveFeedback = 'cardMoveFeedback',
+    gameFinishedFeedback = 'gameFinishedFeedback',
+    ready = 'ready',
+
+    debug = 'debug'
 }
