@@ -23,8 +23,9 @@ router.post(
   ],
   validateRequest,
   async (req: Request, res: Response) => {
-    const { email, password } = req.body
-    const existingUser = await User.findOne({ email })
+    const { name, password } = req.body
+    const existingUser =
+      (await User.findOne({ email: name })) || (await User.findOne({ username: name }))
 
     /*
      * This code will go through the same process no matter what the user or the password is,
