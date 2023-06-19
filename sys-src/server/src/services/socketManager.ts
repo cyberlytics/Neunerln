@@ -293,7 +293,17 @@ return Nextplayer
 }
 
   drawCard(socket: any, roomId: string) {
+<<<<<<< Updated upstream
     let currentRoom = this.rooms.find((room) => room.id == roomId);
+=======
+    let room = this.getRoom(roomId);
+    if (room == null) {
+      return;
+    }
+
+    if(room.isEveryPlayerReady()){
+    let currentRoom = this.getRoom(roomId);
+>>>>>>> Stashed changes
     if (currentRoom == null) {
       return;
     }
@@ -383,7 +393,9 @@ return Nextplayer
 
 
     // update for everyone
+  
     this.updateGamedata(currentRoom);
+  }
   }
 
   joinRoom(socket: any, roomId: string, userName: string) {
