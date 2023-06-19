@@ -16,8 +16,8 @@ router.post(
   '/api/auth/signin',
   [
     oneOf([
-      body('email').isEmail().withMessage('Email must be valid.'),
-      body('username').trim().notEmpty().withMessage('Username must be not empty.')
+      body('name').isEmail().withMessage('Email must be valid.'),
+      body('name').trim().notEmpty().withMessage('Username must be not empty.')
     ]),
     body('password').trim().notEmpty().withMessage('You must supply a password')
   ],
