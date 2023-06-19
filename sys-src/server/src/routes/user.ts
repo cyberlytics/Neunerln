@@ -3,7 +3,7 @@ import { body } from 'express-validator'
 import { InternalServerError } from '../errors/interal-server-error'
 import { BadRequestError } from '../errors/bad-request-error'
 import { validateRequest } from 'src/middlewares/validate-request'
-import { userExists, increasePlayed, increaseWon, findUserByEmail } from 'src/database/User'
+import { increasePlayed, increaseWon, findUserByEmail } from 'src/database/User'
 
 const router = express.Router()
 
@@ -16,7 +16,7 @@ router.put(
       const { userMail } = req.params
       const didWin = req.body
       // return success response
-      if (userExists(userMail) === null) {
+      if (findUserByEmail(userMail) === null) {
         throw new BadRequestError('User does not exist', ['Check User E-Mail'])
       }
       increasePlayed(userMail)
