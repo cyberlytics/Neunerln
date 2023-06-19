@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import axios from 'axios'
-import Vue from 'vue'
-import VueCookies from 'vue-cookies'
+import router from '@/router'
 
 const header = ref('Login')
 const showLoginParts = ref(true)
-const username = ref('NeunerlnTest')
-const email = ref('test@test.de')
+const username = ref('NesunxxerlnTest')
+const email = ref('tessxxssst@test.de')
 const password = ref('Password1!')
 const confirmPassword = ref('Password1!')
 const name = ref('')
@@ -52,8 +51,6 @@ async function signup() {
       password: password.value
     })
     showErrorOrSuccess.value = true
-    const sessionToken = res.headers['set-cookie']
-    VueCookies.VueCookies.set('sessionToken', sessionToken)
   } catch (err: any) {
     isloading.value = !isloading.value
     if (err.response.status === 400)
@@ -64,8 +61,7 @@ async function signup() {
     return
   }
   errorState.value = 'Registrierung war erfolgreich.'
-  //TODO: Weiterleiten an Lobby
-  //TODO: JSON Web Token bekommt man zurück, diesen in Cookie speichern
+  await router.push('/login')
 }
 
 async function login() {
@@ -75,23 +71,20 @@ async function login() {
       name: name.value,
       password: password.value
     })
-    //console.log(res.status)
     showErrorOrSuccess.value = true
-    console.log(res)
-    const sessionToken = res.headers['set-cookie']
-    VueCookies.VueCookies.set('sessionToken', sessionToken)
   } catch (err: any) {
     isloading.value = !isloading.value
-    if (err.response.status === 404) {
+    if (err.status === 404) {
       errorState.value = 'Fehler beim Einloggen. Bitte überprüfen Sie die Eingaben.'
-    } else if (err.response.status === 500)
+    } else if (err.status === 500) {
       errorState.value = 'Verbindung zum Server fehlgeschlagen. Bitte erneut versuchen.'
+    }
     console.log(err)
     return
   }
   errorState.value = 'Einloggen war erfolgreich.'
 
-  //TODO: Weiterleitung
+  await router.push('/')
 }
 
 function showRegisterView() {
