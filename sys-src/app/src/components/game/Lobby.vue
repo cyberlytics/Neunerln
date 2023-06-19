@@ -4,9 +4,9 @@
     <hr />
     <br />
 
-    <button id="showRankings" @click="toggleModal()" :showModal="showModal">Rankings</button>
+    <button id="showRankings" @click="toggleModal()">Rankings</button>
     <dialog>
-      <Ranking @closeModal="toggleModal"></Ranking>
+      <Ranking :showModal="showModal" @closeModal="toggleModal"></Ranking>
     </dialog>
 
     <h2>Create</h2>
@@ -115,7 +115,6 @@ function joinRoom(roomId: string) {
 
 function toggleModal() {
   showModal.value = !showModal.value
-  console.log(showModal.value)
   if (showModal.value) {
     document.querySelector('dialog')?.showModal()
   } else {

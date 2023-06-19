@@ -9,32 +9,25 @@ const errorState = ref('')
 const props = defineProps({
   showModal: Boolean
 })
-let users: any
 
-onMounted(() => {
-  //move to open modal
-  retrieveRankings()
-  console.log(users)
-})
+let users = ref(null)
 
 watch(
   () => props.showModal,
-  () => console.log('test')
-  // (newValue) => {
-  //   console.log('rankings sind da')
-  //   if (newValue) {
-  //     users = retrieveRankings()
-  //   }
-  // }
+  async (newValue) => {
+    if (newValue) {
+      users.value = await retrieveRankings()
+      console.log(users.value)
+    }
+  }
 )
 
 async function retrieveRankings() {
   try {
     const res = await axios.get('http://localhost:3000/api/rankings')
-    // console.log(res.data)
     showErrorOrSuccess.value = true
-    users = res.data
-    console.log(users)
+    errorState.value = 'Rankings erfolgreich erhalten'
+    return res.data.ranking
   } catch (err: any) {
     //TODO: Fehler dem User anzeigen
     if (err.response.status === 500)
@@ -42,8 +35,6 @@ async function retrieveRankings() {
     console.log(err)
     return
   }
-  errorState.value = 'Einloggen erfolgreich'
-  //TODO: Weiterleitung
 }
 
 const emit = defineEmits(['closeModal'])
