@@ -57,6 +57,14 @@ const emit = defineEmits(['closeModal'])
           <div>Games</div>
           <div>Winrate</div>
         </div>
+
+        <div v-for="user in users" class="ranking-entry">
+          <div>{{ user.rank }}</div>
+          <div>{{ user.username }}</div>
+          <div>{{ user.wins }}</div>
+          <div>{{ user.played }}</div>
+          <div>{{ user.winrate }}</div>
+        </div>
       </slot>
     </div>
 
