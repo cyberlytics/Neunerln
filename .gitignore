@@ -8,6 +8,9 @@ concept.synctex.gz
 yarn.lock
 .yarnclean
 
+# gitinspector
+gitinspector.html
+
 # compiled output
 /dist
 /tmp
