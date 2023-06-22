@@ -1,0 +1,822 @@
+openapi: 3.0.3
+info:
+  title: Swagger Petstore - OpenAPI 3.0
+  description: |-
+    This is a sample Pet Store Server based on the OpenAPI 3.0 specification.  You can find out more about
+    Swagger at [https://swagger.io](https://swagger.io). In the third iteration of the pet store, we've switched to the design first approach!
+    You can now help us improve the API whether it's by making changes to the definition itself or to the code.
+    That way, with time, we can improve the API in general, and expose some of the new features in OAS3.
+
+    _If you're looking for the Swagger 2.0/OAS 2.0 version of Petstore, then click [here](https://editor.swagger.io/?url=https://petstore.swagger.io/v2/swagger.yaml). Alternatively, you can load via the `Edit > Load Petstore OAS 2.0` menu option!_
+
+    Some useful links:
+    - [The Pet Store repository](https://github.com/swagger-api/swagger-petstore)
+    - [The source API definition for the Pet Store](https://github.com/swagger-api/swagger-petstore/blob/master/src/main/resources/openapi.yaml)
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: apiteam@swagger.io
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: https://petstore3.swagger.io/api/v3
+tags:
+  - name: users
+    description: Everything about user
+  - name: auth
+    description: Everything about Signing in
+  - name: rooms
+    description: Everything about Rooms
+  - name: rules
+    description: Everything about creating and changing Rules
+  - name: cards
+    description: Everything about creating the Card Deck and hand
+  - name: ranking
+    description: Everything about creating and displaying Rankings
+  - name: turn
+    description: Everything about creating and displaying Player Turns
+paths:
+  /auth/signup:
+    post:
+      tags:
+        - auth
+      summary: Sign up
+      description: Create a user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Response"
+        "400":
+          description: Invalid Input supplied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /auth/signin:
+    post:
+      tags:
+        - auth
+      summary: Login
+      description: Log a User In
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              oneOf:
+                - properties:
+                    email:
+                      type: string
+                    password:
+                      type: string
+                - properties:
+                    username:
+                      type: string
+                    password:
+                      type: string
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/Response"
+                  - properties:
+                      token:
+                        type: string
+        "400":
+          description: Invalid Input supplied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /rooms:
+    post:
+      tags:
+        - rooms
+      summary: Room creation
+      description: create a new Room
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                host:
+                  $ref: "#/components/schemas/User/properties/username"
+                size:
+                  $ref: "#/components/schemas/Room/properties/size"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+        "400":
+          description: Invalid Input supplied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    get:
+      tags:
+        - rooms
+      summary: retrieve Rooms
+      description: get a list of all created Rooms
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Room"
+  /rooms/{roomId}:
+    delete:
+      tags:
+        - rooms
+      summary: delete a Room
+      description: deletes a specific existing Room
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Room deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+        "400":
+          description: Room not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      tags:
+        - rooms
+      summary: update a Room
+      description: updates a specific existing Room
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Room updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+        "400":
+          description: Room not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /rooms/{roomId}/rules:
+    post:
+      tags:
+        - rules
+      summary: Rule creation
+      description: create a Rule for a specific Room
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Rule"
+      responses:
+        "200":
+          description: Rule created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rule"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Room not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      tags:
+        - rules
+      summary: Rule update
+      description: update a Rule for a specific Room
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Rule"
+      responses:
+        "200":
+          description: Rule updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rule"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Room not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    get:
+      tags:
+        - rules
+      summary: get Rules
+      description: retrieve all Rules for a specific Room
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Rule"
+      responses:
+        "200":
+          description: Rules retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Rule"
+        "404":
+          description: Room not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /rooms/{roomId}/cards:
+    post:
+      tags:
+        - cards
+      summary: Card deck creation
+      description: create a Card deck for a specific Room
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              minItems: 36
+              maxItems: 36
+              items:
+                $ref: "#/components/schemas/Card"
+              uniqueItems: true
+      responses:
+        "200":
+          description: Card deck created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Card"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Room not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /rooms/{roomId}/users:
+    get:
+      tags:
+        - users
+      summary: retrieve Users
+      description: retrieve all Users of specific Room
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Users retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    $ref: "#/components/schemas/User/properties/username"
+                  id:
+                    $ref: "#/components/schemas/User/properties/id"
+        "404":
+          description: Room not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      tags:
+        - users
+      summary: update Room Users
+      description: update Users of specific Room
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/User/properties/id"
+      responses:
+        "200":
+          description: Users updated
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    username:
+                      $ref: "#/components/schemas/User/properties/username"
+                    id:
+                      $ref: "#/components/schemas/User/properties/id"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Room not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /rooms/{roomId}/users/{userId}/cards:
+    post:
+      tags:
+        - cards
+      summary: user Card "hand" creation
+      description: create a Card hand for a specific User in a specific Room
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              minItems: 6
+              maxItems: 6
+              items:
+                $ref: "#/components/schemas/Card"
+              uniqueItems: true
+      responses:
+        "200":
+          description: Card hand created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Card"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Room not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      tags:
+        - cards
+      summary: update Card "hand"
+      description: update a Card hand for a specific User in a specific Room
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/Card"
+              uniqueItems: true
+      responses:
+        "200":
+          description: Card hand updated
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Card"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Room not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /rankings/{userId}:
+    post:
+      tags:
+        - ranking
+      summary: create Ranking
+      description: create user specific Ranking
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                wins:
+                  $ref: "#/components/schemas/Ranking/properties/wins"
+                losses:
+                  $ref: "#/components/schemas/Ranking/properties/losses"
+      responses:
+        "200":
+          description: Ranking created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Ranking"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      tags:
+        - ranking
+      summary: delete Ranking
+      description: delete a Ranking for a specific User
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Ranking deleted
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    get:
+      tags:
+        - ranking
+      summary: retrieve Ranking
+      description: retrieve a Ranking for a specific User
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Ranking retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ranking"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /rankings:
+    get:
+      tags:
+        - ranking
+      summary: retrieve Ranking
+      description: retrieve all Rankings of all Users
+      responses:
+        "200":
+          description: Rankings retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Ranking"
+  /rooms/{roomId}/user/{userId}/moves:
+    post:
+      tags:
+        - turn
+      summary: create turn
+      description: create a User specific Turn in a Room
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Turn"
+      responses:
+        "200":
+          description: Turn created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Turn"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /rooms/{roomId}/moves:
+    get:
+      tags:
+        - turn
+      summary: retrieve Turn
+      description: retrieve all Turns of a specific Room
+      parameters:
+        - name: roomId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Turns retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Turn"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+components:
+  schemas:
+    Room:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        size:
+          type: integer
+          minimum: 2
+          maximum: 4
+        users:
+          type: array
+          minItems: 2
+          maxItems: 4
+          items:
+            type: object
+            properties:
+              username:
+                $ref: "#/components/schemas/User/properties/username"
+              id:
+                $ref: "#/components/schemas/User/properties/id"
+        rules:
+          type: array
+          items:
+            $ref: "#/components/schemas/Rule"
+    User:
+      type: object
+      required:
+        - username
+        - email
+        - password
+      properties:
+        id:
+          type: integer
+          format: int64
+        username:
+          type: string
+          example: theUser
+        email:
+          type: string
+          example: john@email.com
+        password:
+          minLength: 8
+          maxLength: 64
+          type: string
+          example: "Aa345678"
+          description: "Pattern for atleast one uppercase, one lowercase and one digit. Min 8 Max 64 characters"
+    Rule:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+    Card:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        farbe:
+          type: string
+        augen:
+          type: string
+    Ranking:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        wins:
+          type: integer
+        losses:
+          type: integer
+        User:
+          $ref: "#/components/schemas/User/properties/id"
+    Turn:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        Card:
+          $ref: "#/components/schemas/Card/properties/id"
+        User:
+          $ref: "#/components/schemas/User/properties/id"
+        Room:
+          $ref: "#/components/schemas/Room/properties/id"
+    Response:
+      type: object
+      properties:
+        message:
+          type: string
+        links:
+          type: array
+          items:
+            type: object
+            properties:
+              href:
+                type: string
+              rel:
+                type: string
+              method:
+                type: string
+    Error:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              error_spec:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  message:
+                    type: string
+                  log_level:
+                    type: string
+                  http_status_codes:
+                    type: array
+                    items:
+                      type: integer
+                  suggested_application_actions:
+                    type: string

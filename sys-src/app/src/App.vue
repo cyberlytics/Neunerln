@@ -1,43 +1,30 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
-import axios from "axios"
-import {ref, onMounted} from "vue"
-
+import axios from 'axios'
+import { ref, onMounted } from 'vue'
+import Login from './views/Login.vue'
 
 const users = ref([])
-
-onMounted(()=>{
-  const fetch = async ()=>{
-    const res = await axios.get("http://localhost:3000/api/test")
-    const s =  res.data.user
-  users.value.push(...s)
-    // console.log(users)
-
-  }
-
-  (fetch())
-})
-
 </script>
 
 <template>
-  <!-- <header>
+  <header>
     <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
 
     <div class="wrapper">
       <HelloWorld msg="You did it!" />
       <div v-for="user in users" :key="user">
-        <p>{{user}}</p>
-
+        <p>{{ user }}</p>
       </div>
 
       <nav>
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/about">About</RouterLink>
+        <RouterLink to="/login">Login/Register</RouterLink>
       </nav>
     </div>
-  </header> -->
+  </header>
 
   <RouterView />
 </template>

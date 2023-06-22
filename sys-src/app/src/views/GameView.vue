@@ -18,9 +18,11 @@
       @createRoom="createRoom" @joinRoom="joinRoom"
     />
     <Game v-else
-      :userName="userName" :publicGameMetadata="publicGameMetadata" :handCards="handCards"
-      @cardPlayed="cardPlayed" @cardDrawn="cardDrawn" @ready="ready" @Color="NineColor" @Ten="playTen"
+
+      :userName="userName" :publicGameMetadata="publicGameMetadata" :handCards="handCards" :playerIsReady="playerIsReady"
+      @cardPlayed="cardPlayed" @cardDrawn="cardDrawn" @setReadyState="setReadyState" @Color="NineColor" @Ten="playTen"
     />
+    <button id="debug" @click="debug">debug button</button>
 </template>
 
 <script setup lang="ts">
@@ -43,6 +45,7 @@ const currentRoomId = ref<string>();
 const publicGameMetadata = ref<PublicGameMetadata>();
 const handCards = ref<Card[]>();
 const userName = ref<string>(getRandomName());
+const playerIsReady = ref(false);
 
 const onScreenMessage = ref('');
 const onScreenMessageVisible = ref(false);
@@ -53,6 +56,8 @@ const currentUser = ref('');
 
 const onFinishMessage = ref('');
 const onFinishMessageVisible = ref(false);
+
+const emit = defineEmits(['gameFinished']);
 
 //#region subscribe
 
@@ -87,6 +92,11 @@ socket.on(SocketRoom.playedTen, (message:string, currentuser:string)=>{
   chooseAPlayer.value = true; 
   currentUser.value= currentuser;
   showOnScreenMessage(message);
+
+socket.on(SocketRoom.gameFinishedFeedback, (message: string) => {
+  showOnFinishMessage(message);
+  setReadyState(false);
+
 });
 
 
@@ -128,11 +138,13 @@ function cardDrawn(card: Card) {
   );
 }
 
-function ready() {
+function setReadyState(state: boolean) {
+  playerIsReady.value = state;
+  
   // sent ready signal to backend
   socket.emit(
     SocketRoom.ready,
-    currentRoomId.value
+    currentRoomId.value, state
   );
 }
 
@@ -145,7 +157,6 @@ chooseAColor.value=false;
   );
 }
 
-
 function playTen(player: string){
 console.log(player + " choosen Player");
   chooseAPlayer.value=false;
@@ -154,6 +165,13 @@ console.log(player + " choosen Player");
     SocketRoom.playedTen,
    player, currentRoomId.value
   );
+
+function debug() {
+  socket.emit(
+    SocketRoom.debug,
+    currentRoomId.value
+  );  
+
 }
 
 //#endregion publish
@@ -275,6 +293,10 @@ function getRandomName() {
   background-color: #f29400;
 }
 
+#debug {
+  position: absolute;
+  inset: 0 0 auto auto;
+}
 
+</style>
 
-</style> 

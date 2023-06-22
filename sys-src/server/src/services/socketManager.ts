@@ -28,6 +28,7 @@ export class SocketManager {
       this.connectUser(socket)
     );
 
+    console.log('SocketManager initialized');
     return this;
   }
 
@@ -72,8 +73,15 @@ export class SocketManager {
     );
 
     socket.on(
-      SocketRoom.ready, (roomId: string) =>
-      this.setPlayerReadyState(socket, roomId)
+      SocketRoom.ready, (roomId: string, ready: boolean) =>
+      this.setPlayerReadyState(socket, roomId, ready)
+    );
+
+    socket.on(
+      SocketRoom.debug, (data: any) => {
+        // use for debugging: e.g. trigger from frontend
+        this.handleGameFinished(data);
+      }
     );
 
     socket.on(
@@ -101,7 +109,6 @@ export class SocketManager {
       this.leaveRoom(joinedRoom, userId);
     }
 
-
     if (this.userConnectionLog) {
       console.log(`Client ${userId} disconnected. (${this.io.engine.clientsCount})`);
     }
@@ -127,14 +134,14 @@ export class SocketManager {
   }
 
   playCard(socket: any, roomId: string, card: Card) {
-    let currentRoom = this.rooms.find((room) => room.id == roomId);
+    const currentRoom = this.getRoom(roomId);
     if (currentRoom == null) {
       return;
     }
 
     // move functions to room/game class
     // check if players turn
-    if (currentRoom?.currentPlayer?.id != socket.id) {
+    if (currentRoom.currentPlayer?.id != socket.id) {
       // send user feedback -> not his turn
       socket.emit(
         SocketRoom.cardMoveFeedback,
@@ -335,10 +342,7 @@ if((previousDiscardCard.number== "7") && card.number!="7"){
 }
 
   drawCard(socket: any, roomId: string) {
-
-    let currentRoom = this.rooms.find((room) => room.id == roomId);
-
-    
+    let currentRoom = this.getRoom(roomId);
     if (currentRoom == null) {
       return;
     }
@@ -456,23 +460,23 @@ if((previousDiscardCard.number== "7") && card.number!="7"){
   }
 
   joinRoom(socket: any, roomId: string, userName: string) {
-    const room = this.rooms.find((room) => room.id == roomId);
-        if (!room
-          || room.ingame) {
-          return;
-        }
+    const room = this.getRoom(roomId);
+    if (!room
+      || room.ingame) {
+      return;
+    }
 
-        // add and subscribe player to room
-        room.players.push(new Player(socket.id, userName));
-        socket.join(room.id);
+    // add and subscribe player to room
+    room.players.push(new Player(socket.id, userName));
+    socket.join(room.id);
 
-        // update lobby rooms
-        this.io.emit(
-          SocketRoom.lobbyRoomsChanged,
-          this.getLobbyData()
-        );
-  
-        this.updateGamedata(room);
+    // update lobby rooms
+    this.io.emit(
+      SocketRoom.lobbyRoomsChanged,
+      this.getLobbyData()
+    );
+
+    this.updateGamedata(room);
   }
 
   leaveRoom(room: Room, userId: string) {
@@ -519,7 +523,7 @@ if((previousDiscardCard.number== "7") && card.number!="7"){
 
   sendHandCards(socket: any, roomId: string) {
     // get user's handcards
-    var correspondingRoom = this.rooms.find((room) => room.id == roomId);
+    var correspondingRoom = this.getRoom(roomId);
     var handCards = correspondingRoom?.players.find((player) => player.id == socket.id)?.handCards;
 
     // send back to user
@@ -531,7 +535,7 @@ if((previousDiscardCard.number== "7") && card.number!="7"){
 
   shuffleDrawingPile(roomId: string) {
       // if drawPile is < 2, then shuffle
-      let currentRoom = this.rooms.find((room) => room.id == roomId);
+      let currentRoom = this.getRoom(roomId);
       if (currentRoom == null) {
         return;
       }
@@ -554,7 +558,7 @@ if((previousDiscardCard.number== "7") && card.number!="7"){
 
   // check if game is finished
   checkGameFinished(roomId: string, card: Card) {
-    let currentRoom = this.rooms.find((room) => room.id == roomId);
+    let currentRoom = this.getRoom(roomId);
     if (currentRoom == null) {
       return;
     }
@@ -570,7 +574,7 @@ if((previousDiscardCard.number== "7") && card.number!="7"){
           }
           else {
             console.log("finished_3or4players");
-            this.messageGameFinished(roomId);
+            this.handleGameFinished(roomId);
           }
         }
         // lobby with 2 players
@@ -585,28 +589,43 @@ if((previousDiscardCard.number== "7") && card.number!="7"){
           }
           else {
             console.log("finished_2players");
-            this.messageGameFinished(roomId);
+            this.handleGameFinished(roomId);
           }
         }
       }
       else {
         console.log("finished not last card 8 or A");
-        this.messageGameFinished(roomId);
+        this.handleGameFinished(roomId);
       }
     }
   }
 
-  messageGameFinished(roomId: string) {
+  handleGameFinished(roomId: string) {
+    // inform clients
     this.io.to(roomId).emit(
       SocketRoom.gameFinishedFeedback,
       "Game Finished"
     );
+
+    // reset room
+    let room = this.getRoom(roomId);
+    if (room == null) {
+      return;
+    }
+    room.resetGame();
+
+    // update clients with resetted room
+    this.updateGamedata(room);
   }
 
+  getRoom(roomId: string) {
+    let room = this.rooms.find((room) => room.id == roomId);
+    return room;
+  }
 
-  setPlayerReadyState(socket: any, roomId: string) {
+  setPlayerReadyState(socket: any, roomId: string, ready: boolean) {
     // get room
-    const room = this.rooms.find((room) => room.id == roomId);
+    const room = this.getRoom(roomId);
     if (!room
       || room.ingame) {
       return;
@@ -618,8 +637,7 @@ if((previousDiscardCard.number== "7") && card.number!="7"){
       return;
     }
 
-    // set player ready
-    player.ready = true;
+    player.ready = ready;
 
     // start game if room full and every player ready
     if (room.isFull() && room.isEveryPlayerReady()) {

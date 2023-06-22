@@ -8,20 +8,21 @@ export class Room {
     // room
     id: string;
     name: string;
-    ingame: boolean = false;
     specialCards: string[];
     startingHandCards: number = 6;
     maxPlayers: number;
     players: Player[];
-
+    
     // game
-    drawPile: Card[];
-    discardPile: Card[];
-    currentPlayer: Player | null;
     choosenColor: string = '';
     playedseveninarow: number = 0;
     TenGiveCard:boolean = false;
     choosenPlayer: string = '';
+    ingame: boolean = false;
+    drawPile: Card[] = [];
+    discardPile: Card[] = [];
+    currentPlayer: Player | null = null;
+
 
     constructor(id: string, name: string, specialCards: string[], maxPlayers: number) {
         this.id = id;
@@ -30,9 +31,18 @@ export class Room {
         this.players = [];
         this.maxPlayers = maxPlayers;
 
+        this.resetGame();
+    }
+
+    resetGame() {
+        this.ingame = false;
         this.drawPile = this.getDeck();
         this.discardPile = [];
         this.currentPlayer = null;
+
+        this.players.forEach(player => {
+            player.handCards = [];
+        });
     }
 
     playerCount() {
