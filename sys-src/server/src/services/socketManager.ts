@@ -7,7 +7,8 @@ import { Room } from "./room";
 import { Card } from "src/types/card";
 import { shuffle } from "./helperFunctions";
 
-let RoomID: Room;
+
+
 
 export class SocketManager {
   // logging
@@ -82,6 +83,17 @@ export class SocketManager {
         this.handleGameFinished(data);
       }
     );
+
+    socket.on(
+      SocketRoom.nineColor, (Color: string, roomId:string) =>
+      this.ChooseColor(Color, roomId)
+    );
+    
+    socket.on(
+      SocketRoom.playedTen, (player: string, roomId:string,) =>
+      this.GivePlayerYourCard(player, roomId)
+      
+    );
       
     if (this.userConnectionLog) {
       console.log(`Client ${socket.id} connected. (${this.io.engine.clientsCount})`);
@@ -138,15 +150,47 @@ export class SocketManager {
       return;
     }
 
+    if(currentRoom.TenGiveCard){
+
+      if(currentRoom.currentPlayer?.handCards==null){
+        return;
+      }
+      const ChoosenPlayer = currentRoom.players.find(player => player.name === currentRoom?.choosenPlayer);
+      ChoosenPlayer?.handCards.push(<Card>card);
+      currentRoom.currentPlayer.handCards = currentRoom?.currentPlayer.handCards.filter((choosencard) => !(choosencard.number == card.number && choosencard.color == card.color));
+      currentRoom.TenGiveCard=false;
+      const currentIndex = currentRoom.players.findIndex(player => player.id === socket.id);
+      const nextIndex = (currentIndex + 1) % currentRoom.players.length;
+      const nextPlayer = currentRoom.players[nextIndex];
+      currentRoom.currentPlayer = nextPlayer;
+      
+      
+    }else{
+    //let seven:boolean = false;
+    let lastDiscardCard = currentRoom.discardPile[currentRoom?.discardPile.length - 1];
+
    //Check for nine in specialcards and if nine is played
     let nine:boolean = false;
     if((currentRoom.specialCards.includes("nine")) && (card.number == "9")){
       nine = true;
     }
-
+let playedninebefor = false;
     if(!nine){
     // check if card an be played
-    let lastDiscardCard = currentRoom.discardPile[currentRoom?.discardPile.length - 1]; 
+  
+    if(lastDiscardCard?.number == '9') {
+      let wishedthisninecolor= this.checkforninecolor(currentRoom);
+      playedninebefor = true;
+      if(wishedthisninecolor !=  card.color){   
+        socket.emit(
+          SocketRoom.cardMoveFeedback,
+          "you can't place this card"
+        );
+        return;
+      }
+
+    }
+    if(!playedninebefor){
     if (lastDiscardCard?.color != card.color
       && lastDiscardCard?.number != card.number) {
 
@@ -157,6 +201,7 @@ export class SocketManager {
       );
       return;
       }
+    }
     }
 
 
@@ -178,6 +223,11 @@ export class SocketManager {
    
         // * set new current player if card is not in special cards
        let number:string = this.CardnumberToString(card);
+
+       if(currentRoom.specialCards.includes('seven') && card.number!='7'){
+        this.addCardsAfterSeven(currentRoom, card);
+        }
+
         if(currentRoom.specialCards.includes(number)){
 
           currentRoom.currentPlayer = this.SpecialMove(socket, number, socket.id, currentRoom);
@@ -189,14 +239,16 @@ export class SocketManager {
           currentRoom.currentPlayer = nextPlayer;
         }
 
-
+       
+      }
     // update for everyone
     this.updateGamedata(currentRoom);
+      
   }
 
   CardnumberToString(card: Card){
     let cardnumber: string = "";
-    if(card.number == "6"){
+    if(card.number == "6"){ 
       cardnumber = "six";
     }else if(card.number == "7"){
       cardnumber = "seven";
@@ -225,20 +277,12 @@ SpecialMove(socket:any, Cardnumber: string, socketid : String, currentRoom: Room
 var Nextplayer:Player;
 
 if(Cardnumber == "seven"){
-  this.shuffleDrawingPile(currentRoom.id);
-  console.log("is in seven");
-  //Next player has to take two cards
-  const currentIndex = currentRoom.players.findIndex(player => player.id === socketid);
-  const nextHandcardIndex = (currentIndex + 1) % currentRoom.players.length;
-  const Nexthandcardplayer = currentRoom.players[nextHandcardIndex];
-  //Take two cards
-  Nexthandcardplayer.handCards.push(<Card>currentRoom.drawPile.pop());
-  Nexthandcardplayer.handCards.push(<Card>currentRoom.drawPile.pop());
+
+    currentRoom.playedseveninarow++;
 
   //Todo if other player has a 7 he can play it 
 
 }else if(Cardnumber == "eight"){
-  console.log("is in eight");
   //Next player is skipped
   const currentIndex = currentRoom.players.findIndex(player => player.id === socketid);
   const nextIndex = (currentIndex + 2) % currentRoom.players.length;
@@ -247,22 +291,26 @@ if(Cardnumber == "seven"){
 
 
 }else if(Cardnumber == "nine"){
-  console.log("is in nine");
   //ToDo
   //Player can decide color of next card
   socket.emit(
-          SocketRoom.cardMoveFeedback,
+          SocketRoom.nineColor,
           "Wähle eine Farbe aus?"
         );
   
 
 }else if(Cardnumber == "ten"){
-  console.log("is in ten");
   //Give the player of your choice one card
-  
+  currentRoom.TenGiveCard=true;
+  socket.emit(
+    SocketRoom.playedTen,
+    "Choose a Player to give your card?", currentRoom.currentPlayer?.name
+  );
+  const currentIndex = currentRoom.players.findIndex(player => player.id === socketid);
+  Nextplayer = currentRoom.players[currentIndex];
+  return Nextplayer;
 
 }else if(Cardnumber == "ace"){
-console.log("is in ace");
   //You can play another card
   const currentIndex = currentRoom.players.findIndex(player => player.id === socketid);
   Nextplayer = currentRoom.players[currentIndex];
@@ -275,7 +323,22 @@ const nextIndex = (currentIndex + 1) % currentRoom.players.length;
 Nextplayer = currentRoom.players[nextIndex];
 
 return Nextplayer
+}
 
+
+addCardsAfterSeven(currentRoom:Room, card:Card){
+
+  let previousDiscardCard = currentRoom.discardPile[currentRoom?.discardPile.length - 2];
+  console.log(previousDiscardCard);
+
+if((previousDiscardCard.number== "7") && card.number!="7"){
+  for(let i= 0; i < currentRoom.playedseveninarow; i++){
+    currentRoom.currentPlayer?.handCards.push(<Card>currentRoom.drawPile.pop());
+    currentRoom.currentPlayer?.handCards.push(<Card>currentRoom.drawPile.pop());
+    }
+  currentRoom.playedseveninarow = 0;
+
+}
 }
 
   drawCard(socket: any, roomId: string) {
@@ -283,6 +346,9 @@ return Nextplayer
     if (currentRoom == null) {
       return;
     }
+
+    if(currentRoom.isEveryPlayerReady()){
+    
 
     // check if players turn
     if (currentRoom?.currentPlayer?.id != socket.id) {
@@ -299,6 +365,12 @@ return Nextplayer
     let lastDiscardCard = currentRoom.discardPile[currentRoom?.discardPile.length - 1]; 
     let handcardLength: number = 0;
     let handcardMatches = false;
+    let Wished: boolean = false;
+
+    //check if nine was played last and check for wishedColor
+    if(currentRoom.specialCards.includes("nine") && lastDiscardCard.number == "9"){
+      Wished = true; 
+    }
 
     // check if handcards are defined
     if (currentRoom.currentPlayer?.handCards) {
@@ -307,8 +379,8 @@ return Nextplayer
 
     // check if any handcard match to the discard card
     for (let i = 0; i < handcardLength; i++) {
-      if (currentRoom.currentPlayer?.handCards[i].color == lastDiscardCard.color
-        || currentRoom.currentPlayer?.handCards[i].number == lastDiscardCard.number
+      if(Wished){
+      if (currentRoom.currentPlayer?.handCards[i].color == currentRoom.choosenColor
         || (currentRoom.specialCards.includes("nine") && currentRoom.currentPlayer?.handCards[i].number == '9')){
           handcardMatches = true;
           socket.emit(
@@ -316,6 +388,19 @@ return Nextplayer
             "Put one of your hand cards"
           );
           return;
+      }
+
+      }else{
+        if (currentRoom.currentPlayer?.handCards[i].color == lastDiscardCard.color
+          || currentRoom.currentPlayer?.handCards[i].number == lastDiscardCard.number
+          || (currentRoom.specialCards.includes("nine") && currentRoom.currentPlayer?.handCards[i].number == '9')){
+            handcardMatches = true;
+            socket.emit(
+              SocketRoom.cardMoveFeedback,
+              "Put one of your hand cards"
+            );
+            return;
+        }
       }
     }
 
@@ -335,7 +420,7 @@ return Nextplayer
     const currentIndex = currentRoom.players.findIndex(player => player.id === socket.id);
 
 
-    // * if DiscardCard (number or color) is not the same as drawn card, the the nextplayer is next
+    // * if DiscardCard (number or color) is not the same as drawn card, then the nextplayer is next
     if (lastDiscardCard?.color == lastDrawCard?.color
       || lastDiscardCard?.number == lastDrawCard?.number
       || (lastDrawCard?.number == '9' && currentRoom.specialCards.includes("nine"))) {
@@ -369,7 +454,9 @@ return Nextplayer
 
 
     // update for everyone
+  
     this.updateGamedata(currentRoom);
+  }
   }
 
   joinRoom(socket: any, roomId: string, userName: string) {
@@ -580,13 +667,42 @@ return Nextplayer
     }
   }
 
-  RoomId(room: Room| null){
-    
-    if(room !== null){
-    RoomID = room;
-    return RoomID;
-    }else{
-      return RoomID;
-    }
+ ChooseColor(color: string, roomId:string){
+  
+  let currentRoom = this.rooms.find((room) => room.id == roomId);
+  if (currentRoom == null) {
+    return;
   }
+  currentRoom.choosenColor = color;
+
+ }
+
+ checkforninecolor(currentRoom: Room){
+  console.log(currentRoom.choosenColor + " = farbe gewählt");
+  let wishedninecolor:string = '';
+  if(currentRoom.choosenColor=='Eichel'){
+    wishedninecolor='../src/assets/Bay_eichel.svg';
+    return wishedninecolor;
+  }else if(currentRoom.choosenColor=='Schellen'){
+    wishedninecolor='../src/assets/Bay_schellen.svg';
+    return wishedninecolor;
+  }else if(currentRoom.choosenColor=='Herz'){
+    wishedninecolor='../src/assets/Bay_herz.svg';
+    return wishedninecolor;
+  }else{
+    wishedninecolor='../src/assets/Bay_gras.svg';
+    return wishedninecolor;
+  }
+ }
+
+GivePlayerYourCard(choosenplayer: string, roomId:string){
+
+  let currentRoom = this.rooms.find((room) => room.id == roomId);
+  if (currentRoom == null) {
+    return;
+  }
+  currentRoom.choosenPlayer = choosenplayer;
+
 }
+}
+

@@ -14,10 +14,15 @@ export class Room {
     players: Player[];
     
     // game
+    choosenColor: string = '';
+    playedseveninarow: number = 0;
+    TenGiveCard:boolean = false;
+    choosenPlayer: string = '';
     ingame: boolean = false;
     drawPile: Card[] = [];
     discardPile: Card[] = [];
     currentPlayer: Player | null = null;
+
 
     constructor(id: string, name: string, specialCards: string[], maxPlayers: number) {
         this.id = id;
@@ -79,6 +84,8 @@ export class Room {
 
         this.discardPile.push(<Card>this.drawPile.pop());
     }
+
+    
     
     getDeck() {
         return [
