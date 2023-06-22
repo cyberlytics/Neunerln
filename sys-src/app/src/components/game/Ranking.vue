@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, watch } from 'vue'
+import { watch } from 'vue'
 import { ref } from 'vue'
 import axios from 'axios'
 
@@ -7,7 +7,8 @@ const showErrorOrSuccess = ref(true)
 const errorState = ref('')
 
 const props = defineProps({
-  showModal: Boolean
+  showModal: Boolean,
+  userName: String
 })
 
 let users = ref(null)
@@ -17,7 +18,6 @@ watch(
   async (newValue) => {
     if (newValue) {
       users.value = await retrieveRankings()
-      console.log(users.value)
     }
   }
 )
@@ -58,12 +58,25 @@ const emit = defineEmits(['closeModal'])
           <div>Winrate</div>
         </div>
 
-        <div v-for="user in users" class="ranking-entry">
-          <div>{{ user.rank }}</div>
-          <div>{{ user.username }}</div>
-          <div>{{ user.wins }}</div>
-          <div>{{ user.played }}</div>
-          <div>{{ user.winrate }}</div>
+        <div v-for="user in users">
+          <div
+            v-if="userName == user.username"
+            style="background-color: rgb(84, 141, 84); color: #ffffff"
+            class="ranking-entry"
+          >
+            <div>{{ user.rank }}</div>
+            <div>{{ user.username }}</div>
+            <div>{{ user.wins }}</div>
+            <div>{{ user.played }}</div>
+            <div>{{ user.winrate }}</div>
+          </div>
+          <div v-else class="ranking-entry">
+            <div>{{ user.rank }}</div>
+            <div>{{ user.username }}</div>
+            <div>{{ user.wins }}</div>
+            <div>{{ user.played }}</div>
+            <div>{{ user.winrate }}</div>
+          </div>
         </div>
       </slot>
     </div>

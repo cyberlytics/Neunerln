@@ -6,7 +6,7 @@
 
     <button id="showRankings" @click="toggleModal()">Rankings</button>
     <dialog>
-      <Ranking :showModal="showModal" @closeModal="toggleModal"></Ranking>
+      <Ranking :showModal="showModal" @closeModal="toggleModal" :userName="userName"></Ranking>
     </dialog>
 
     <h2>Create</h2>
