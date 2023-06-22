@@ -18,6 +18,10 @@ export class Room {
     drawPile: Card[];
     discardPile: Card[];
     currentPlayer: Player | null;
+    choosenColor: string = '';
+    playedseveninarow: number = 0;
+    TenGiveCard:boolean = false;
+    choosenPlayer: string = '';
 
     constructor(id: string, name: string, specialCards: string[], maxPlayers: number) {
         this.id = id;
@@ -70,6 +74,8 @@ export class Room {
 
         this.discardPile.push(<Card>this.drawPile.pop());
     }
+
+    
     
     getDeck() {
         return [

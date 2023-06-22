@@ -1,11 +1,16 @@
 <template>
     <div v-if="onScreenMessageVisible" class="onScreenMessage">{{ onScreenMessage }}</div>
     <div v-if="ChooseColorVisible" class="onScreenMessage">{{ onScreenMessage }}</div>
-    <div class="NineColor" v-if="chooseAColor">
-        <button  @click="NineColor('Schellen')">Schellen</button>
-        <button  @click="NineColor('Eichel')">Eichel</button>
-        <button  @click="NineColor('Blatt')">Blatt</button>
-        <button  @click="NineColor('Herz')">Herz</button>
+    <div class="NineColor" v-if="chooseAColor" >
+        <button  @click="NineColor('Schellen')" class="SchellenButton">Schellen</button>
+        <button  @click="NineColor('Eichel')" class="EichelButton">Eichel</button>
+        <button  @click="NineColor('Blatt')" class="BlattButton">Blatt</button>
+        <button  @click="NineColor('Herz')" class="HerzButton">Herz</button>
+    </div>
+    <div class="playTen" v-if="chooseAPlayer">
+      <div v-for="item in publicGameMetadata?.players">
+      <button v-if="item !== currentUser" @click="playTen(item)" >{{ item }} </button>
+    </div>
     </div>
     <div v-if="onFinishMessageVisible" class="onFinishMessage">{{ onFinishMessage }}</div>
     <Lobby v-if="!currentRoomId"
@@ -14,7 +19,7 @@
     />
     <Game v-else
       :userName="userName" :publicGameMetadata="publicGameMetadata" :handCards="handCards"
-      @cardPlayed="cardPlayed" @cardDrawn="cardDrawn" @ready="ready" @Color="NineColor"
+      @cardPlayed="cardPlayed" @cardDrawn="cardDrawn" @ready="ready" @Color="NineColor" @Ten="playTen"
     />
 </template>
 
@@ -25,8 +30,8 @@ import { io } from 'socket.io-client';
 import Lobby from '../components/game/Lobby.vue';
 import Game from '../components/game/Game.vue';
 import type { Card } from '@/types/card';
-import type { PublicGameMetadata } from '@/types/publicGameMetadata';
-import type { PublicRoomData } from '@/types/publicRoomData';
+import { PublicGameMetadata } from '@/types/publicGameMetadata';
+import { PublicRoomData } from '@/types/publicRoomData';
 import { SocketRoom } from '@/types/socketRoom';
 //#endregion imports
 
@@ -43,6 +48,8 @@ const onScreenMessage = ref('');
 const onScreenMessageVisible = ref(false);
 const ChooseColorVisible = ref(false);
 const chooseAColor = ref(false);
+const chooseAPlayer = ref(false);
+const currentUser = ref('');
 
 const onFinishMessage = ref('');
 const onFinishMessageVisible = ref(false);
@@ -73,6 +80,12 @@ socket.on(SocketRoom.cardMoveFeedback, (message: string) => {
 
 socket.on(SocketRoom.nineColor, (message:string)=>{
   chooseAColor.value = true; 
+  showOnScreenMessage(message);
+});
+
+socket.on(SocketRoom.playedTen, (message:string, currentuser:string)=>{
+  chooseAPlayer.value = true; 
+  currentUser.value= currentuser;
   showOnScreenMessage(message);
 });
 
@@ -132,6 +145,17 @@ chooseAColor.value=false;
   );
 }
 
+
+function playTen(player: string){
+console.log(player + " choosen Player");
+  chooseAPlayer.value=false;
+  
+  socket.emit(
+    SocketRoom.playedTen,
+   player, currentRoomId.value
+  );
+}
+
 //#endregion publish
 
 let timeout: number;
@@ -183,6 +207,61 @@ function getRandomName() {
   background-color: rgba(0, 0, 0, 0.5);
 }
 
+.HerzButton{
+  position: absolute;
+  inset: 60% auto auto 41%;
+  translate: -50% -50%;
+  z-index: 100;
+  padding: 10px;
+  border-radius: 30px;
+
+  font-family: 'Courier New', Courier, monospace;
+  text-align: center;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.SchellenButton{
+  position: absolute;
+  inset: 60% auto auto 48%;
+  translate: -50% -50%;
+  z-index: 100;
+  padding: 10px;
+  border-radius: 30px;
+
+  font-family: 'Courier New', Courier, monospace;
+  text-align: center;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.EichelButton{
+  position: absolute;
+  inset: 60% auto auto 55%;
+  translate: -50% -50%;
+  z-index: 100;
+  padding: 10px;
+  border-radius: 30px;
+
+  font-family: 'Courier New', Courier, monospace;
+  text-align: center;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+.BlattButton{
+  position: absolute;
+  inset: 60% auto auto 61%;
+  translate: -50% -50%;
+  z-index: 100;
+  padding: 10px;
+  border-radius: 30px;
+
+  font-family: 'Courier New', Courier, monospace;
+  text-align: center;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
 .onFinishMessage {
   position: absolute;
   inset: 50% auto auto 50%;
@@ -196,4 +275,6 @@ function getRandomName() {
   background-color: #f29400;
 }
 
-</style>
+
+
+</style> 
