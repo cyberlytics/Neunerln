@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="lobby">
     <h3>{{ userName }}</h3>
     <hr />
     <br />
@@ -127,9 +127,20 @@ async function retrieveRankings() {
 </script>
 
 <style scoped>
+#lobby {
+  position: absolute;
+  inset: 0;
+
+  background: url("../../assets/table.jpg");
+  background-size: cover;
+  color: white;
+  font-size: large;
+}
+
 .specCards {
   display: flex;
   text-align: center;
+  color: black;
 }
 .specCard {
   margin-right: 1em;
