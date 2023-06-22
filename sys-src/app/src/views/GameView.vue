@@ -9,7 +9,7 @@
     </div>
     <div class="playTen" v-if="chooseAPlayer">
       <div v-for="item in publicGameMetadata?.players">
-      <button v-if="item !== currentUser" @click="playTen(item)" >{{ item }} </button>
+      <button class="PlayerButton" v-if="item !== currentUser" @click="playTen(item)" >{{ item }} </button>
     </div>
     </div>
     <div v-if="onFinishMessageVisible" class="onFinishMessage">{{ onFinishMessage }}</div>
@@ -92,6 +92,7 @@ socket.on(SocketRoom.playedTen, (message:string, currentuser:string)=>{
   chooseAPlayer.value = true; 
   currentUser.value= currentuser;
   showOnScreenMessage(message);
+});
 
 socket.on(SocketRoom.gameFinishedFeedback, (message: string) => {
   showOnFinishMessage(message);
@@ -165,13 +166,13 @@ console.log(player + " choosen Player");
     SocketRoom.playedTen,
    player, currentRoomId.value
   );
+}
 
 function debug() {
   socket.emit(
     SocketRoom.debug,
     currentRoomId.value
   );  
-
 }
 
 //#endregion publish
@@ -206,6 +207,8 @@ function getRandomName() {
   const randomNumber = Math.floor(Math.random() * 100);
   return `User${randomNumber}`;
 }
+
+
 
 </script>
 
@@ -269,6 +272,19 @@ function getRandomName() {
 .BlattButton{
   position: absolute;
   inset: 60% auto auto 61%;
+  translate: -50% -50%;
+  z-index: 100;
+  padding: 10px;
+  border-radius: 30px;
+
+  font-family: 'Courier New', Courier, monospace;
+  text-align: center;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.PlayerButton{
+  position:relative;
   translate: -50% -50%;
   z-index: 100;
   padding: 10px;
