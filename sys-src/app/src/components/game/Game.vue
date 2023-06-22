@@ -182,22 +182,40 @@ function setReadyState(state: boolean) {
     bottom: 0;
 }
 .hand-cards .playerCards:nth-child(1), .enemies-handcards .enemiesCards:nth-child(1) {
-    transform: translate(-197.026px, -77.7771px) rotate(-5.625deg) scale(1, 1);
+    transform: translate(-197.026px, -80.7771px) rotate(-5.625deg) scale(1, 1);
 }
 .hand-cards .playerCards:nth-child(2), .enemies-handcards .enemiesCards:nth-child(2) {
-    transform: translate(-138.306px, -82.3984px) rotate(-3.375deg) scale(1, 1);
+    transform: translate(-138.306px, -85.3984px) rotate(-3.375deg) scale(1, 1);
 }
 .hand-cards .playerCards:nth-child(3), .enemies-handcards .enemiesCards:nth-child(3) {
-    transform: translate(-79.4505px, -84.7109px) rotate(-1.125deg) scale(1, 1);
+    transform: translate(-79.4505px, -87.7109px) rotate(-1.125deg) scale(1, 1);
 }   
 .hand-cards .playerCards:nth-child(4), .enemies-handcards .enemiesCards:nth-child(4) {
-    transform: translate(-20.5495px, -84.7109px) rotate(1.125deg) scale(1, 1);
+    transform: translate(-20.5495px, -87.7109px) rotate(1.125deg) scale(1, 1);
 }
 .hand-cards .playerCards:nth-child(5), .enemies-handcards .enemiesCards:nth-child(5) {
-    transform: translate(38.3062px, -82.3984px) rotate(3.375deg) scale(1, 1);
+    transform: translate(38.3062px, -85.3984px) rotate(3.375deg) scale(1, 1);
 }
 .hand-cards .playerCards:nth-child(6), .enemies-handcards .enemiesCards:nth-child(6) {
-    transform: translate(97.0257px, -77.7771px) rotate(5.625deg) scale(1, 1);
+    transform: translate(97.0257px, -80.7771px) rotate(5.625deg) scale(1, 1);
+}
+.hand-cards .playerCards:nth-child(7), .enemies-handcards .enemiesCards:nth-child(7) {
+    transform: translate(-197.026px, -10.7771px) rotate(-5.625deg) scale(1, 1);
+}
+.hand-cards .playerCards:nth-child(8), .enemies-handcards .enemiesCards:nth-child(8) {
+    transform: translate(-138.306px, -15.3984px) rotate(-3.375deg) scale(1, 1);
+}
+.hand-cards .playerCards:nth-child(9), .enemies-handcards .enemiesCards:nth-child(9) {
+    transform: translate(-79.4505px, -17.7109px) rotate(-1.125deg) scale(1, 1);
+}   
+.hand-cards .playerCards:nth-child(10), .enemies-handcards .enemiesCards:nth-child(10) {
+    transform: translate(-20.5495px, -17.7109px) rotate(1.125deg) scale(1, 1);
+}
+.hand-cards .playerCards:nth-child(11), .enemies-handcards .enemiesCards:nth-child(11) {
+    transform: translate(38.3062px, -15.3984px) rotate(3.375deg) scale(1, 1);
+}
+.hand-cards .playerCards:nth-child(12), .enemies-handcards .enemiesCards:nth-child(12) {
+    transform: translate(97.0257px, -10.7771px) rotate(5.625deg) scale(1, 1);
 }
 
 div.enemies-handcards:nth-child(2) {
