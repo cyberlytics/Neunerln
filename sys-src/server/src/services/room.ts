@@ -15,6 +15,10 @@ export class Room {
     players: Player[];
     
     // game
+    choosenColor: string = '';
+    playedseveninarow: number = 0;
+    TenGiveCard:boolean = false;
+    choosenPlayer: string = '';
     ingame: boolean = false;
     drawPile: Card[] = [];
     discardPile: Card[] = [];
@@ -80,6 +84,8 @@ export class Room {
 
         this.discardPile.push(<Card>this.drawPile.pop());
     }
+
+    
     
     getDeck() {
         return [

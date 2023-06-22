@@ -46,6 +46,7 @@ import { computed, ref } from 'vue';
 
 const cardBack= '../src/assets/card_back.svg';
 
+
 const props = defineProps({
     userName: String,
     publicGameMetadata: PublicGameMetadata,
