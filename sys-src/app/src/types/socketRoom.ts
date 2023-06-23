@@ -22,6 +22,7 @@ export enum SocketRoom {
     ready = 'ready',
     nineColor = 'Color',
     playedTen = 'Ten',
-    debug = 'debug'
+    debug = 'debug',
+    choosenNineColor = 'choosenNineColor'
 
 }
