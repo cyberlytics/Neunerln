@@ -151,7 +151,7 @@ export class SocketManager {
       // send user feedback -> not his turn
       socket.emit(
         SocketRoom.cardMoveFeedback,
-        "Not your turn!"
+        "Du bist nicht am Zug!"
       );
       return;
     }
@@ -190,7 +190,7 @@ let playedninebefor = false;
       if(wishedthisninecolor !=  card.color){   
         socket.emit(
           SocketRoom.cardMoveFeedback,
-          "you can't place this card"
+          "Du kannst diese Karte nicht spielen!"
         );
         return;
       }
@@ -203,7 +203,7 @@ let playedninebefor = false;
       // send user feedback -> invalid move
       socket.emit(
         SocketRoom.cardMoveFeedback,
-        "you can't place this card"
+        "Du kannst diese Karte nicht spielen!"
       );
       return;
       }
@@ -310,7 +310,7 @@ if(Cardnumber == "seven"){
   currentRoom.TenGiveCard=true;
   socket.emit(
     SocketRoom.playedTen,
-    "Choose a Player to give your card?", currentRoom.currentPlayer?.name
+    "Wählen einen Spieler aus, den du eine Karte schieben willst?", currentRoom.currentPlayer?.name
   );
   const currentIndex = currentRoom.players.findIndex(player => player.id === socketid);
   Nextplayer = currentRoom.players[currentIndex];
@@ -361,7 +361,7 @@ if((previousDiscardCard.number== "7") && card.number!="7"){
       // send user feedback -> not his turn
       socket.emit(
         SocketRoom.cardMoveFeedback,
-        "Not your turn!"
+        "Du bist nicht am Zug!"
       );
       return;
     }
@@ -391,7 +391,7 @@ if((previousDiscardCard.number== "7") && card.number!="7"){
           handcardMatches = true;
           socket.emit(
             SocketRoom.cardMoveFeedback,
-            "Put one of your hand cards"
+            "Spiele einer deiner Handkarten!"
           );
           return;
       }
@@ -403,7 +403,7 @@ if((previousDiscardCard.number== "7") && card.number!="7"){
             handcardMatches = true;
             socket.emit(
               SocketRoom.cardMoveFeedback,
-              "Put one of your hand cards"
+              "Spiele einer deiner Handkarten!"
             );
             return;
         }
@@ -528,6 +528,11 @@ if((previousDiscardCard.number== "7") && card.number!="7"){
       SocketRoom.gamedataPublished,
       gameMetadata
     );
+    // inform current player
+    this.io.to(room.currentPlayer?.id).emit(
+      SocketRoom.cardMoveFeedback,
+      "Du bist an der Reihe!"
+    );
   }
 
   sendHandCards(socket: any, roomId: string) {
@@ -551,7 +556,7 @@ if((previousDiscardCard.number== "7") && card.number!="7"){
       if(currentRoom?.drawPile?.length <= 2) {
         this.io.to(roomId).emit(
           SocketRoom.cardMoveFeedback,
-          "Der Ziehstapel wird neu gemischt"
+          "Der Ziehstapel wird neu gemischt!"
         );
         // discardPile without topcard
         let newDeck = currentRoom?.discardPile.slice(0, -1); 
@@ -613,7 +618,7 @@ if((previousDiscardCard.number== "7") && card.number!="7"){
     // inform clients
     this.io.to(roomId).emit(
       SocketRoom.gameFinishedFeedback,
-      "Game Finished"
+      "Spiel beendet!"
     );
 
     // reset room
