@@ -1,13 +1,15 @@
 <template>
     <div v-if="onScreenMessageVisible" class="onScreenMessage">{{ onScreenMessage }}</div>
-    <div v-if="ChooseColorVisible" class="onScreenMessage">{{ onScreenMessage }}</div>
+   
     <div class="NineColor" v-if="chooseAColor" >
+        <div class="onScreenMessagestay">{{ onScreenMessagestay }}</div>
         <button  @click="NineColor('Schellen')" class="SchellenButton">Schellen</button>
         <button  @click="NineColor('Eichel')" class="EichelButton">Eichel</button>
         <button  @click="NineColor('Blatt')" class="BlattButton">Blatt</button>
         <button  @click="NineColor('Herz')" class="HerzButton">Herz</button>
     </div>
-    <div class="playTen" v-if="chooseAPlayer">
+    <div v-if="chooseAPlayer">
+      <div class="onScreenMessagestay"> {{ onScreenMessagestay }}</div>
       <div v-for="item in publicGameMetadata?.players">
       <button class="PlayerButton" v-if="item !== currentUser" @click="playTen(item)" >{{ item }} </button>
     </div>
@@ -48,6 +50,7 @@ const userName = ref<string>(getRandomName());
 const playerIsReady = ref(false);
 
 const onScreenMessage = ref('');
+const onScreenMessagestay = ref('');
 const onScreenMessageVisible = ref(false);
 const ChooseColorVisible = ref(false);
 const chooseAColor = ref(false);
@@ -89,20 +92,24 @@ socket.on(SocketRoom.cardMoveFeedback, (message: string) => {
 });
 
 socket.on(SocketRoom.nineColor, (message:string)=>{
-  chooseAColor.value = true; 
-  showOnScreenMessage(message);
+  chooseAColor.value = true;
+  onScreenMessagestay.value= message; 
 });
 
 socket.on(SocketRoom.playedTen, (message:string, currentuser:string)=>{
   chooseAPlayer.value = true; 
   currentUser.value= currentuser;
-  showOnScreenMessage(message);
+  onScreenMessagestay.value= message;
 });
 
 socket.on(SocketRoom.gameFinishedFeedback, (message: string) => {
   showOnFinishMessage(message);
   setReadyState(false);
 
+});
+
+socket.on(SocketRoom.choosenNineColor, (message: string) => {
+  showOnFinishMessage(message);
 });
 
 
@@ -162,7 +169,6 @@ chooseAColor.value=false;
 }
 
 function playTen(player: string){
-console.log(player + " choosen Player");
   chooseAPlayer.value=false;
   
   socket.emit(
@@ -192,6 +198,7 @@ function showOnScreenMessage(message: string) {
   }, 2000);
 }
 
+
 let timeFinish: number;
 
 function showOnFinishMessage(message: string) {
@@ -219,7 +226,21 @@ function getRandomName() {
 
 .onScreenMessage {
   position: absolute;
-  inset: 50% auto auto 50%;
+  inset: 35% auto auto 50%;
+  translate: -50% -50%;
+  z-index: 100;
+  padding: 10px;
+  border-radius: 30px;
+
+  font-family: 'Courier New', Courier, monospace;
+  text-align: center;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.onScreenMessagestay {
+  position: absolute;
+  inset: 70% auto auto 50%;
   translate: -50% -50%;
   z-index: 100;
   padding: 10px;
@@ -233,7 +254,7 @@ function getRandomName() {
 
 .HerzButton{
   position: absolute;
-  inset: 60% auto auto 41%;
+  inset: 78% auto auto 41%;
   translate: -50% -50%;
   z-index: 100;
   padding: 10px;
@@ -247,7 +268,7 @@ function getRandomName() {
 
 .SchellenButton{
   position: absolute;
-  inset: 60% auto auto 48%;
+  inset: 78% auto auto 48%;
   translate: -50% -50%;
   z-index: 100;
   padding: 10px;
@@ -261,7 +282,7 @@ function getRandomName() {
 
 .EichelButton{
   position: absolute;
-  inset: 60% auto auto 55%;
+  inset: 78% auto auto 55%;
   translate: -50% -50%;
   z-index: 100;
   padding: 10px;
@@ -274,7 +295,7 @@ function getRandomName() {
 }
 .BlattButton{
   position: absolute;
-  inset: 60% auto auto 61%;
+  inset: 78% auto auto 61%;
   translate: -50% -50%;
   z-index: 100;
   padding: 10px;
@@ -287,7 +308,8 @@ function getRandomName() {
 }
 
 .PlayerButton{
-  position:relative;
+  position:absolute;
+  inset:  78% auto auto 50%;
   translate: -50% -50%;
   z-index: 100;
   padding: 10px;
@@ -316,6 +338,14 @@ function getRandomName() {
   position: absolute;
   inset: 0 0 auto auto;
 }
+
+.Overlay
+    {
+      opacity:1;
+      background:#515151;
+      width:auto;
+      height:auto;
+    }
 
 </style>
 

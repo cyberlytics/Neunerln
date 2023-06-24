@@ -10,6 +10,8 @@ import { shuffle } from "./helperFunctions";
 
 
 
+
+
 export class SocketManager {
   // logging
   userConnectionLog = false;
@@ -145,6 +147,11 @@ export class SocketManager {
       return;
     }
 
+    //addseven
+    if(currentRoom?.specialCards.includes('seven') && card?.number!='7'){
+      this.addCardsAfterSeven(currentRoom, card.number, true);
+      }
+
     // move functions to room/game class
     // check if players turn
     if (currentRoom.currentPlayer?.id != socket.id) {
@@ -230,9 +237,8 @@ let playedninebefor = false;
         // * set new current player if card is not in special cards
        let number:string = this.CardnumberToString(card);
 
-       if(currentRoom.specialCards.includes('seven') && card.number!='7'){
-        this.addCardsAfterSeven(currentRoom, card);
-        }
+     
+
 
         if(currentRoom.specialCards.includes(number)){
 
@@ -285,8 +291,25 @@ var Nextplayer:Player;
 if(Cardnumber == "seven"){
 
     currentRoom.playedseveninarow++;
+    //check if next Player has seven 
+    //if he does do hasseven=true;
+    //if he doesnt, hasseven=false;
+    const currentIndex = currentRoom.players.findIndex(player => player.name === currentRoom.currentPlayer?.name);
+    const nextIndex = (currentIndex + 1) % currentRoom.players.length;
+    let Nextsevenplayer = currentRoom.players[nextIndex];
+    let hasseven=false;
+    for(let i=0; i < Nextsevenplayer?.handCards?.length; i++){
+      if(Nextsevenplayer.handCards[i].number == "7" ){
+        hasseven=true;
+      }
+    }
 
-  //Todo if other player has a 7 he can play it 
+   
+
+    if(!hasseven){
+      this.addCardsAfterSeven(currentRoom,Cardnumber,hasseven);
+    }
+  
 
 }else if(Cardnumber == "eight"){
   //Next player is skipped
@@ -332,18 +355,29 @@ return Nextplayer
 }
 
 
-addCardsAfterSeven(currentRoom:Room, card:Card){
+addCardsAfterSeven(currentRoom:Room, cardnumber:string, hasseven:boolean){
 
   let previousDiscardCard = currentRoom.discardPile[currentRoom?.discardPile.length - 2];
   console.log(previousDiscardCard);
 
-if((previousDiscardCard.number== "7") && card.number!="7"){
-  for(let i= 0; i < currentRoom.playedseveninarow; i++){
-    currentRoom.currentPlayer?.handCards.push(<Card>currentRoom.drawPile.pop());
-    currentRoom.currentPlayer?.handCards.push(<Card>currentRoom.drawPile.pop());
+if(hasseven){
+if((previousDiscardCard?.number== "7") && cardnumber!='7'){
+  for(let i= 0; i < currentRoom?.playedseveninarow; i++){
+    currentRoom?.currentPlayer?.handCards.push(<Card>currentRoom.drawPile.pop());
+    currentRoom?.currentPlayer?.handCards.push(<Card>currentRoom.drawPile.pop());
     }
-  currentRoom.playedseveninarow = 0;
+    currentRoom.playedseveninarow = 0;
+}
+}else{
+  const currentIndex = currentRoom.players.findIndex(player => player.name === currentRoom?.currentPlayer?.name);
+  const nextIndex = (currentIndex + 1) % currentRoom.players.length;
+  let Nextsevenplayer = currentRoom.players[nextIndex];
 
+      for(let i= 0; i < currentRoom?.playedseveninarow; i++){
+        Nextsevenplayer?.handCards.push(<Card>currentRoom.drawPile.pop());
+        Nextsevenplayer?.handCards.push(<Card>currentRoom.drawPile.pop());
+        }   
+        currentRoom.playedseveninarow = 0;
 }
 }
 
@@ -687,6 +721,13 @@ if((previousDiscardCard.number== "7") && card.number!="7"){
   if (currentRoom == null) {
     return;
   }
+
+  let ChoosenColorString:string = color + " wurde gewählt";
+  this.io.to(roomId).emit(
+    SocketRoom.choosenNineColor,
+    ChoosenColorString,
+  );
+
   currentRoom.choosenColor = color;
 
  }
