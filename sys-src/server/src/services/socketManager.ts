@@ -649,10 +649,15 @@ if((previousDiscardCard?.number== "7") && cardnumber!='7'){
   }
 
   handleGameFinished(roomId: string) {
+
+    let currentRoom = this.getRoom(roomId);
+    if (currentRoom == null) {
+      return;
+    }
     // inform clients
     this.io.to(roomId).emit(
       SocketRoom.gameFinishedFeedback,
-      "Spiel beendet!"
+     currentRoom.currentPlayer?.name  + " hat diese Spielrunde gewonnen!",
     );
 
     // reset room
