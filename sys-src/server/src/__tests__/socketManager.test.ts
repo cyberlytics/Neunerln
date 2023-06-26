@@ -203,6 +203,64 @@ describe('checkforninecolor', () => {
 
 })
 
+
+describe('CardNumbertoString', () => {
+
+    test("Return Six", ()=>{
+        let cardnumber = '';
+        cardnumber= socketManager.CardnumberToString(new Card(CardNumber.six, CardColor.eichel));
+        expect(cardnumber).toBe('six');
+    });
+
+     test("Return Seven", ()=>{
+        let cardnumber = '';
+        cardnumber= socketManager.CardnumberToString(new Card(CardNumber.seven, CardColor.eichel));
+        expect(cardnumber).toBe('seven');
+    });
+
+     test("Return Eight", ()=>{
+        let cardnumber = '';
+        cardnumber= socketManager.CardnumberToString(new Card(CardNumber.eight, CardColor.eichel));
+        expect(cardnumber).toBe('eight');
+    });
+
+     test("Return Nine", ()=>{
+        let cardnumber = '';
+        cardnumber= socketManager.CardnumberToString(new Card(CardNumber.nine, CardColor.eichel));
+        expect(cardnumber).toBe('nine');
+    }); 
+
+     test("Return Ten", ()=>{
+        let cardnumber = '';
+        cardnumber= socketManager.CardnumberToString(new Card(CardNumber.ten, CardColor.eichel));
+        expect(cardnumber).toBe('ten');
+    });
+
+     test("Return Ober", ()=>{
+        let cardnumber = '';
+        cardnumber= socketManager.CardnumberToString(new Card(CardNumber.ober, CardColor.eichel));
+        expect(cardnumber).toBe('ober');
+    });
+
+     test("Return Unter", ()=>{
+        let cardnumber = '';
+        cardnumber= socketManager.CardnumberToString(new Card(CardNumber.unter, CardColor.eichel));
+        expect(cardnumber).toBe('unter');
+    });
+
+     test("Return King", ()=>{
+        let cardnumber = '';
+        cardnumber= socketManager.CardnumberToString(new Card(CardNumber.king, CardColor.eichel));
+        expect(cardnumber).toBe('king');
+    });
+
+     test("Return Ace", ()=>{
+        let cardnumber = '';
+        cardnumber= socketManager.CardnumberToString(new Card(CardNumber.ace, CardColor.eichel));
+        expect(cardnumber).toBe('ace');
+    });
+})
+
 describe('checkforninecolor', () => {
     let roomCreaterName  = 'creatorName'
     let specialCards = [ 'nine', 'bar2'];
@@ -253,8 +311,6 @@ describe('SpezialMove', () => {
     let joinUser2Name = 'join2Name';
     let joinUser3Id = 'join3Id';
     let joinUser3Name = 'join3Name';
-
-
 
     test("sevenTest/NextplayerHasNoSeven", ()=>{
 
