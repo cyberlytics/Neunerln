@@ -161,7 +161,7 @@ function NineColor(color: string) {
 
 function playTen(player: string) {
   chooseAPlayer.value = false
-
+  showOnScreenMessage('Wähle eine Karte!')
   socket.emit(SocketRoom.playedTen, player, currentRoomId.value)
 }
 
