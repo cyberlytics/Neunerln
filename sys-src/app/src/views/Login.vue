@@ -74,6 +74,7 @@ async function login() {
     })
 
     Cookies.set('token', res.data.token)
+    Cookies.set('username', res.data.username)
     showErrorOrSuccess.value = true
   } catch (err: any) {
     isloading.value = !isloading.value
@@ -87,7 +88,7 @@ async function login() {
   }
   errorState.value = 'Einloggen war erfolgreich.'
 
-  await router.push('/')
+  await router.push('/game')
 }
 
 function showRegisterView() {

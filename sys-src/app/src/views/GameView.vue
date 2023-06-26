@@ -34,8 +34,9 @@ import { io } from 'socket.io-client';
 import Lobby from '../components/game/Lobby.vue';
 import Game from '../components/game/Game.vue';
 import type { Card } from '@/types/card';
-import { PublicGameMetadata } from '@/types/publicGameMetadata';
-import { PublicRoomData } from '@/types/publicRoomData';
+import type { PublicGameMetadata } from '@/types/publicGameMetadata';
+import type { PublicRoomData } from '@/types/publicRoomData';
+import Cookies from 'js-cookie'
 import { SocketRoom } from '@/types/socketRoom';
 //#endregion imports
 
@@ -46,7 +47,7 @@ const roomData = ref<PublicRoomData[]>();
 const currentRoomId = ref<string>();
 const publicGameMetadata = ref<PublicGameMetadata>();
 const handCards = ref<Card[]>();
-const userName = ref<string>(getRandomName());
+const userName = ref<string>(Cookies.get("username") || "lol");
 const playerIsReady = ref(false);
 
 const onScreenMessage = ref('');
