@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import axios from 'axios'
-import Vue from 'vue'
-import VueCookies from 'vue-cookies'
+import router from '@/router'
 
 const header = ref('Login')
 const showLoginParts = ref(true)
-const username = ref('NeunerlnTest')
-const email = ref('test@test.de')
-const password = ref('Password1!')
-const confirmPassword = ref('Password1!')
+const username = ref('')
+const email = ref('')
+const password = ref('')
+const confirmPassword = ref('')
 const name = ref('')
 const showErrorOrSuccess = ref(true)
 const errorState = ref('')
@@ -52,8 +51,6 @@ async function signup() {
       password: password.value
     })
     showErrorOrSuccess.value = true
-    const sessionToken = res.headers['set-cookie']
-    VueCookies.VueCookies.set('sessionToken', sessionToken)
   } catch (err: any) {
     isloading.value = !isloading.value
     if (err.response.status === 400)
@@ -64,34 +61,34 @@ async function signup() {
     return
   }
   errorState.value = 'Registrierung war erfolgreich.'
-  //TODO: Weiterleiten an Lobby
-  //TODO: JSON Web Token bekommt man zurück, diesen in Cookie speichern
+  showLoginParts.value = true
+  isloading.value = false
 }
 
 async function login() {
   isloading.value = !isloading.value
   try {
-    const res = await axios.post('http://localhost:3000/api/auth/signin', {
+    const res: any = await axios.post('http://localhost:3000/api/auth/signin', {
       name: name.value,
       password: password.value
     })
-    //console.log(res.status)
+
+    Cookies.set('token', res.data.token)
+    Cookies.set('username', res.data.username)
     showErrorOrSuccess.value = true
-    console.log(res)
-    const sessionToken = res.headers['set-cookie']
-    VueCookies.VueCookies.set('sessionToken', sessionToken)
   } catch (err: any) {
     isloading.value = !isloading.value
-    if (err.response.status === 404) {
+    if (err.status === 404) {
       errorState.value = 'Fehler beim Einloggen. Bitte überprüfen Sie die Eingaben.'
-    } else if (err.response.status === 500)
+    } else if (err.status === 500) {
       errorState.value = 'Verbindung zum Server fehlgeschlagen. Bitte erneut versuchen.'
+    }
     console.log(err)
     return
   }
   errorState.value = 'Einloggen war erfolgreich.'
 
-  //TODO: Weiterleitung
+  await router.push('/game')
 }
 
 function showRegisterView() {
@@ -167,6 +164,7 @@ function arePasswordsEqual() {
             type="email"
             placeholder="benutzer@oth-aw.de"
             required
+            @input="(e) => handleInput(e, 'email')"
           />
         </td>
       </tr>
@@ -180,6 +178,7 @@ function arePasswordsEqual() {
             type="password"
             placeholder="Over9000"
             required
+            @input="(e) => handleInput(e, 'password')"
           />
         </td>
       </tr>
@@ -193,6 +192,7 @@ function arePasswordsEqual() {
             type="password"
             placeholder="Over9000"
             required
+            @input="(e) => handleInput(e, 'confirmPassword')"
           />
         </td>
       </tr>
@@ -253,22 +253,24 @@ function arePasswordsEqual() {
 * {
   font-family: 'Lucida Console', 'Courier New', monospace;
 }
-html,
+
 body {
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
 }
-#LoginForm {
-  display: grid;
+
+table {
+  max-height: 500px;
 }
+
 label {
   align-items: center;
   margin-right: 20px;
 }
-table {
-  left: 50%;
-  top: 20%;
-}
+
 a {
   text-align: center;
   margin: 0 auto;
@@ -285,12 +287,14 @@ a {
   margin: 0 auto;
   display: block;
 }
+
 .heading {
   position: relative;
   font-size: large;
   padding: 5px;
   text-align: center;
 }
+
 .success {
   font-size: large;
   padding: 5px;

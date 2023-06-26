@@ -127,6 +127,7 @@ function toggleModal() {
 #lobby {
   position: absolute;
   inset: 0;
+  overflow-y: scroll;
 
   background: url("../../assets/table.jpg");
   background-size: cover;

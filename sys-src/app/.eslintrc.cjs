@@ -8,8 +8,6 @@ module.exports = {
     'eslint:recommended',
     '@vue/eslint-config-typescript',
     '@vue/eslint-config-prettier/skip-formatting',
-    "@antfu",
-    "@unocss"
   ],
   overrides: [
     {
