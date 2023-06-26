@@ -1,6 +1,4 @@
 import * as data from "../User";
-import {increasePlayed, increaseWon} from "../User";
-
 
 const db = require("./db");
 
@@ -67,19 +65,19 @@ describe('should find User in database', () => {
 describe('increase games and wins', () => {
   it('should increase games played', async () => {
     await data.createUser("Player1", "Player1@test.com", "Pass12345");
-    const user = await increasePlayed("Player1@test.com",);
+    const user = await data.increasePlayed("Player1@test.com",);
     expect(user.played).toEqual(1);
     expect(user.won).toEqual(0);
   })
   it('should increase games won', async () => {
     await data.createUser("Player1", "Player1@test.com", "Pass12345");
-    const user = await increaseWon("Player1@test.com");
+    const user = await data.increaseWon("Player1@test.com");
     expect(user.won).toEqual(1);
   })
   it('should throw error on increase played', async () => {
     await data.createUser("Player1", "Player1@test.com", "Pass12345");
     try{
-      await increasePlayed("emailNotInData");
+      await data.increasePlayed("emailNotInData");
     }catch(err:any){
       expect(err).toBeDefined()
     }
@@ -87,7 +85,7 @@ describe('increase games and wins', () => {
   it('should throw error on increase won', async () => {
     await data.createUser("Player1", "Player1@test.com", "Pass12345");
     try{
-      await increaseWon("emailNotInData");
+      await data.increaseWon("emailNotInData");
     }catch(err:any){
       expect(err).toBeDefined()
     }

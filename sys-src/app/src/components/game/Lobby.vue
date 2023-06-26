@@ -4,7 +4,10 @@
     <hr />
     <br />
 
-    <button @click="retrieveRankings()">Rankings</button>
+    <button id="showRankings" @click="toggleModal()">Rankings</button>
+    <dialog>
+      <Ranking :showModal="showModal" @closeModal="toggleModal" :userName="userName"></Ranking>
+    </dialog>
 
     <h2>Create</h2>
 
@@ -86,14 +89,15 @@
 //#region imports
 import type { PublicRoomData } from '@/types/publicRoomData'
 import CardFront from '../game/CardFront.vue'
+import Ranking from '../game/Ranking.vue'
 import { ref } from 'vue'
-import axios from 'axios'
 //#endregion imports
 
 const specialCards = ref(['seven', 'eight', 'nine', 'ten', 'ace'])
 const maxPlayers = ref(2)
 const showErrorOrSuccess = ref(true)
 const errorState = ref('')
+const showModal = ref(false)
 
 const props = defineProps({
   rooms: Array<PublicRoomData>,
@@ -109,20 +113,13 @@ function joinRoom(roomId: string) {
   emit('joinRoom', roomId)
 }
 
-async function retrieveRankings() {
-  try {
-    const res = await axios.get('http://localhost:3000/api/rankings')
-    console.log(res.data)
-    showErrorOrSuccess.value = true
-  } catch (err: any) {
-    //TODO: Fehler dem User anzeigen
-    if (err.response.status === 500)
-      errorState.value = 'Verbindung zum Server fehlgeschlagen. Bitte erneut versuchen.'
-    console.log(err)
-    return
+function toggleModal() {
+  showModal.value = !showModal.value
+  if (showModal.value) {
+    document.querySelector('dialog')?.showModal()
+  } else {
+    document.querySelector('dialog')?.close()
   }
-  errorState.value = 'Einloggen erfolgreich'
-  //TODO: Weiterleitung
 }
 </script>
 
@@ -145,6 +142,13 @@ async function retrieveRankings() {
 }
 .specCard {
   margin-right: 1em;
+}
+
+dialog {
+  border: solid;
+  border-radius: 1vw;
+  width: 80vw;
+  background: white;
 }
 .card-lobby {
   position: relative;
