@@ -2,14 +2,13 @@
 import { ref } from 'vue'
 import axios from 'axios'
 import router from '@/router'
-import Cookies from 'js-cookie'
 
 const header = ref('Login')
 const showLoginParts = ref(true)
 const username = ref('')
 const email = ref('')
-const password = ref('Password1!')
-const confirmPassword = ref('Password1!')
+const password = ref('')
+const confirmPassword = ref('')
 const name = ref('')
 const showErrorOrSuccess = ref(true)
 const errorState = ref('')
@@ -62,7 +61,8 @@ async function signup() {
     return
   }
   errorState.value = 'Registrierung war erfolgreich.'
-  await router.push('/login')
+  showLoginParts.value = true
+  isloading.value = false
 }
 
 async function login() {
@@ -178,6 +178,7 @@ function arePasswordsEqual() {
             type="password"
             placeholder="Over9000"
             required
+            @input="(e) => handleInput(e, 'password')"
           />
         </td>
       </tr>
@@ -191,6 +192,7 @@ function arePasswordsEqual() {
             type="password"
             placeholder="Over9000"
             required
+            @input="(e) => handleInput(e, 'confirmPassword')"
           />
         </td>
       </tr>
@@ -251,22 +253,24 @@ function arePasswordsEqual() {
 * {
   font-family: 'Lucida Console', 'Courier New', monospace;
 }
-html,
+
 body {
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
 }
-#LoginForm {
-  display: grid;
+
+table {
+  max-height: 500px;
 }
+
 label {
   align-items: center;
   margin-right: 20px;
 }
-table {
-  left: 50%;
-  top: 20%;
-}
+
 a {
   text-align: center;
   margin: 0 auto;
@@ -283,12 +287,14 @@ a {
   margin: 0 auto;
   display: block;
 }
+
 .heading {
   position: relative;
   font-size: large;
   padding: 5px;
   text-align: center;
 }
+
 .success {
   font-size: large;
   padding: 5px;
