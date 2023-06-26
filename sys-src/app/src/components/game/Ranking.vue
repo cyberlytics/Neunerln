@@ -68,14 +68,14 @@ const emit = defineEmits(['closeModal'])
             <div>{{ user.username }}</div>
             <div>{{ user.wins }}</div>
             <div>{{ user.played }}</div>
-            <div>{{ user.winrate }}</div>
+            <div>{{ Math.round(user.winrate) }}%</div>
           </div>
           <div v-else class="ranking-entry">
             <div>{{ user.rank }}</div>
             <div>{{ user.username }}</div>
             <div>{{ user.wins }}</div>
             <div>{{ user.played }}</div>
-            <div>{{ user.winrate }}</div>
+            <div>{{ Math.round(user.winrate) }}%</div>
           </div>
         </div>
       </slot>
