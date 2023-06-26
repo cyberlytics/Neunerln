@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express'
-import { body } from 'express-validator'
+import { body, oneOf } from 'express-validator'
 import jwt from 'jsonwebtoken'
 import { BadRequestError } from '../errors/bad-request-error'
 import { validateRequest } from '../middlewares/validate-request'
@@ -15,13 +15,17 @@ const router = express.Router()
 router.post(
   '/api/auth/signin',
   [
-    body('email').isEmail().withMessage('Email must be valid'),
+    oneOf([
+      body('name').isEmail().withMessage('Email must be valid.'),
+      body('name').trim().notEmpty().withMessage('Username must be not empty.')
+    ]),
     body('password').trim().notEmpty().withMessage('You must supply a password')
   ],
   validateRequest,
   async (req: Request, res: Response) => {
-    const { email, password } = req.body
-    const existingUser = await User.findOne({ email })
+    const { name, password } = req.body
+    const existingUser =
+      (await User.findOne({ email: name })) || (await User.findOne({ username: name }))
 
     /*
      * This code will go through the same process no matter what the user or the password is,
