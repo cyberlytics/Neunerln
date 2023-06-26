@@ -2,11 +2,12 @@
 import { ref } from 'vue'
 import axios from 'axios'
 import router from '@/router'
+import Cookies from 'js-cookie'
 
 const header = ref('Login')
 const showLoginParts = ref(true)
-const username = ref('NesunxxerlnTest')
-const email = ref('tessxxssst@test.de')
+const username = ref('')
+const email = ref('')
 const password = ref('Password1!')
 const confirmPassword = ref('Password1!')
 const name = ref('')
@@ -67,10 +68,12 @@ async function signup() {
 async function login() {
   isloading.value = !isloading.value
   try {
-    const res = await axios.post('http://localhost:3000/api/auth/signin', {
+    const res: any = await axios.post('http://localhost:3000/api/auth/signin', {
       name: name.value,
       password: password.value
     })
+
+    Cookies.set('token', res.data.token)
     showErrorOrSuccess.value = true
   } catch (err: any) {
     isloading.value = !isloading.value
@@ -160,6 +163,7 @@ function arePasswordsEqual() {
             type="email"
             placeholder="benutzer@oth-aw.de"
             required
+            @input="(e) => handleInput(e, 'email')"
           />
         </td>
       </tr>

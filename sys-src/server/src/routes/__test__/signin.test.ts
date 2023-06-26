@@ -35,7 +35,7 @@ describe('POST /api/auth/signin', () => {
     await request(app)
       .post('/api/auth/signin')
       .send({
-        email: 'test@test.com',
+        name: 'test@test.com',
         password: ''
       })
       .expect(400)
@@ -49,7 +49,7 @@ describe('POST /api/auth/signin', () => {
     await request(app)
       .post('/api/auth/signin')
       .send({
-        email: 'test@test.com',
+        name: 'test@test.com',
         password: 'incorrect'
       })
       .expect(400)
@@ -60,7 +60,7 @@ describe('POST /api/auth/signin', () => {
     const response = await request(app)
       .post('/api/auth/signin')
       .send({
-        email: 'test@test.com',
+        name: 'test@test.com',
         password: 'password'
       })
       .expect(200)
