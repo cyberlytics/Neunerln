@@ -2,6 +2,7 @@ export enum SocketRoom {
     connection = 'connection',
     disconnected = 'disconnect',
 
+    createRoom = 'createRoom',
     roomCreated = 'roomCreated',
     roomJoined = 'roomJoined',
     gameStarted = "gameStarted",
@@ -19,6 +20,8 @@ export enum SocketRoom {
     cardMoveFeedback = 'cardMoveFeedback',
     gameFinishedFeedback = 'gameFinishedFeedback',
     ready = 'ready',
-
-    debug = 'debug'
+    nineColor = 'Color',
+    playedTen = 'Ten',
+    debug = 'debug',
+    choosenNineColor = 'choosenNineColor'
 }
