@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import axios from 'axios'
 import router from '@/router'
+import Cookies from 'js-cookie'
 
 const header = ref('Login')
 const showLoginParts = ref(true)
