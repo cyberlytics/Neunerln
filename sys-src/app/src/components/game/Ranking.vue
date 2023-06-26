@@ -11,7 +11,7 @@ const props = defineProps({
   userName: String
 })
 
-let users = ref(null)
+let users: any = ref(null)
 
 watch(
   () => props.showModal,

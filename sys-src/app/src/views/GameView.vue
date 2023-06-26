@@ -1,229 +1,209 @@
 <template>
-    <div v-if="onScreenMessageVisible" class="onScreenMessage">{{ onScreenMessage }}</div>
-   
-    <div class="NineColor" v-if="chooseAColor" >
-        <div class="onScreenMessagestay">{{ onScreenMessagestay }}</div>
-        <button  @click="NineColor('Schellen')" class="SchellenButton">Schellen</button>
-        <button  @click="NineColor('Eichel')" class="EichelButton">Eichel</button>
-        <button  @click="NineColor('Blatt')" class="BlattButton">Blatt</button>
-        <button  @click="NineColor('Herz')" class="HerzButton">Herz</button>
-    </div>
-    <div v-if="chooseAPlayer">
-      <div class="onScreenMessagestay"> {{ onScreenMessagestay }}</div>
-      <div v-for="item in publicGameMetadata?.players">
-      <button class="PlayerButton" v-if="item !== currentUser" @click="playTen(item)" >{{ item }} </button>
-    </div>
-    </div>
-    <div v-if="onFinishMessageVisible" class="onFinishMessage">{{ onFinishMessage }}</div>
-    <Lobby v-if="!currentRoomId"
-      :rooms="roomData" :userName="userName"
-      @createRoom="createRoom" @joinRoom="joinRoom"
-    />
-    <Game v-else
+  <div v-if="onScreenMessageVisible" class="onScreenMessage">{{ onScreenMessage }}</div>
 
-      :userName="userName" :publicGameMetadata="publicGameMetadata" :handCards="handCards" :playerIsReady="playerIsReady"
-      @cardPlayed="cardPlayed" @cardDrawn="cardDrawn" @setReadyState="setReadyState" @Color="NineColor" @Ten="playTen"
-    />
-    <button id="debug" @click="debug">debug button</button>
+  <div class="NineColor" v-if="chooseAColor">
+    <div class="onScreenMessagestay">{{ onScreenMessagestay }}</div>
+    <button @click="NineColor('Schellen')" class="SchellenButton">Schellen</button>
+    <button @click="NineColor('Eichel')" class="EichelButton">Eichel</button>
+    <button @click="NineColor('Blatt')" class="BlattButton">Blatt</button>
+    <button @click="NineColor('Herz')" class="HerzButton">Herz</button>
+  </div>
+  <div v-if="chooseAPlayer">
+    <div class="onScreenMessagestay">{{ onScreenMessagestay }}</div>
+    <div class="buttonWrapper">
+      <div v-for="item in publicGameMetadata?.players">
+        <button class="PlayerButton" v-if="item !== currentUser" @click="playTen(item)">
+          {{ item }}
+        </button>
+      </div>
+    </div>
+  </div>
+  <div v-if="onFinishMessageVisible" class="onFinishMessage">{{ onFinishMessage }}</div>
+  <Lobby
+    v-if="!currentRoomId"
+    :rooms="roomData"
+    :userName="userName"
+    @createRoom="createRoom"
+    @joinRoom="joinRoom"
+  />
+  <Game
+    v-else
+    :userName="userName"
+    :publicGameMetadata="publicGameMetadata"
+    :handCards="handCards"
+    :playerIsReady="playerIsReady"
+    @cardPlayed="cardPlayed"
+    @cardDrawn="cardDrawn"
+    @setReadyState="setReadyState"
+    @Color="NineColor"
+    @Ten="playTen"
+  />
+  <button id="debug" @click="debug">debug button</button>
 </template>
 
 <script setup lang="ts">
 //#region imports
-import { ref } from 'vue';
-import { io } from 'socket.io-client';
-import Lobby from '../components/game/Lobby.vue';
-import Game from '../components/game/Game.vue';
-import type { Card } from '@/types/card';
-import { PublicGameMetadata } from '@/types/publicGameMetadata';
-import { PublicRoomData } from '@/types/publicRoomData';
-import { SocketRoom } from '@/types/socketRoom';
+import { ref } from 'vue'
+import { io } from 'socket.io-client'
+import Lobby from '../components/game/Lobby.vue'
+import Game from '../components/game/Game.vue'
+import type { Card } from '@/types/card'
+import { PublicGameMetadata } from '@/types/publicGameMetadata'
+import { PublicRoomData } from '@/types/publicRoomData'
+import { SocketRoom } from '@/types/socketRoom'
 //#endregion imports
 
-const url = 'http://localhost:3000';
-const socket = io(url);
+const url = 'http://localhost:3000'
+const socket = io(url)
 
-const roomData = ref<PublicRoomData[]>();
-const currentRoomId = ref<string>();
-const publicGameMetadata = ref<PublicGameMetadata>();
-const handCards = ref<Card[]>();
-const userName = ref<string>(getRandomName());
-const playerIsReady = ref(false);
+const roomData = ref<PublicRoomData[]>()
+const currentRoomId = ref<string>()
+const publicGameMetadata = ref<PublicGameMetadata>()
+const handCards = ref<Card[]>()
+const userName = ref<string>(getRandomName())
+const playerIsReady = ref(false)
 
-const onScreenMessage = ref('');
-const onScreenMessagestay = ref('');
-const onScreenMessageVisible = ref(false);
-const ChooseColorVisible = ref(false);
-const chooseAColor = ref(false);
-const chooseAPlayer = ref(false);
-const currentUser = ref('');
+const onScreenMessage = ref('')
+const onScreenMessagestay = ref('')
+const onScreenMessageVisible = ref(false)
+const ChooseColorVisible = ref(false)
+const chooseAColor = ref(false)
+const chooseAPlayer = ref(false)
+const currentUser = ref('')
 
-const onFinishMessage = ref('');
-const onFinishMessageVisible = ref(false);
+const onFinishMessage = ref('')
+const onFinishMessageVisible = ref(false)
 
-const emit = defineEmits(['gameFinished']);
+const emit = defineEmits(['gameFinished'])
 
 //#region subscribe
 
 socket.on(SocketRoom.lobbyRoomsChanged, (openRooms: PublicRoomData[]) => {
-  roomData.value = openRooms;
-});
+  roomData.value = openRooms
+})
 
-socket.on(
-  SocketRoom.roomCreated,
-  (roomId: string) => joinRoom(roomId)
-)
+socket.on(SocketRoom.roomCreated, (roomId: string) => joinRoom(roomId))
 
 socket.on(SocketRoom.gameStarted, () => {
   // do something
-});
+})
 
 socket.on(SocketRoom.gamedataPublished, (gameMetadata: PublicGameMetadata) => {
-  publicGameMetadata.value = gameMetadata;
-  
-  socket.emit(SocketRoom.handcardsRequested, currentRoomId.value);
-});
+  publicGameMetadata.value = gameMetadata
+
+  socket.emit(SocketRoom.handcardsRequested, currentRoomId.value)
+})
 
 socket.on(SocketRoom.handCardsPublished, (cards: Card[]) => {
-  handCards.value = cards;
-});
+  handCards.value = cards
+})
 
 socket.on(SocketRoom.cardMoveFeedback, (message: string) => {
-  showOnScreenMessage(message);
-});
+  showOnScreenMessage(message)
+})
 
-socket.on(SocketRoom.nineColor, (message:string)=>{
-  chooseAColor.value = true;
-  onScreenMessagestay.value= message; 
-});
+socket.on(SocketRoom.nineColor, (message: string) => {
+  chooseAColor.value = true
+  onScreenMessagestay.value = message
+})
 
-socket.on(SocketRoom.playedTen, (message:string, currentuser:string)=>{
-  chooseAPlayer.value = true; 
-  currentUser.value= currentuser;
-  onScreenMessagestay.value= message;
-});
+socket.on(SocketRoom.playedTen, (message: string, currentuser: string) => {
+  chooseAPlayer.value = true
+  currentUser.value = currentuser
+  onScreenMessagestay.value = message
+})
 
 socket.on(SocketRoom.gameFinishedFeedback, (message: string) => {
-  showOnFinishMessage(message);
-  setReadyState(false);
-
-});
+  showOnFinishMessage(message)
+  setReadyState(false)
+})
 
 socket.on(SocketRoom.choosenNineColor, (message: string) => {
-  showOnFinishMessage(message);
-});
-
+  showOnFinishMessage(message)
+})
 
 //#endregion subscribe
 
 //#region publish
 
 function createRoom(specialCards: string[], maxPlayers: number) {
-  socket.emit(
-    SocketRoom.createRoom, 
-    userName.value, specialCards, maxPlayers
-  );
+  socket.emit(SocketRoom.createRoom, userName.value, specialCards, maxPlayers)
 }
 
 function joinRoom(roomId: string) {
-  currentRoomId.value = roomId;
+  currentRoomId.value = roomId
 
-  socket.emit(
-    SocketRoom.roomJoined,
-    roomId, userName.value
-  );
+  socket.emit(SocketRoom.roomJoined, roomId, userName.value)
 }
 
 function cardPlayed(card: Card) {
   // sent move to backend
-  socket.emit(
-    SocketRoom.playCard,
-    currentRoomId.value, card
-  );
+  socket.emit(SocketRoom.playCard, currentRoomId.value, card)
 }
 
 function cardDrawn(card: Card) {
   // sent move to backend
-  socket.emit(
-    SocketRoom.drawCard,
-    currentRoomId.value, card
-  );
+  socket.emit(SocketRoom.drawCard, currentRoomId.value, card)
 }
 
 function setReadyState(state: boolean) {
-  playerIsReady.value = state;
-  
+  playerIsReady.value = state
+
   // sent ready signal to backend
-  socket.emit(
-    SocketRoom.ready,
-    currentRoomId.value, state
-  );
+  socket.emit(SocketRoom.ready, currentRoomId.value, state)
 }
 
-function NineColor(color: string){
+function NineColor(color: string) {
   //sent Color to backend
-chooseAColor.value=false;
-  socket.emit(
-    SocketRoom.nineColor,
-    color, currentRoomId.value
-  );
+  chooseAColor.value = false
+  socket.emit(SocketRoom.nineColor, color, currentRoomId.value)
 }
 
-function playTen(player: string){
-  chooseAPlayer.value=false;
-  
-  socket.emit(
-    SocketRoom.playedTen,
-   player, currentRoomId.value
-  );
+function playTen(player: string) {
+  chooseAPlayer.value = false
+
+  socket.emit(SocketRoom.playedTen, player, currentRoomId.value)
 }
 
 function debug() {
-  socket.emit(
-    SocketRoom.debug,
-    currentRoomId.value
-  );  
+  socket.emit(SocketRoom.debug, currentRoomId.value)
 }
 
 //#endregion publish
 
-let timeout: number;
+let timeout: number
 function showOnScreenMessage(message: string) {
-  clearTimeout(timeout); // clear previous timeout
+  clearTimeout(timeout) // clear previous timeout
 
-  onScreenMessage.value = message;
-  onScreenMessageVisible.value = true;
+  onScreenMessage.value = message
+  onScreenMessageVisible.value = true
 
   timeout = setTimeout(() => {
-    onScreenMessageVisible.value = false;
-  }, 2000);
+    onScreenMessageVisible.value = false
+  }, 2000)
 }
 
-
-let timeFinish: number;
+let timeFinish: number
 
 function showOnFinishMessage(message: string) {
-  clearTimeout(timeFinish); // clear previous timeout
+  clearTimeout(timeFinish) // clear previous timeout
 
-  onFinishMessage.value = message;
-  onFinishMessageVisible.value = true;
+  onFinishMessage.value = message
+  onFinishMessageVisible.value = true
 
   timeFinish = setTimeout(() => {
-    onFinishMessageVisible.value = false;
-  }, 5000);
+    onFinishMessageVisible.value = false
+  }, 5000)
 }
 
 // ToDo: remove later on, just for testing purpose
 function getRandomName() {
-  const randomNumber = Math.floor(Math.random() * 100);
-  return `User${randomNumber}`;
+  const randomNumber = Math.floor(Math.random() * 100)
+  return `User${randomNumber}`
 }
-
-
-
 </script>
 
 <style>
-
 .onScreenMessage {
   position: absolute;
   inset: 35% auto auto 50%;
@@ -252,7 +232,7 @@ function getRandomName() {
   background-color: rgba(0, 0, 0, 0.5);
 }
 
-.HerzButton{
+.HerzButton {
   position: absolute;
   inset: 78% auto auto 41%;
   translate: -50% -50%;
@@ -266,7 +246,7 @@ function getRandomName() {
   background-color: rgba(0, 0, 0, 0.5);
 }
 
-.SchellenButton{
+.SchellenButton {
   position: absolute;
   inset: 78% auto auto 48%;
   translate: -50% -50%;
@@ -280,7 +260,7 @@ function getRandomName() {
   background-color: rgba(0, 0, 0, 0.5);
 }
 
-.EichelButton{
+.EichelButton {
   position: absolute;
   inset: 78% auto auto 55%;
   translate: -50% -50%;
@@ -293,7 +273,7 @@ function getRandomName() {
   color: white;
   background-color: rgba(0, 0, 0, 0.5);
 }
-.BlattButton{
+.BlattButton {
   position: absolute;
   inset: 78% auto auto 61%;
   translate: -50% -50%;
@@ -307,11 +287,7 @@ function getRandomName() {
   background-color: rgba(0, 0, 0, 0.5);
 }
 
-.PlayerButton{
-  position:absolute;
-  inset:  78% auto auto 50%;
-  translate: -50% -50%;
-  z-index: 100;
+.PlayerButton {
   padding: 10px;
   border-radius: 30px;
 
@@ -319,6 +295,16 @@ function getRandomName() {
   text-align: center;
   color: white;
   background-color: rgba(0, 0, 0, 0.5);
+}
+
+.buttonWrapper {
+  position: absolute;
+  inset: 78% auto auto 50%;
+  translate: -50% -50%;
+  z-index: 100;
+  gap: 10px;
+  display: flex;
+  flex-direction: row;
 }
 
 .onFinishMessage {
@@ -339,13 +325,10 @@ function getRandomName() {
   inset: 0 0 auto auto;
 }
 
-.Overlay
-    {
-      opacity:1;
-      background:#515151;
-      width:auto;
-      height:auto;
-    }
-
+.Overlay {
+  opacity: 1;
+  background: #515151;
+  width: auto;
+  height: auto;
+}
 </style>
-
