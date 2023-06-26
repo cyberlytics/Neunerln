@@ -191,6 +191,16 @@ describe('checkforninecolor', () => {
         const Path = socketManager.checkforninecolor(room);
         expect(Path).toBe('../src/assets/Bay_schellen.svg');
     });
+
+    test("Return Undefined Path", ()=>{
+        socketManager.createRoom(getSocketMock(), roomCreaterName, specialCards, maxPlayers);
+        let room = socketManager.rooms[0];
+        room.discardPile = [new Card(CardNumber.nine, CardColor.schellen)]
+        room.choosenColor = '';
+        const Path = socketManager.checkforninecolor(room);
+        expect(Path).toBe(room.discardPile[0].color);
+    });
+
 })
 
 describe('checkforninecolor', () => {

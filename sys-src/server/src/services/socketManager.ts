@@ -744,8 +744,12 @@ if((previousDiscardCard?.number== "7") && cardnumber!='7'){
   }else if(currentRoom.choosenColor=='Herz'){
     wishedninecolor='../src/assets/Bay_herz.svg';
     return wishedninecolor;
-  }else{
+  }else if(currentRoom.choosenColor=='Blatt'){
     wishedninecolor='../src/assets/Bay_gras.svg';
+    return wishedninecolor;
+  }else{
+    let lastDiscardCard = currentRoom.discardPile[currentRoom?.discardPile.length - 1];
+    wishedninecolor = lastDiscardCard.color;
     return wishedninecolor;
   }
  }
