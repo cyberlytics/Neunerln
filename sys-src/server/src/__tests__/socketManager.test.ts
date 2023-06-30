@@ -450,3 +450,60 @@ describe("addCardsAfterSeven", ()=>{
     });
 
 })
+
+describe("playCard", ()=>{
+
+    let roomCreaterName  = 'creatorName'
+    let specialCards = [ 'nine', 'seven', 'eight', 'ten', 'ace'];
+    let maxPlayers = 2;
+    let joinUser1Id = 'join1Id';
+    let joinUser1Name = 'join1Name';
+  
+
+    it("play a normal Card", ()=>{
+
+        let roomId = socketManager.createRoom(getSocketMock(), roomCreaterName, specialCards, maxPlayers);
+        let room = socketManager.rooms[0];
+        socketManager.joinRoom(getSocketMock(joinUser1Id), roomId, joinUser1Name);
+       
+        room.currentPlayer= { id:joinUser1Id, name:joinUser1Name, handCards:[new Card(CardNumber.eight, CardColor.herz)], ready:true};
+        room.discardPile = [new Card(CardNumber.eight, CardColor.gras), new Card(CardNumber.seven, CardColor.gras),new Card(CardNumber.seven, CardColor.herz)]
+        socketManager.playCard(getSocketMock(joinUser1Id), roomId, new Card(CardNumber.eight, CardColor.herz));
+        
+        expect(room.discardPile.length).toBe(4);
+        expect(room.currentPlayer.handCards.length).toBe(0);
+        expect(room.TenGiveCard).toBe(false);
+
+    });
+
+})
+
+
+// describe("drawCard", ()=>{
+
+//     let roomCreaterName  = 'creatorName'
+//     let specialCards = ['ace'];
+//     let maxPlayers = 2;
+//     let joinUser1Id = 'join1Id';
+//     let joinUser1Name = 'join1Name';
+  
+
+//     it("draw a Card", ()=>{
+
+//         let roomId = socketManager.createRoom(getSocketMock(), roomCreaterName, specialCards, maxPlayers);
+//         let room = socketManager.rooms[0];
+//         socketManager.joinRoom(getSocketMock(joinUser1Id), roomId, joinUser1Name);
+       
+//         room.currentPlayer= { id:joinUser1Id, name:joinUser1Name, handCards:[new Card(CardNumber.six, CardColor.schellen)], ready:true};
+//         room.drawPile = [new Card(CardNumber.eight, CardColor.gras), new Card(CardNumber.seven, CardColor.gras),new Card(CardNumber.seven, CardColor.herz)]
+//         room.discardPile = [new Card(CardNumber.ten, CardColor.eichel)]
+//         socketManager.drawCard(getSocketMock(joinUser1Id), roomId);
+        
+//         expect(room.currentPlayer.handCards.length).toBe(2);
+//         expect(room.drawPile.length).toBe(2);
+        
+       
+
+//     });
+
+// })
