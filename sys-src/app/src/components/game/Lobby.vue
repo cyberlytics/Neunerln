@@ -11,7 +11,7 @@
 
     <h2>Create</h2>
 
-    <div>special cards: {{ specialCards }}</div>
+    <div>special cards:</div>
     <div class="specCards">
       <div class="specCard">
         <CardFront class="card-lobby"
@@ -58,7 +58,7 @@
     <label for="ace">ace</label> -->
     <!-- <br><br> -->
 
-    <div>players: {{ maxPlayers }}</div>
+    <div>players:</div>
     <input type="radio" id="two" value="2" v-model="maxPlayers" />
     <label for="two">2</label>
     <input type="radio" id="three" value="3" v-model="maxPlayers" />

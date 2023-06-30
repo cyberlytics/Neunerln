@@ -246,5 +246,7 @@ position: absolute;
 
 .readyGame {
     position: absolute;
+    inset: auto auto 20px 50%;
+    translate: -50%;
 }
 </style>
