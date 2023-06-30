@@ -428,6 +428,7 @@ describe("addCardsAfterSeven", ()=>{
         room.drawPile = [new Card(CardNumber.ace, CardColor.herz), new Card(CardNumber.eight, CardColor.herz)]
         socketManager.addCardsAfterSeven(room, card.number, true)
         
+
         expect(room.drawPile.length).toBe(0);
         expect(room.playedseveninarow).toBe(0);
         expect(room.currentPlayer?.handCards?.length).toBe(3);
@@ -454,56 +455,195 @@ describe("addCardsAfterSeven", ()=>{
 describe("playCard", ()=>{
 
     let roomCreaterName  = 'creatorName'
-    let specialCards = [ 'nine', 'seven', 'eight', 'ten', 'ace'];
+    let specialCards = [ 'nine'];
     let maxPlayers = 2;
     let joinUser1Id = 'join1Id';
     let joinUser1Name = 'join1Name';
   
 
-    it("play a normal Card", ()=>{
+    it("play a card with the same color", ()=>{
+
+        let roomId = socketManager.createRoom(getSocketMock(), roomCreaterName, specialCards, maxPlayers);
+        let room = socketManager.rooms[0];
+        socketManager.joinRoom(getSocketMock(joinUser1Id), roomId, joinUser1Name);
+       
+        room.currentPlayer= { id:joinUser1Id, name:joinUser1Name, handCards:[new Card(CardNumber.ace, CardColor.eichel)], ready:true};
+        room.discardPile = [new Card(CardNumber.seven, CardColor.eichel)]
+        socketManager.playCard(getSocketMock(joinUser1Id), roomId, room.currentPlayer.handCards[0]);
+        
+        expect(room.discardPile.length).toBe(2);
+        expect(room.currentPlayer.handCards.length).toBe(0);
+        expect(room.TenGiveCard).toBe(false);
+
+    });
+
+    it("play a card with the same number", ()=>{
 
         let roomId = socketManager.createRoom(getSocketMock(), roomCreaterName, specialCards, maxPlayers);
         let room = socketManager.rooms[0];
         socketManager.joinRoom(getSocketMock(joinUser1Id), roomId, joinUser1Name);
        
         room.currentPlayer= { id:joinUser1Id, name:joinUser1Name, handCards:[new Card(CardNumber.eight, CardColor.herz)], ready:true};
-        room.discardPile = [new Card(CardNumber.eight, CardColor.gras), new Card(CardNumber.seven, CardColor.gras),new Card(CardNumber.seven, CardColor.herz)]
-        socketManager.playCard(getSocketMock(joinUser1Id), roomId, new Card(CardNumber.eight, CardColor.herz));
+        room.discardPile = [new Card(CardNumber.eight, CardColor.eichel)]
+        socketManager.playCard(getSocketMock(joinUser1Id), roomId, room.currentPlayer.handCards[0]);
         
-        expect(room.discardPile.length).toBe(4);
+        expect(room.discardPile.length).toBe(2);
         expect(room.currentPlayer.handCards.length).toBe(0);
         expect(room.TenGiveCard).toBe(false);
 
     });
 
+    it("play a card with a other number", ()=>{
+
+        let roomId = socketManager.createRoom(getSocketMock(), roomCreaterName, specialCards, maxPlayers);
+        let room = socketManager.rooms[0];
+        socketManager.joinRoom(getSocketMock(joinUser1Id), roomId, joinUser1Name);
+       
+        room.currentPlayer= { id:joinUser1Id, name:joinUser1Name, handCards:[new Card(CardNumber.eight, CardColor.herz)], ready:true};
+        room.discardPile = [new Card(CardNumber.ace, CardColor.eichel)]
+        socketManager.playCard(getSocketMock(joinUser1Id), roomId, room.currentPlayer.handCards[0]);
+        
+        expect(room.discardPile.length).toBe(1);
+        expect(room.currentPlayer.handCards.length).toBe(1);
+        expect(room.TenGiveCard).toBe(false);
+
+    });
+
+    it("play a card with a other color", ()=>{
+
+        let roomId = socketManager.createRoom(getSocketMock(), roomCreaterName, specialCards, maxPlayers);
+        let room = socketManager.rooms[0];
+        socketManager.joinRoom(getSocketMock(joinUser1Id), roomId, joinUser1Name);
+       
+        room.currentPlayer= { id:joinUser1Id, name:joinUser1Name, handCards:[new Card(CardNumber.eight, CardColor.eichel)], ready:true};
+        room.discardPile = [new Card(CardNumber.ace, CardColor.schellen)]
+        socketManager.playCard(getSocketMock(joinUser1Id), roomId, room.currentPlayer.handCards[0]);
+        
+        expect(room.discardPile.length).toBe(1);
+        expect(room.currentPlayer.handCards.length).toBe(1);
+        expect(room.TenGiveCard).toBe(false);
+
+    });
+
+
 })
 
 
 // describe("drawCard", ()=>{
-
 //     let roomCreaterName  = 'creatorName'
 //     let specialCards = ['ace'];
 //     let maxPlayers = 2;
 //     let joinUser1Id = 'join1Id';
 //     let joinUser1Name = 'join1Name';
-  
+
 
 //     it("draw a Card", ()=>{
 
 //         let roomId = socketManager.createRoom(getSocketMock(), roomCreaterName, specialCards, maxPlayers);
 //         let room = socketManager.rooms[0];
+        
 //         socketManager.joinRoom(getSocketMock(joinUser1Id), roomId, joinUser1Name);
-       
-//         room.currentPlayer= { id:joinUser1Id, name:joinUser1Name, handCards:[new Card(CardNumber.six, CardColor.schellen)], ready:true};
-//         room.drawPile = [new Card(CardNumber.eight, CardColor.gras), new Card(CardNumber.seven, CardColor.gras),new Card(CardNumber.seven, CardColor.herz)]
-//         room.discardPile = [new Card(CardNumber.ten, CardColor.eichel)]
+
+//         room.currentPlayer= { id:joinUser1Id, name:joinUser1Name, handCards:[new Card(CardNumber.ace, CardColor.schellen)], ready:true};
+//         room.drawPile = [new Card(CardNumber.eight, CardColor.gras)];
+//         room.discardPile = [new Card(CardNumber.ten, CardColor.eichel)];
 //         socketManager.drawCard(getSocketMock(joinUser1Id), roomId);
         
-//         expect(room.currentPlayer.handCards.length).toBe(2);
-//         expect(room.drawPile.length).toBe(2);
-        
-       
-
+//         //expect(room.currentPlayer.handCards.length).toBe(2);
+//         expect(room.drawPile.length).toBe(0);
 //     });
 
 // })
+
+
+describe("check if game is finished", ()=>{
+    let roomCreaterName  = 'creatorName'
+    let specialCards = ['eight', 'ace'];
+    let maxPlayers = 2;
+    let joinUser1Id = 'join1Id';
+    let joinUser1Name = 'join1Name';
+
+
+    it("your last handcard is a eight", ()=>{
+
+        let roomId = socketManager.createRoom(getSocketMock(), roomCreaterName, specialCards, maxPlayers);
+        let room = socketManager.rooms[0];
+
+        const mockHandleGameFinished = jest.spyOn(socketManager, 'handleGameFinished');
+
+        socketManager.joinRoom(getSocketMock(joinUser1Id), roomId, joinUser1Name);
+        room.currentPlayer= { id:joinUser1Id, name:joinUser1Name, handCards:[], ready:true};
+        room.discardPile = [new Card(CardNumber.ten, CardColor.eichel)];
+        socketManager.checkGameFinished(roomId, new Card(CardNumber.eight, CardColor.eichel));
+        
+        expect(mockHandleGameFinished).not.toHaveBeenCalled();
+    });
+
+    it("your last handcard is a ace", ()=>{
+
+        let roomId = socketManager.createRoom(getSocketMock(), roomCreaterName, specialCards, maxPlayers);
+        let room = socketManager.rooms[0];
+        const mockHandleGameFinished = jest.spyOn(socketManager, 'handleGameFinished');
+
+        socketManager.joinRoom(getSocketMock(joinUser1Id), roomId, joinUser1Name);
+        room.currentPlayer= { id:joinUser1Id, name:joinUser1Name, handCards:[], ready:true};
+        room.discardPile = [new Card(CardNumber.ten, CardColor.eichel)];
+        socketManager.checkGameFinished(roomId, new Card(CardNumber.ace, CardColor.eichel));
+        
+        expect(mockHandleGameFinished).not.toHaveBeenCalled();
+    });
+
+    it("your last handcard is a seven", ()=>{
+
+        let roomId = socketManager.createRoom(getSocketMock(), roomCreaterName, specialCards, maxPlayers);
+        let room = socketManager.rooms[0];
+        const mockHandleGameFinished = jest.spyOn(socketManager, 'handleGameFinished');
+
+        socketManager.joinRoom(getSocketMock(joinUser1Id), roomId, joinUser1Name);
+        room.currentPlayer= { id:joinUser1Id, name:joinUser1Name, handCards:[], ready:true};
+        room.discardPile = [new Card(CardNumber.ten, CardColor.eichel)];
+        socketManager.checkGameFinished(roomId, new Card(CardNumber.seven, CardColor.eichel));
+        
+        expect(mockHandleGameFinished).toHaveBeenCalled();
+    });
+
+})
+
+
+describe("check if deck shuffle", ()=>{
+    let roomCreaterName  = 'creatorName'
+    let specialCards = ['eight', 'ace'];
+    let maxPlayers = 2;
+    let joinUser1Id = 'join1Id';
+    let joinUser1Name = 'join1Name';
+
+
+    it("discard pile = 1 -> shuffle", ()=>{
+
+        let roomId = socketManager.createRoom(getSocketMock(), roomCreaterName, specialCards, maxPlayers);
+        let room = socketManager.rooms[0];
+
+        socketManager.joinRoom(getSocketMock(joinUser1Id), roomId, joinUser1Name);
+        room.currentPlayer= { id:joinUser1Id, name:joinUser1Name, handCards:[], ready:true};
+        room.discardPile = [new Card(CardNumber.ten, CardColor.eichel), new Card(CardNumber.ace, CardColor.eichel)];
+        room.drawPile = [new Card(CardNumber.eight, CardColor.gras)];
+        socketManager.shuffleDrawingPile(roomId);
+        
+        expect(room.drawPile.length).toBe(2);
+    });
+
+    it("discard pile = 3 -> dont shuffle", ()=>{
+
+        let roomId = socketManager.createRoom(getSocketMock(), roomCreaterName, specialCards, maxPlayers);
+        let room = socketManager.rooms[0];
+
+        socketManager.joinRoom(getSocketMock(joinUser1Id), roomId, joinUser1Name);
+        room.currentPlayer= { id:joinUser1Id, name:joinUser1Name, handCards:[], ready:true};
+        room.discardPile = [new Card(CardNumber.seven, CardColor.eichel)];
+        room.drawPile = [new Card(CardNumber.ten, CardColor.eichel), new Card(CardNumber.ace, CardColor.eichel), new Card(CardNumber.ace, CardColor.gras)];
+        socketManager.shuffleDrawingPile(roomId);
+        
+        expect(room.drawPile.length).toBe(3);
+    });
+
+})
