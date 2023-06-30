@@ -40,7 +40,7 @@
 //#region imports
 import type { Card } from '@/types/card';
 import CardFront from '../game/CardFront.vue';
-import { PublicGameMetadata } from '@/types/publicGameMetadata';
+import type { PublicGameMetadata } from '../../types/publicGameMetadata';
 import { computed, ref } from 'vue';
 //#endregion imports
 
@@ -49,13 +49,13 @@ const cardBack= '../src/assets/card_back.svg';
 
 const props = defineProps({
     userName: String,
-    publicGameMetadata: PublicGameMetadata,
+    publicGameMetadata: Object, // declaring as PublicGameMetadata gives type warnings, idk why O.o
     handCards: Array<Card>,
     playerIsReady: Boolean
 });
 
 const player = computed(() => {
-    return props.publicGameMetadata?.players
+    return (<PublicGameMetadata>props.publicGameMetadata).players
         .find((playerName) => playerName == props.userName);
 });
 
@@ -64,7 +64,7 @@ const unorderedEnemies = computed(() => {
         return;
     }
 
-    const enemies = props.publicGameMetadata?.players
+    const enemies = (<PublicGameMetadata>props.publicGameMetadata).players
         .filter((playerName) => playerName != props.userName);
     
     return enemies;
@@ -76,7 +76,7 @@ const orderedEnemies = computed(() => {
         return;
     }
 
-    const playerIndex = props.publicGameMetadata?.players.indexOf(player.value);
+    const playerIndex = (<PublicGameMetadata>props.publicGameMetadata).players.indexOf(player.value);
     const enemiesBeforePlayer = unorderedEnemies.value.slice(0, playerIndex);
     const enemiesAfterPlayer = unorderedEnemies.value.slice(playerIndex);
 
