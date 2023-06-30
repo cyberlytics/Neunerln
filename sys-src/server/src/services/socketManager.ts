@@ -549,19 +549,20 @@ if((previousDiscardCard?.number== "7") && cardnumber!='7'){
       return result;
     }, {} as { [userName: string]: number; })
 
-        const gameMetadata = new PublicGameMetadata(
-          cardsPerPlayer,
-          room.drawPile.length,
-          room.discardPile,
-          room.players.map((player) => player.name),
-          room.currentPlayer?.name,
-        )
+    const gameMetadata = new PublicGameMetadata(
+      cardsPerPlayer,
+      room.drawPile.length,
+      room.discardPile,
+      room.players.map((player) => player.name),
+      room.currentPlayer?.name,
+    )
 
     // update room members with new game data
     this.io.to(room.id).emit(
       SocketRoom.gamedataPublished,
       gameMetadata
     );
+    
     // inform current player
     this.io.to(room.currentPlayer?.id).emit(
       SocketRoom.cardMoveFeedback,

@@ -27,7 +27,7 @@
     @joinRoom="joinRoom"
   />
   <Game
-    v-else
+    v-else-if="publicGameMetadata"
     :userName="userName"
     :publicGameMetadata="publicGameMetadata"
     :handCards="handCards"
@@ -61,7 +61,7 @@ const roomData = ref<PublicRoomData[]>();
 const currentRoomId = ref<string>();
 const publicGameMetadata = ref<PublicGameMetadata>();
 const handCards = ref<Card[]>();
-const userName = ref<string>(Cookies.get("username") || "lol");
+const userName = ref<string>(Cookies.get("username") || getRandomName());
 const playerIsReady = ref(false);
 
 const onScreenMessage = ref('')
@@ -199,8 +199,19 @@ function showOnFinishMessage(message: string) {
 
 // ToDo: remove later on, just for testing purpose
 function getRandomName() {
-  const randomNumber = Math.floor(Math.random() * 100)
-  return `User${randomNumber}`
+  const randomNames: string[] = [
+    'Lukas', 'Marie', 'Finn', 'Hannah', 'Leon', 'Laura', 'Paul', 'Manu',
+    'Benjamin', 'Mia', 'Jonas', 'Lena', 'Noah', 'Sophie', 'Berkay', 'Kevin',
+    'Julian', 'Lea', 'Felix', 'Lara', 'Maximilian', 'Sarah', 'Tim', 'Franzi',
+    'Simon', 'Lina', 'Niklas', 'Anna', 'Daniel', 'Johanna', 'David', 'Clara',
+    'Philipp', 'Luisa', 'Tom', 'Maja', 'Moritz', 'Manuel', 'Jan', 'Dominik'
+  ];
+
+  // get random name
+  const randomIndex = Math.floor(Math.random() * randomNames.length);
+  const randomName = randomNames[randomIndex];
+
+  return randomName;
 }
 </script>
 
