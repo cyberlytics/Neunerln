@@ -84,7 +84,7 @@ const orderedEnemies = computed(() => {
     return enemies;
 });
 
-const emit = defineEmits(['cardPlayed', 'cardDrawn', 'setReadyState']);
+const emit = defineEmits(['cardPlayed', 'cardDrawn', 'setReadyState', 'ten', 'color']);
 
 function playCard(card: Card) {
   emit('cardPlayed', card);
