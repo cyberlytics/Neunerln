@@ -223,8 +223,6 @@ function getRandomName() {
   z-index: 100;
   padding: 10px;
   border-radius: 30px;
-
-  font-family: 'Courier New', Courier, monospace;
   text-align: center;
   color: white;
   background-color: rgba(0, 0, 0, 0.5);
@@ -237,8 +235,6 @@ function getRandomName() {
   z-index: 100;
   padding: 10px;
   border-radius: 30px;
-
-  font-family: 'Courier New', Courier, monospace;
   text-align: center;
   color: white;
   background-color: rgba(0, 0, 0, 0.5);
@@ -251,8 +247,6 @@ function getRandomName() {
   z-index: 100;
   padding: 10px;
   border-radius: 30px;
-
-  font-family: 'Courier New', Courier, monospace;
   text-align: center;
   color: white;
   background-color: rgba(0, 0, 0, 0.5);
@@ -265,8 +259,6 @@ function getRandomName() {
   z-index: 100;
   padding: 10px;
   border-radius: 30px;
-
-  font-family: 'Courier New', Courier, monospace;
   text-align: center;
   color: white;
   background-color: rgba(0, 0, 0, 0.5);
@@ -279,8 +271,6 @@ function getRandomName() {
   z-index: 100;
   padding: 10px;
   border-radius: 30px;
-
-  font-family: 'Courier New', Courier, monospace;
   text-align: center;
   color: white;
   background-color: rgba(0, 0, 0, 0.5);
@@ -292,8 +282,6 @@ function getRandomName() {
   z-index: 100;
   padding: 10px;
   border-radius: 30px;
-
-  font-family: 'Courier New', Courier, monospace;
   text-align: center;
   color: white;
   background-color: rgba(0, 0, 0, 0.5);
@@ -302,8 +290,6 @@ function getRandomName() {
 .PlayerButton {
   padding: 10px;
   border-radius: 30px;
-
-  font-family: 'Courier New', Courier, monospace;
   text-align: center;
   color: white;
   background-color: rgba(0, 0, 0, 0.5);
