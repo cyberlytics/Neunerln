@@ -389,7 +389,6 @@ if((previousDiscardCard?.number== "7") && cardnumber!='7'){
 
     if(currentRoom.isEveryPlayerReady()){
     
-
     // check if players turn
     if (currentRoom?.currentPlayer?.id != socket.id) {
       // send user feedback -> not his turn
@@ -400,11 +399,12 @@ if((previousDiscardCard?.number== "7") && cardnumber!='7'){
       return;
     }
 
-    // declare the top card
+    // declare the top card of drawPile
     let lastDrawCard = currentRoom.drawPile[currentRoom?.drawPile.length - 1];
+    // declare the top card of discardPile
     let lastDiscardCard = currentRoom.discardPile[currentRoom?.discardPile.length - 1]; 
     let handcardLength: number = 0;
-    let handcardMatches = false;
+    let handcardMatches: boolean = false;
     let Wished: boolean = false;
 
     //check if nine was played last and check for wishedColor
@@ -419,18 +419,23 @@ if((previousDiscardCard?.number== "7") && cardnumber!='7'){
 
     // check if any handcard match to the discard card
     for (let i = 0; i < handcardLength; i++) {
+      // nine is in specialCards and the top Card
       if(Wished){
-      if (currentRoom.currentPlayer?.handCards[i].color == currentRoom.choosenColor
-        || (currentRoom.specialCards.includes("nine") && currentRoom.currentPlayer?.handCards[i].number == '9')){
+        // one of the handcards match with a choosen color card
+        if (currentRoom.currentPlayer?.handCards[i].color == currentRoom.choosenColor)
+        {
           handcardMatches = true;
           socket.emit(
             SocketRoom.cardMoveFeedback,
             "Spiele einer deiner Handkarten!"
           );
           return;
-      }
+        }
 
-      }else{
+      }
+      else
+      {
+        // check if any handcard match to the discard card
         if (currentRoom.currentPlayer?.handCards[i].color == lastDiscardCard.color
           || currentRoom.currentPlayer?.handCards[i].number == lastDiscardCard.number
           || (currentRoom.specialCards.includes("nine") && currentRoom.currentPlayer?.handCards[i].number == '9')){
@@ -446,15 +451,15 @@ if((previousDiscardCard?.number== "7") && cardnumber!='7'){
 
     // if handcard matches, then you can and should draw a card
     if (handcardMatches == false){
-            // process cardmove
         // * add draw pile to handcards
         currentRoom.currentPlayer?.handCards.push(lastDrawCard);
     
         // * remove card from draw pile
         currentRoom.drawPile.pop();
-      }
+    }
 
-      this.shuffleDrawingPile(roomId);
+    // check drawPile.length
+    this.shuffleDrawingPile(roomId);
 
     // * set new current player
     const currentIndex = currentRoom.players.findIndex(player => player.id === socket.id);
@@ -465,36 +470,18 @@ if((previousDiscardCard?.number== "7") && cardnumber!='7'){
       || lastDiscardCard?.number == lastDrawCard?.number
       || (lastDrawCard?.number == '9' && currentRoom.specialCards.includes("nine"))) {
 
+        // currentplayer is still on the move 
         const nextPlayer = currentRoom.players[currentIndex];
         currentRoom.currentPlayer = nextPlayer;   
     }
+
     else {
+      // next player is on the move 
       const nextIndex = (currentIndex + 1) % currentRoom.players.length;
       const nextPlayer = currentRoom.players[nextIndex];
       currentRoom.currentPlayer = nextPlayer;
     }
 
-
-    // if (lastDiscardCard?.color != lastDrawCard?.color
-    //   && lastDiscardCard?.number != lastDrawCard?.number
-    //   && lastDrawCard?.number != '9') {
-
-
-    //     (currentRoom.specialCards.includes("nine") && currentRoom.currentPlayer?.handCards[i].number == '9')
-
-    //     const nextIndex = (currentIndex + 1) % currentRoom.players.length;
-    //     const nextPlayer = currentRoom.players[nextIndex];
-    //     currentRoom.currentPlayer = nextPlayer;
-
-    // }
-    // else {
-    //   const nextPlayer = currentRoom.players[currentIndex];
-    //   currentRoom.currentPlayer = nextPlayer;
-    // }
-
-
-    // update for everyone
-  
     this.updateGamedata(currentRoom);
   }
   }
