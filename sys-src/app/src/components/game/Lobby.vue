@@ -9,9 +9,9 @@
       <Ranking :showModal="showModal" @closeModal="toggleModal" :userName="userName"></Ranking>
     </dialog>
 
-    <h2>Create</h2>
+    <h2>Raum erstellen</h2>
 
-    <div>special cards:</div>
+    <div>Spezialkarten:</div>
     <div class="specCards">
       <div class="specCard">
         <CardFront class="card-lobby"
@@ -58,7 +58,7 @@
     <label for="ace">ace</label> -->
     <!-- <br><br> -->
 
-    <div>players:</div>
+    <div>Spieler:</div>
     <input type="radio" id="two" value="2" v-model="maxPlayers" />
     <label for="two">2</label>
     <input type="radio" id="three" value="3" v-model="maxPlayers" />
@@ -67,19 +67,19 @@
     <label for="four">4</label>
 
     <br />
-    <button @click="createRoom()">Create room</button>
+    <button @click="createRoom()">Raum erstellen</button>
 
     <br /><br />
     <!-- <hr> -->
     <br />
 
-    <h2>Open Rooms</h2>
+    <h2>Offene Räume</h2>
     <ul>
       <li v-for="room in props.rooms" :key="room.id">
         <div>Name: {{ room.name }}</div>
-        <div>Special Cards: {{ room.specialCards }}</div>
-        <div>Players: {{ room.currentPlayers }}/{{ room.maxPlayers }}</div>
-        <button @click="joinRoom(room.id)">Join</button>
+        <div>Spezialkarten: {{ room.specialCards }}</div>
+        <div>Spieler: {{ room.currentPlayers }}/{{ room.maxPlayers }}</div>
+        <button @click="joinRoom(room.id)">Raum beitreten</button>
       </li>
     </ul>
   </div>
@@ -128,7 +128,7 @@ function toggleModal() {
   position: absolute;
   inset: 0;
   overflow-y: scroll;
-
+  padding-left: 20px;
   background: url("../../assets/table.jpg");
   background-size: cover;
   color: white;

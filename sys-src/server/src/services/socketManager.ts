@@ -118,7 +118,7 @@ export class SocketManager {
   createRoom(socket: any, userName: string, specialCards: string[], maxPlayers: number) {
     // create and save new room
     const newRoom: Room = new Room(
-      `Room of ${userName}`,
+      `Raum von ${userName}`,
       specialCards,
       maxPlayers
     );
