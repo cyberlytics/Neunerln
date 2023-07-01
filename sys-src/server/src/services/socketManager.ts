@@ -387,7 +387,8 @@ if((previousDiscardCard?.number== "7") && cardnumber!='7'){
       return;
     }
 
-    if(currentRoom.isEveryPlayerReady()){
+
+    
     
     // check if players turn
     if (currentRoom?.currentPlayer?.id != socket.id) {
@@ -448,7 +449,6 @@ if((previousDiscardCard?.number== "7") && cardnumber!='7'){
         }
       }
     }
-
     // if handcard matches, then you can and should draw a card
     if (handcardMatches == false){
         // * add draw pile to handcards
@@ -483,7 +483,7 @@ if((previousDiscardCard?.number== "7") && cardnumber!='7'){
     }
 
     this.updateGamedata(currentRoom);
-  }
+  
   }
 
   joinRoom(socket: any, roomId: string, userName: string) {
