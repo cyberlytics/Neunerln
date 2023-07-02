@@ -44,7 +44,9 @@ import type { PublicGameMetadata } from '../../types/publicGameMetadata';
 import { computed, ref } from 'vue';
 //#endregion imports
 
-const cardBack= '../src/assets/card_back.svg';
+const cardBack= 'https://uc308e5abe654bb56e2ab601d638.previews.dropboxusercontent.com/p/thumb/AB92cKgG_opRKZeEMM8VUafQ24o0byqW1n18LxuHId4s1YX3vROftUXRQhJwlEGFSwijv7pLmB8fwh3ZmZeRWJ7-T8O9MSIqEYidK6-UbIqnDjYNX0aA1ul-Jc6JifzPgEFNpN0voLpVU21N1iKFPPlg_7uy3gZck4fU-WICLKIWYPYG04gQZF4PToz74LIvY81XGw6YKU9hNpDopFz93PJmo4b2rsNKIvMPvGePupczS3OoogqirR8jKPYGhMQ7WvM-Adi5WuTGwNwaF-DQx68KTpCbnoB6JV4aiqCdA8Vcx6yNeSyOkVkeQREOaPICZtSzRPwm8lqScB39BshfV4jTDsYSOACmIEUUTK4bu_xPfpB-BPVuVySUvZGEBUaavj0/p.png';
+
+
 
 
 const props = defineProps({
