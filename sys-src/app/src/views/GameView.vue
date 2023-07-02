@@ -54,8 +54,9 @@ import Cookies from 'js-cookie'
 import { SocketRoom } from '@/types/socketRoom';
 //#endregion imports
 
-const url = 'http://localhost:3000'
-const socket = io(url)
+const url = 'http://35.158.148.247:3000';
+// const url = 'http://localhost:3000';
+const socket = io(url);
 
 const roomData = ref<PublicRoomData[]>();
 const currentRoomId = ref<string>();

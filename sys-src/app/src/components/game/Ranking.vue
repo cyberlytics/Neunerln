@@ -24,7 +24,7 @@ watch(
 
 async function retrieveRankings() {
   try {
-    const res = await axios.get('http://localhost:3000/api/rankings')
+    const res = await axios.get('https://35.158.148.247:3000/api/rankings')
     showErrorOrSuccess.value = true
     errorState.value = 'Rankings erfolgreich erhalten'
     return res.data.ranking
