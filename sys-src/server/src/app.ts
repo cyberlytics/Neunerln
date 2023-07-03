@@ -55,6 +55,13 @@ app.all('*', async () => {
 app.use(errorHandler)
 
 // socket.io requires a http.Server instance
-app = require('http').Server(app)
+// var fs = require('fs');
+// var options = {
+//   key: fs.readFileSync('<.key location>'),
+//   cert: fs.readFileSync('<.cert location>')
+// };
+app = require('http').createServer(app)
+// app = require('http').createServer(app)
+
 
 export { app }

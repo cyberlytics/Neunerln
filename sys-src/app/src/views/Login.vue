@@ -46,7 +46,7 @@ async function signup() {
   }*/
   isloading.value = !isloading.value
   try {
-    const res = await axios.post('http://localhost:3000/api/auth/signup', {
+    const res = await axios.post('https://35.158.148.247:3000/api/auth/signup', {
       username: username.value,
       email: email.value,
       password: password.value
@@ -69,7 +69,7 @@ async function signup() {
 async function login() {
   isloading.value = !isloading.value
   try {
-    const res: any = await axios.post('http://localhost:3000/api/auth/signin', {
+    const res: any = await axios.post('http://35.158.148.247:3000/api/auth/signin', {
       name: name.value,
       password: password.value
     })
